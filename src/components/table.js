@@ -13,8 +13,8 @@ const Table = ({ contacts }) => {
             pageable={true}
             sortable={true}>
             <GridColumn field="name" />
-            <GridColumn field="email" />
-            <GridColumn field="catchPhrase" />
+            <GridColumn className=".column" field="email" />
+            <GridColumn className=".column" field="catchPhrase" />
         </Grid>
     </div>
     );
