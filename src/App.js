@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './css/styles.css';
+import './App.css';
 import Contacts from './components/contacts'
 
 class App extends Component {
@@ -12,9 +13,9 @@ class App extends Component {
     const opts = {
       "token": config.main.token,
       "data": {
-        "name": "Chris Torres",
-        "email": "ctorres@somesite.com",
-        "catchPhrase": "One day, it will just work...",
+        "name": "name",
+        "email": "internetEmail",
+        "catchPhrase": "otherCatchPhrase",
         _repeat: 10
       }
     }
