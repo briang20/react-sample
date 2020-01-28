@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './css/styles.css';
 import './App.css';
 import Contacts from './components/contacts'
+import Table from './components/table'
 
 class App extends Component {
   state = {
@@ -9,6 +10,10 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.queryApi();
+  }
+
+  queryApi() {
     var config = require('./.settings.json');
     const opts = {
       "token": config.main.token,
@@ -33,7 +38,7 @@ class App extends Component {
 
   render() {
     return (
-      <Contacts contacts={this.state.contacts} />
+      <Table contacts={this.state.contacts} />
     );
   }
 }
