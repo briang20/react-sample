@@ -3,8 +3,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { addContact } from "../actions/index";
-// import { process } from '@progress/kendo-data-query';
-// import { Grid, GridColumn } from '@progress/kendo-react-grid';
 
 function mapDispatchToProps(dispatch) {
     return {
