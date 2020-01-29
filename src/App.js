@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import './css/styles.css';
 import './App.css';
-import Contacts from './components/contacts'
-import Table from './components/table'
+import Table from './js/components/table';
 
 class App extends Component {
   state = {
@@ -36,9 +35,16 @@ class App extends Component {
     .catch(console.log)
   }
 
+  // renderHeader() {
+  //   return (
+  //   );
+  // }
+
   render() {
     return (
-      <Table contacts={this.state.contacts} />
+      <div>
+        <Table contacts={this.state.contacts} />
+      </div>
     );
   }
 }

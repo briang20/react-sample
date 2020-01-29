@@ -1,4 +1,4 @@
-// src/components/contacts.js
+// src/js/components/contacts.js
 
 import React from 'react';
 
