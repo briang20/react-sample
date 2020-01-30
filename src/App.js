@@ -1,9 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from "react-redux";
 import './css/styles.css';
 import './App.css';
 import Table, {TableColumn} from './js/components/table';
+import { addContact } from "./js/actions/index";
 
-class App extends Component {
+function mapDispatchToProps(dispatch) {
+  return {
+      addContact: contact => dispatch(addContact(contact))
+  };
+}
+
+class ConnectedApp extends Component {
   componentDidMount() {
     this.queryApi();
   }
@@ -28,8 +36,7 @@ class App extends Component {
     .then((data) => {
       for (let contact in data)
       {
-        console.log(JSON.stringify(data[contact])); // This is temp until I hook this class up
-        //this.props.addContact(data[contact]);
+        this.props.addContact(data[contact]);
       }
     })
     .catch(console.log)
@@ -56,5 +63,10 @@ class App extends Component {
     );
   }
 }
+
+const App = connect(
+  null,
+  mapDispatchToProps
+)(ConnectedApp);
 
 export default App;

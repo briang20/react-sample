@@ -3,12 +3,17 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { addContact } from "../actions/index";
+import { getContactsState } from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
         addContact: contact => dispatch(addContact(contact))
     };
   }
+
+  const mapStateToProps = state => {
+    return { contacts: getContactsState(state) };
+  };
 
 export class TableColumn extends Component {
     constructor(props) {
@@ -23,7 +28,7 @@ export class TableColumn extends Component {
     render() {
         const { title } = this.state;
         return (
-            <h5>{title}</h5> // TODO: set this to the same style as "usa-table th"
+            <div id="table-cell">{title}</div> // TODO: set this to the same style as "usa-table th"
         );
     }
 }
@@ -36,15 +41,39 @@ class ConnectedTable extends Component {
         };
         if (props.title != null) this.state.title = props.title;
     }
+    
+    renderCells(key, data?) {
+        return (
+            <div id="table-cell">
+
+            </div>
+        );
+    }
+    renderRows(columns, data?) {
+        let keys = [];
+        for (let index = 0; index < React.Children.count(columns); ++index)
+        {
+            let key = columns[index].props.field;
+            keys = keys.concat(key);
+        }
+        return (
+            <div id="table-row">
+            </div>
+        );
+    }
+
     render() {
-        const { title } = this.state;
         let colCount = React.Children.count(this.props.children);
         //TODO: render the rows of data using the dynamic columns we have
         return (
             <div>
-                <div className="usa-table">
-                    <caption>{title}</caption>
-                    {this.props.children}
+                <div className="usa-table" id="table-body">
+                    <div id="table-heading">
+                        {this.props.children}
+                    </div>
+                    <div id="table-body">
+                        {this.renderRows(this.props.children, this.props.contacts)}
+                    </div>
                 </div>
                 <p>{colCount} cols</p>
             </div>
@@ -67,7 +96,7 @@ class ConnectedTable extends Component {
 }
 
 const Table = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(ConnectedTable);
 
