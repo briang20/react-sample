@@ -9,7 +9,7 @@ const initialState = {
 function rootReducer(state = initialState, action) {
     if (action.type === ADD_CONTACT) {
         return Object.assign({}, state, {
-            contacts: state.articles.concat(action.payload)
+            contacts: state.contacts.concat(action.payload)
         });
     }
     return state;

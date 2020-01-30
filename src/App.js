@@ -17,29 +17,43 @@ class ConnectedApp extends Component {
   }
 
   queryApi() {
-    var config = require('./.settings.json');
-    const opts = {
-      "token": config.main.token,
-      "data": {
-        "name": "name",
-        "email": "internetEmail",
-        "catchPhrase": "otherCatchPhrase",
-        _repeat: 10
-      }
-    }
-    fetch('https://app.fakejson.com/q', {
-      method: 'post',
-      body: JSON.stringify(opts),
+    fetch('https://jsonplaceholder.typicode.com/users', {
+      method: 'get',
       headers: { 'Content-Type': 'application/json' },
     })
     .then(res => res.json())
     .then((data) => {
       for (let contact in data)
       {
+        console.log(data[contact]);
         this.props.addContact(data[contact]);
       }
     })
     .catch(console.log)
+
+    // var config = require('./.settings.json');
+    // const opts = {
+    //   "token": config.main.token,
+    //   "data": {
+    //     "name": "name",
+    //     "email": "internetEmail",
+    //     "catchPhrase": "otherCatchPhrase",
+    //     _repeat: 10
+    //   }
+    // }
+    // fetch('https://app.fakejson.com/q', {
+    //   method: 'post',
+    //   body: JSON.stringify(opts),
+    //   headers: { 'Content-Type': 'application/json' },
+    // })
+    // .then(res => res.json())
+    // .then((data) => {
+    //   for (let contact in data)
+    //   {
+    //     this.props.addContact(data[contact]);
+    //   }
+    // })
+    // .catch(console.log)
   }
 
   renderHeader() {
@@ -55,9 +69,11 @@ class ConnectedApp extends Component {
       <div>
         {this.renderHeader()}
         <Table title="Contacts">
+          <TableColumn field="id" />
           <TableColumn field="name" />
+          <TableColumn field="username" />
           <TableColumn field="email" />
-          <TableColumn field="catchPhrase" />
+          <TableColumn field="website" />
         </Table>
       </div>
     );

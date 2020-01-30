@@ -61,7 +61,7 @@ class ConnectedTable extends Component {
         return (
             <>
             {Object.keys(data).map((item) => {
-                return (<div id="table-row">{this.renderCells(keys,item)}</div>);
+                return (<div id="table-row">{this.renderCells(keys,data[item])}</div>);
             })}
             </>
         );
@@ -81,6 +81,7 @@ class ConnectedTable extends Component {
                     </div>
                 </div>
                 <p>{colCount} cols</p>
+                <p>{this.props.contacts.length} records</p>
             </div>
         );
     }
