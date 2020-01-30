@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import './css/styles.css';
+import './css/theme.scss';
 import './App.css';
 import Table, {TableColumn} from './js/components/table';
 import { addContact } from "./js/actions/index";

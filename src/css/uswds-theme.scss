@@ -1,0 +1,26 @@
+$theme-font-path: "../../../fonts/";
+$theme-image-path: "../../../img";
+$theme-font-type-lang: 'public-sans';
+
+$site-primary-family:   'blue-warm';
+$site-primary:          '#{$site-primary-family}-50';
+$site-primary-dark:     '#{$site-primary-family}-70';
+$site-primary-darker:   '#{$site-primary-family}-80';
+$site-primary-vivid:    '#{$site-primary-family}-50v';
+$site-ink:              'black-transparent-80';
+$site-border-width:     1px;
+
+$site-base-transparent-light: 'black-transparent-10';
+$height-nav-secondary: 6;
+$z-nav-secondary: 100;
+
+$theme-font-weight-medium: 500 !default;
+$theme-font-weight-semibold: 600 !default;
+
+@import "~uswds/dist/scss/theme/uswds-theme-spacing";
+@import "~uswds/dist/scss/theme/uswds-theme-color";
+@import '~uswds/dist/scss/packages/required';
+@import '~uswds/dist/scss/packages/global';
+@import '~uswds/dist/scss/packages/typography';
+@import '~uswds/dist/scss/packages/layout-grid';
+@import '~uswds/dist/scss/packages/uswds-utilities';
