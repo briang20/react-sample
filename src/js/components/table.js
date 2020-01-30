@@ -37,18 +37,16 @@ class ConnectedTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: "",
-            editible: false
+            title: ""
         };
         if (props.title != null) this.state.title = props.title;
-        if (props.editible != null) this.state.editible = props.editible;
     }
     
     renderCells(keys, data?) {
         return (
             <>
                 {Object.keys(keys).map((key) => {
-                    return (<div key={"cell" + key.toString()} id="table-cell" contentEditable={this.state.editible}>{data[keys[key]]}</div>);
+                    return (<div id="table-cell">{data[keys[key]]}</div>);
                 })}
             </>
         );
@@ -63,7 +61,7 @@ class ConnectedTable extends Component {
         return (
             <>
             {Object.keys(data).map((item) => {
-                return (<div key={"row" + item.toString()} id="table-row">{this.renderCells(keys,data[item])}</div>);
+                return (<div id="table-row">{this.renderCells(keys,data[item])}</div>);
             })}
             </>
         );
@@ -87,6 +85,20 @@ class ConnectedTable extends Component {
             </div>
         );
     }
+
+    // return (
+    // <div className="usa-table">
+    //     <Grid 
+    //         data={contacts}
+    //         pageable={true}
+    //         sortable={true}
+    //         className=".column">
+    //         <GridColumn field="name" />
+    //         <GridColumn className=".column" field="email" />
+    //         <GridColumn className=".column" field="catchPhrase" />
+    //     </Grid>
+    // </div>
+    // );
 }
 
 const Table = connect(
