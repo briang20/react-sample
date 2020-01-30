@@ -17,11 +17,13 @@ function rootReducer(state = initialState, action) {
             contacts: state.contacts.filter(contact => contact !== action.payload)
         });
     }
-    // if (action.type === MODIFY_CONTACT) {
-    //     return Object.assign({}, state, {
-    //         contacts: state.contacts.concat(action.payload)
-    //     });
-    // }
+    if (action.type === MODIFY_CONTACT) {
+        return Object.assign({}, state, {
+            contacts: state.contacts.map( obj => {
+                return obj === action.payload ? action.payload : obj;
+            })
+        });
+    }
 
     return state;
 };

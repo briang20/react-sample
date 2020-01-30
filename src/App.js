@@ -74,7 +74,7 @@ class ConnectedApp extends Component {
           <TableColumn field="username" />
           <TableColumn field="email" />
           <TableColumn field="website" />
-          <TableColumn field="select" />
+          <TableColumn field="select" type="checkbox" />
         </Table>
       </div>
     );

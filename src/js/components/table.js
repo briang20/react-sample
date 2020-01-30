@@ -2,12 +2,14 @@
 
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import { addContact } from "../actions/index";
+import { addContact, removeContact, modifyContact } from "../actions/index";
 import { getContactsState } from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: contact => dispatch(addContact(contact))
+        addContact: contact => dispatch(addContact(contact)),
+        removeContact: contact => dispatch(removeContact(contact)),
+        modifyContact: contact => dispatch(modifyContact(contact))
     };
   }
 
@@ -38,21 +40,42 @@ class ConnectedTable extends Component {
         super(props);
         this.state = {
             title: "",
-            editible: false
+            editible: false,
+            type: "text"
         };
         if (props.title != null) this.state.title = props.title;
         if (props.editible != null) this.state.editible = props.editible;
+        if (props.type != null) this.state.type = props.type;
+    }
+
+    handleOnClick(event) {
+        const target = event.target;
+        target.contentEditable = true;
+    }
+
+    handleFocusOut(event, key, data) {
+        const target = event.target;
+        target.contentEditable = false;
+        data[key] = target.textContent;
+        this.props.modifyContact(data);
     }
     
     renderCells(keys, data?) {
         return (
             <>
                 {Object.keys(keys).map((key) => {
-                    return (<div key={"cell" + key.toString()} id="table-cell" contentEditable={this.state.editible}>{data[keys[key]]}</div>);
+                    return (<div key={key.toString()} 
+                        id="table-cell" 
+                        contentEditable={this.state.editible} 
+                        onClick={this.handleOnClick}
+                        onBlur={(event) => this.handleFocusOut(event, keys[key], data)}>
+                            {data[keys[key]]}
+                        </div>);
                 })}
             </>
         );
     }
+
     renderRows(columns, data?) {
         let keys = [];
         for (let index = 0; index < React.Children.count(columns); ++index)
@@ -63,7 +86,7 @@ class ConnectedTable extends Component {
         return (
             <>
             {Object.keys(data).map((item) => {
-                return (<div key={"row" + item.toString()} id="table-row">{this.renderCells(keys,data[item])}</div>);
+                return (<div key={item.toString()} id="table-row">{this.renderCells(keys, data[item])}</div>);
             })}
             </>
         );

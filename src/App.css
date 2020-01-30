@@ -19,7 +19,8 @@
 
 .usa-table {
   display: table;
-	width: 100%;
+  width: 100%;
+  float: left;
 }
 
 .usa-table #table-heading {
@@ -38,12 +39,12 @@
 .usa-table #table-cell {
   border: 1px solid #999999;
 	display: table-cell;
-	padding: 3px 10px;
+  padding: 3px 10px;
 }
 
 /* On screens that are 992px wide or less, go from four columns to two columns */
 @media screen and (max-width: 992px) {
-  .k-grid-header-wrap {
+  #table-heading {
     flex: 50%;
   }
 }
