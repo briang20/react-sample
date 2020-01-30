@@ -22,33 +22,32 @@ export class TableColumn extends Component {
     }
     render() {
         const { title } = this.state;
-
         return (
-            <h3>{title}</h3>
+            <h5>{title}</h5> // TODO: set this to the same style as "usa-table th"
         );
     }
 }
 
 class ConnectedTable extends Component {
-    // state = {
-    //     data: [],
-    //     sortable: false
-    // }
     constructor(props) {
         super(props);
         this.state = {
             title: ""
         };
+        if (props.title != null) this.state.title = props.title;
     }
     render() {
         const { title } = this.state;
         let colCount = React.Children.count(this.props.children);
+        //TODO: render the rows of data using the dynamic columns we have
         return (
-        <div className="usa-table">
-            <h2>{title}</h2>
-            {this.props.children}
-            <p>{colCount} cols</p>
-        </div>
+            <div>
+                <div className="usa-table">
+                    <caption>{title}</caption>
+                    {this.props.children}
+                </div>
+                <p>{colCount} cols</p>
+            </div>
         );
     }
 

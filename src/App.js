@@ -28,7 +28,7 @@ class App extends Component {
     .then((data) => {
       for (let contact in data)
       {
-        console.log(JSON.stringify(data[contact]));
+        console.log(JSON.stringify(data[contact])); // This is temp until I hook this class up
         //this.props.addContact(data[contact]);
       }
     })
@@ -47,7 +47,7 @@ class App extends Component {
     return (
       <div>
         {this.renderHeader()}
-        <Table>
+        <Table title="Contacts">
           <TableColumn field="name" />
           <TableColumn field="email" />
           <TableColumn field="catchPhrase" />
