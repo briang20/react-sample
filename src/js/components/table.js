@@ -10,18 +10,21 @@ function mapDispatchToProps(dispatch) {
     };
   }
 
-class TableColumn extends Component {
+export class TableColumn extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: ""
+            title: "",
+            field: ""
         };
+        if (props.field != null) this.state.title = this.state.field = props.field;
+        if (props.title != null) this.state.title = props.title;
     }
     render() {
+        const { title } = this.state;
+
         return (
-        <div className="usa-table">
-            <h3>{this.state.label}</h3>
-        </div>
+            <h3>{title}</h3>
         );
     }
 }
@@ -39,12 +42,29 @@ class ConnectedTable extends Component {
     }
     render() {
         const { title } = this.state;
+        let colCount = React.Children.count(this.props.children);
         return (
         <div className="usa-table">
             <h2>{title}</h2>
+            {this.props.children}
+            <p>{colCount} cols</p>
         </div>
         );
     }
+
+    // return (
+    // <div className="usa-table">
+    //     <Grid 
+    //         data={contacts}
+    //         pageable={true}
+    //         sortable={true}
+    //         className=".column">
+    //         <GridColumn field="name" />
+    //         <GridColumn className=".column" field="email" />
+    //         <GridColumn className=".column" field="catchPhrase" />
+    //     </Grid>
+    // </div>
+    // );
 }
 
 const Table = connect(

@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import './css/styles.css';
 import './App.css';
-import Table from './js/components/table';
+import Table, {TableColumn} from './js/components/table';
 
 class App extends Component {
-  state = {
-    contacts: []
-  }
-
   componentDidMount() {
     this.queryApi();
   }
@@ -30,20 +26,32 @@ class App extends Component {
     })
     .then(res => res.json())
     .then((data) => {
-      this.setState({contacts: data})
+      for (let contact in data)
+      {
+        console.log(JSON.stringify(data[contact]));
+        //this.props.addContact(data[contact]);
+      }
     })
     .catch(console.log)
   }
 
-  // renderHeader() {
-  //   return (
-  //   );
-  // }
+  renderHeader() {
+    return (
+      <div className="usa-header">
+        <h1>Some page header here</h1>
+      </div>
+    );
+  }
 
   render() {
     return (
       <div>
-        <Table contacts={this.state.contacts} />
+        {this.renderHeader()}
+        <Table>
+          <TableColumn field="name" />
+          <TableColumn field="email" />
+          <TableColumn field="catchPhrase" />
+        </Table>
       </div>
     );
   }
