@@ -42,11 +42,13 @@ class ConnectedTable extends Component {
         if (props.title != null) this.state.title = props.title;
     }
     
-    renderCells(key, data?) {
+    renderCells(keys, data?) {
         return (
-            <div id="table-cell">
-
-            </div>
+            <>
+                {Object.keys(keys).map((key) => {
+                    return (<div id="table-cell">{data[keys[key]]}</div>);
+                })}
+            </>
         );
     }
     renderRows(columns, data?) {
@@ -57,8 +59,11 @@ class ConnectedTable extends Component {
             keys = keys.concat(key);
         }
         return (
-            <div id="table-row">
-            </div>
+            <>
+            {Object.keys(data).map((item) => {
+                return (<div id="table-row">{this.renderCells(keys,item)}</div>);
+            })}
+            </>
         );
     }
 

@@ -45,7 +45,7 @@ class ConnectedApp extends Component {
   renderHeader() {
     return (
       <div className="usa-header">
-        <h1>Some page header here</h1>
+        <h2>Contacts Page</h2>
       </div>
     );
   }
