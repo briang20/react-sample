@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
-import './css/theme.scss';
+import './css/uswds-theme.scss';
 import './App.css';
 import Table, {TableColumn} from './js/components/table';
 import { addContact } from "./js/actions/index";
@@ -68,12 +68,13 @@ class ConnectedApp extends Component {
     return (
       <div>
         {this.renderHeader()}
-        <Table title="Contacts">
+        <Table title="Contacts" editible="false">
           <TableColumn field="id" />
           <TableColumn field="name" />
           <TableColumn field="username" />
           <TableColumn field="email" />
           <TableColumn field="website" />
+          <TableColumn field="select" />
         </Table>
       </div>
     );
