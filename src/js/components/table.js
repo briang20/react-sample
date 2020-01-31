@@ -22,16 +22,45 @@ export class TableColumn extends Component {
         super(props);
         this.state = {
             title: "",
-            field: ""
+            field: "",
+            type: "text"
         };
         if (props.field != null) this.state.title = this.state.field = props.field;
         if (props.title != null) this.state.title = props.title;
+        if (props.type != null) this.state.type = props.type;
     }
+    toggleCheckbox(event) {
+        const target = event.target;
+        var state = target.getAttribute('aria-checked').toLowerCase()
+
+        if (event.type === 'click' || 
+            (event.type === 'keydown' && event.keyCode === 32)) 
+        {
+            if (state === 'true') {
+                target.setAttribute('aria-checked', 'false');
+            } else {
+                target.setAttribute('aria-checked', 'true');
+            }
+
+            //TODO: prop this to all of the rows
+
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+    
     render() {
-        const { title } = this.state;
-        return (
-            <div id="table-cell">{title}</div> // TODO: set this to the same style as "usa-table th"
-        );
+        const { title, type } = this.state;
+        if (type === "checkbox") {
+            return (
+                <div id="table-cell" role="checkbox" onClick={this.toggleCheckbox} aria-checked="false" aria-labelledby="foo" tabindex="0">
+                </div>//TODO: add a image to this div to show either a empty box or checked box
+            );
+        } else {
+            return (
+                <div id="table-cell">{title}</div> // TODO: set this to the same style as "usa-table th"
+            );
+        }
     }
 }
 
@@ -40,12 +69,10 @@ class ConnectedTable extends Component {
         super(props);
         this.state = {
             title: "",
-            editible: false,
-            type: "text"
+            editible: false
         };
         if (props.title != null) this.state.title = props.title;
         if (props.editible != null) this.state.editible = props.editible;
-        if (props.type != null) this.state.type = props.type;
     }
 
     handleOnClick(event) {
