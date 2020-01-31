@@ -87,7 +87,7 @@ class ConnectedTable extends Component {
         this.props.modifyContact(data);
     }
     
-    renderCells(keys, data?) {
+    renderCells(keys, data) {
         return (
             <>
                 {Object.keys(keys).map((key) => {
@@ -103,7 +103,7 @@ class ConnectedTable extends Component {
         );
     }
 
-    renderRows(columns, data?) {
+    renderRows(columns, data) {
         let keys = [];
         for (let index = 0; index < React.Children.count(columns); ++index)
         {
