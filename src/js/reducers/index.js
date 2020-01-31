@@ -20,7 +20,7 @@ function rootReducer(state = initialState, action) {
     if (action.type === MODIFY_CONTACT) {
         return Object.assign({}, state, {
             contacts: state.contacts.map(obj => {
-                if (obj === action.payload)
+                if (obj === action.oldPayload)
                     return action.payload;
                 return obj;
             })

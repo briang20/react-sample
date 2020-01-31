@@ -19,8 +19,8 @@ const mapStateToProps = state => {
 
 function toggleCheckbox(event) {
     const target = event.currentTarget;
-    var state = target.getAttribute('aria-checked');
-    var image = target.getElementsByTagName('img')[0]; // Get the img to change the look
+    const state = target.getAttribute('aria-checked');
+    const image = target.getElementsByTagName('img')[0]; // Get the img to change the look
 
     if (event.type === 'click' ||
         (event.type === 'keydown' && event.keyCode === 32)) {
@@ -90,9 +90,10 @@ class ConnectedTable extends Component {
 
     handleFocusOut(event, key, data) {
         const target = event.target;
+        let newData = Object.assign({}, data);
         target.contentEditable = false;
-        data[key] = target.textContent;
-        this.props.modifyContact(data);
+        newData[key] = target.textContent;
+        this.props.modifyContact(data, newData);
     }
 
     // This function is here to render a single cell of a row

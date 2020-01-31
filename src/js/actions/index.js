@@ -10,6 +10,6 @@ export function removeContact(payload) {
     return {type: REMOVE_CONTACT, payload}
 }
 
-export function modifyContact(payload) {
-    return {type: MODIFY_CONTACT, payload}
+export function modifyContact(oldPayload, payload) {
+    return {type: MODIFY_CONTACT, oldPayload, payload}
 }
