@@ -69,12 +69,12 @@ class ConnectedApp extends Component {
       <div>
         {this.renderHeader()}
         <Table title="Contacts" editible="false">
-          <TableColumn field="id" />
-          <TableColumn field="name" />
-          <TableColumn field="username" />
-          <TableColumn field="email" />
-          <TableColumn field="website" />
-          <TableColumn field="select" type="checkbox" />
+          <TableColumn field="id" title="User ID" />
+          <TableColumn field="name" title="Name" />
+          <TableColumn field="username" title="Username" />
+          <TableColumn field="email" title="Email" />
+          <TableColumn field="website" title="URL" />
+          <TableColumn title="Select" type="checkbox" />
         </Table>
       </div>
     );

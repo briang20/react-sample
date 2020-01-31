@@ -30,19 +30,22 @@ export class TableColumn extends Component {
         if (props.type != null) this.state.type = props.type;
     }
     toggleCheckbox(event) {
-        const target = event.target;
-        var state = target.getAttribute('aria-checked').toLowerCase()
+        const target = event.currentTarget;
+        var state = target.getAttribute('aria-checked');
+        var image = target.getElementsByTagName('img')[0]; // Get the img to change the look
 
         if (event.type === 'click' || 
             (event.type === 'keydown' && event.keyCode === 32)) 
         {
-            if (state === 'true') {
+            if (state.toLowerCase() === 'true') {
                 target.setAttribute('aria-checked', 'false');
+                image.src = './images/checkbox-unchecked-black.png'
             } else {
                 target.setAttribute('aria-checked', 'true');
+                image.src = './images/checkbox-checked-black.png'
             }
 
-            //TODO: prop this to all of the rows
+            //TODO: propagate this to all of the rows
 
             event.preventDefault();
             event.stopPropagation();
@@ -53,7 +56,14 @@ export class TableColumn extends Component {
         const { title, type } = this.state;
         if (type === "checkbox") {
             return (
-                <div id="table-cell" role="checkbox" onClick={this.toggleCheckbox} aria-checked="false" aria-labelledby="table-header" tabindex="0">
+                <div id="table-cell" role="checkbox" 
+                    aria-checked="false" 
+                    aria-labelledby="table-header" 
+                    tabindex="0"
+                    onClick={this.toggleCheckbox} 
+                    onKeyDown={this.handleOnClick} >
+                    {title + " "}
+                    <img src="./images/checkbox-unchecked-black.png" alt="" />
                 </div>//TODO: add a image to this div to show either a empty box or checked box
             );
         } else {
