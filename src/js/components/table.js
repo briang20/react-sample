@@ -54,19 +54,19 @@ export class TableColumn extends Component {
         const {title, type} = this.state;
         if (type === "checkbox") {
             return (
-                <div id="table-cell" role="checkbox"
-                     aria-checked="false"
-                     aria-labelledby="table-header"
-                     tabindex="0"
+                <div id={"table-cell"} role={"checkbox"}
+                     aria-checked={"false"}
+                     aria-labelledby={"table-header"}
+                     tabindex={"0"}
                      onClick={toggleCheckbox}
                      onKeyDown={this.handleOnClick}>
                     {title + " "}
-                    <img src="./images/checkbox-unchecked-black.png" alt=""/>
+                    <img src={"./images/checkbox-unchecked-black.png"} alt={""}/>
                 </div>
             );
         } else {
             return (
-                <div id="table-cell">{title}</div> //TODO: set this to the same style as "usa-table th"
+                <div id={"table-cell"}>{title}</div> //TODO: set this to the same style as "usa-table th"
             );
         }
     }
@@ -105,18 +105,19 @@ class ConnectedTable extends Component {
                     let key = keys[keyIdx];
                     if (key.type === "checkbox") {
                         return (<div key={keyIdx.toString()}
-                                     id="table-cell"
-                                     role="checkbox"
-                                     aria-checked="false"
-                                     aria-labelledby="table-header"
-                                     tabindex="0"
+                                     name={"selected"}
+                                     id={"table-cell"}
+                                     role={"checkbox"}
+                                     aria-checked={"false"}
+                                     aria-labelledby={"table-header"}
+                                     tabindex={"0"}
                                      onClick={toggleCheckbox}
                                      onKeyDown={this.handleOnClick}>
-                            <img src="./images/checkbox-unchecked-black.png" alt=""/>
+                            <img src={"./images/checkbox-unchecked-black.png"} alt={""}/>
                         </div>);
                     } else {
                         return (<div key={key.field.toString()}
-                                     id="table-cell"
+                                     id={"table-cell"}
                                      contentEditable={this.state.editable}
                                      onClick={this.handleOnClick}
                                      onBlur={(event) => this.handleFocusOut(event, key.field, data)}>
@@ -137,7 +138,7 @@ class ConnectedTable extends Component {
         return (
             <>
                 {Object.keys(data).map((item) => {
-                    return (<div key={item.toString()} id="table-row">{this.renderCells(keys, data[item])}</div>);
+                    return (<div key={item.toString()} id={"table-row"}>{this.renderCells(keys, data[item])}</div>);
                 })}
             </>
         );
@@ -146,11 +147,11 @@ class ConnectedTable extends Component {
     render() {
         return (
             <div>
-                <div className="usa-table" id="table-body">
-                    <div id="table-heading">
+                <div className={"usa-table"} id={"table-body"}>
+                    <div id={"table-heading"}>
                         {this.props.children}
                     </div>
-                    <div id="table-body">
+                    <div id={"table-body"}>
                         {this.renderRows(this.props.children, this.props.contacts)}
                     </div>
                 </div>
