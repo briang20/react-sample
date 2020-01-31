@@ -25,7 +25,6 @@ class ConnectedApp extends Component {
     .then((data) => {
       for (let contact in data)
       {
-        console.log(data[contact]);
         this.props.addContact(data[contact]);
       }
     })
@@ -68,7 +67,7 @@ class ConnectedApp extends Component {
     return (
       <div>
         {this.renderHeader()}
-        <Table title="Contacts" editible="false">
+        <Table title="Contacts" editable="false">
           <TableColumn field="id" title="User ID" />
           <TableColumn field="name" title="Name" />
           <TableColumn field="username" title="Username" />

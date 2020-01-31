@@ -9,13 +9,34 @@ function mapDispatchToProps(dispatch) {
     return {
         addContact: contact => dispatch(addContact(contact)),
         removeContact: contact => dispatch(removeContact(contact)),
-        modifyContact: contact => dispatch(modifyContact(contact))
+        modifyContact: (contact, newContact) => dispatch(modifyContact(contact, newContact))
     };
-  }
+}
 
-  const mapStateToProps = state => {
+const mapStateToProps = state => {
     return { contacts: getContactsState(state) };
-  };
+};
+
+function toggleCheckbox(event) {
+    const target = event.currentTarget;
+    var state = target.getAttribute('aria-checked');
+    var image = target.getElementsByTagName('img')[0]; // Get the img to change the look
+
+    if (event.type === 'click' ||
+        (event.type === 'keydown' && event.keyCode === 32))
+    {
+        if (state.toLowerCase() === 'true') {
+            target.setAttribute('aria-checked', 'false');
+            image.src = './images/checkbox-unchecked-black.png';
+        } else {
+            target.setAttribute('aria-checked', 'true');
+            image.src = './images/checkbox-checked-black.png';
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+    }
+}
 
 export class TableColumn extends Component {
     constructor(props) {
@@ -29,28 +50,6 @@ export class TableColumn extends Component {
         if (props.title != null) this.state.title = props.title;
         if (props.type != null) this.state.type = props.type;
     }
-    toggleCheckbox(event) {
-        const target = event.currentTarget;
-        var state = target.getAttribute('aria-checked');
-        var image = target.getElementsByTagName('img')[0]; // Get the img to change the look
-
-        if (event.type === 'click' || 
-            (event.type === 'keydown' && event.keyCode === 32)) 
-        {
-            if (state.toLowerCase() === 'true') {
-                target.setAttribute('aria-checked', 'false');
-                image.src = './images/checkbox-unchecked-black.png'
-            } else {
-                target.setAttribute('aria-checked', 'true');
-                image.src = './images/checkbox-checked-black.png'
-            }
-
-            //TODO: propagate this to all of the rows
-
-            event.preventDefault();
-            event.stopPropagation();
-        }
-    }
     
     render() {
         const { title, type } = this.state;
@@ -60,15 +59,15 @@ export class TableColumn extends Component {
                     aria-checked="false" 
                     aria-labelledby="table-header" 
                     tabindex="0"
-                    onClick={this.toggleCheckbox} 
+                    onClick={toggleCheckbox}
                     onKeyDown={this.handleOnClick} >
                     {title + " "}
                     <img src="./images/checkbox-unchecked-black.png" alt="" />
-                </div>//TODO: add a image to this div to show either a empty box or checked box
+                </div>
             );
         } else {
             return (
-                <div id="table-cell">{title}</div> // TODO: set this to the same style as "usa-table th"
+                <div id="table-cell">{title}</div> //TODO: set this to the same style as "usa-table th"
             );
         }
     }
@@ -79,10 +78,10 @@ class ConnectedTable extends Component {
         super(props);
         this.state = {
             title: "",
-            editible: false
+            editable: false
         };
         if (props.title != null) this.state.title = props.title;
-        if (props.editible != null) this.state.editible = props.editible;
+        if (props.editable != null) this.state.editable = props.editable;
     }
 
     handleOnClick(event) {
@@ -96,29 +95,46 @@ class ConnectedTable extends Component {
         data[key] = target.textContent;
         this.props.modifyContact(data);
     }
-    
+
+    // This function is here to render a single cell of a row
     renderCells(keys, data) {
+        //TODO: May want to think about merging this and renderRows together
         return (
             <>
-                {Object.keys(keys).map((key) => {
-                    return (<div key={key.toString()} 
-                        id="table-cell" 
-                        contentEditable={this.state.editible} 
-                        onClick={this.handleOnClick}
-                        onBlur={(event) => this.handleFocusOut(event, keys[key], data)}>
-                            {data[keys[key]]}
+                {Object.keys(keys).map((keyIdx) => {
+                    let key = keys[keyIdx];
+                    if (key.type === "checkbox")
+                    {
+                        return (<div key={keyIdx.toString()}
+                                     id="table-cell"
+                                     role="checkbox"
+                                     aria-checked="false"
+                                     aria-labelledby="table-header"
+                                     tabindex="0"
+                                     onClick={toggleCheckbox}
+                                     onKeyDown={this.handleOnClick} >
+                                    <img src="./images/checkbox-unchecked-black.png" alt="" />
+                                </div>);
+                    } else {
+                        return (<div key={key.field.toString()}
+                                     id="table-cell"
+                                     contentEditable={this.state.editable}
+                                     onClick={this.handleOnClick}
+                                     onBlur={(event) => this.handleFocusOut(event, key.field, data)}>
+                            {data[key.field]}
                         </div>);
+                    }
                 })}
             </>
         );
     }
 
+    // This function renders a single row of data.
     renderRows(columns, data) {
         let keys = [];
         for (let index = 0; index < React.Children.count(columns); ++index)
         {
-            let key = columns[index].props.field;
-            keys = keys.concat(key);
+            keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
         return (
             <>
@@ -130,8 +146,6 @@ class ConnectedTable extends Component {
     }
 
     render() {
-        let colCount = React.Children.count(this.props.children);
-        //TODO: render the rows of data using the dynamic columns we have
         return (
             <div>
                 <div className="usa-table" id="table-body">
@@ -142,10 +156,22 @@ class ConnectedTable extends Component {
                         {this.renderRows(this.props.children, this.props.contacts)}
                     </div>
                 </div>
-                <p>{colCount} cols</p>
-                <p>{this.props.contacts.length} records</p>
+                <p className={"usa-footer"} >{this.props.contacts.length} records</p>
+                <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
+                <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
             </div>
         );
+    }
+
+    handleDeleteRows() {
+        //TODO: get the selected rows and pass them here.
+        //TODO: maybe prompt for confirmation of the delete action?
+        //this.props.removeContact({});
+    }
+
+    handleAddRow() {
+        //TODO: figure out how we want to actually allow the user to edit the new row before adding a new record
+        //this.props.addContact({});
     }
 }
 
