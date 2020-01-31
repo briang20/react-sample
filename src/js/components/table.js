@@ -53,7 +53,7 @@ export class TableColumn extends Component {
         const { title, type } = this.state;
         if (type === "checkbox") {
             return (
-                <div id="table-cell" role="checkbox" onClick={this.toggleCheckbox} aria-checked="false" aria-labelledby="foo" tabindex="0">
+                <div id="table-cell" role="checkbox" onClick={this.toggleCheckbox} aria-checked="false" aria-labelledby="table-header" tabindex="0">
                 </div>//TODO: add a image to this div to show either a empty box or checked box
             );
         } else {
