@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Provider } from "react-redux";
+import {Provider} from "react-redux";
 import store from "./js/storage/index";
 import './index.css';
 import App from './App';
@@ -8,8 +8,8 @@ import * as serviceWorker from './serviceWorker';
 
 ReactDOM.render(
     <Provider store={store}>
-        <App />
-    </Provider>, 
+        <App/>
+    </Provider>,
     document.getElementById('root')
 );
 

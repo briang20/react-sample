@@ -1,88 +1,87 @@
-import React, { Component } from 'react';
-import { connect } from "react-redux";
+import React, {Component} from 'react';
+import {connect} from "react-redux";
 import './css/uswds-theme.scss';
 import './App.css';
 import Table, {TableColumn} from './js/components/table';
-import { addContact } from "./js/actions/index";
+import {addContact} from "./js/actions/index";
 
 function mapDispatchToProps(dispatch) {
-  return {
-      addContact: contact => dispatch(addContact(contact))
-  };
+    return {
+        addContact: contact => dispatch(addContact(contact))
+    };
 }
 
 class ConnectedApp extends Component {
-  componentDidMount() {
-    this.queryApi();
-  }
+    componentDidMount() {
+        this.queryApi();
+    }
 
-  queryApi() {
-    fetch('https://jsonplaceholder.typicode.com/users', {
-      method: 'get',
-      headers: { 'Content-Type': 'application/json' },
-    })
-    .then(res => res.json())
-    .then((data) => {
-      for (let contact in data)
-      {
-        this.props.addContact(data[contact]);
-      }
-    })
-    .catch(console.log)
+    queryApi() {
+        fetch('https://jsonplaceholder.typicode.com/users', {
+            method: 'get',
+            headers: {'Content-Type': 'application/json'},
+        })
+            .then(res => res.json())
+            .then((data) => {
+                for (let contact in data) {
+                    this.props.addContact(data[contact]);
+                }
+            })
+            .catch(console.log)
 
-    // var config = require('./.settings.json');
-    // const opts = {
-    //   "token": config.main.token,
-    //   "data": {
-    //     "name": "name",
-    //     "email": "internetEmail",
-    //     "catchPhrase": "otherCatchPhrase",
-    //     _repeat: 10
-    //   }
-    // }
-    // fetch('https://app.fakejson.com/q', {
-    //   method: 'post',
-    //   body: JSON.stringify(opts),
-    //   headers: { 'Content-Type': 'application/json' },
-    // })
-    // .then(res => res.json())
-    // .then((data) => {
-    //   for (let contact in data)
-    //   {
-    //     this.props.addContact(data[contact]);
-    //   }
-    // })
-    // .catch(console.log)
-  }
+        // var config = require('./.settings.json');
+        // const opts = {
+        //   "token": config.main.token,
+        //   "data": {
+        //     "name": "name",
+        //     "email": "internetEmail",
+        //     "catchPhrase": "otherCatchPhrase",
+        //     _repeat: 10
+        //   }
+        // }
+        // fetch('https://app.fakejson.com/q', {
+        //   method: 'post',
+        //   body: JSON.stringify(opts),
+        //   headers: { 'Content-Type': 'application/json' },
+        // })
+        // .then(res => res.json())
+        // .then((data) => {
+        //   for (let contact in data)
+        //   {
+        //     this.props.addContact(data[contact]);
+        //   }
+        // })
+        // .catch(console.log)
+    }
 
-  renderHeader() {
-    return (
-      <div className="usa-header">
-        <h2>Contacts Page</h2>
-      </div>
-    );
-  }
+    renderHeader() {
+        return (
+            <div className="usa-header">
+                <h2>Contacts Page</h2>
+            </div>
+        );
+    }
 
-  render() {
-    return (
-      <div>
-        {this.renderHeader()}
-        <Table title="Contacts" editable="false">
-          <TableColumn field="id" title="User ID" />
-          <TableColumn field="name" title="Name" />
-          <TableColumn field="username" title="Username" />
-          <TableColumn field="email" title="Email" />
-          <TableColumn field="website" title="URL" />
-          <TableColumn title="Select" type="checkbox" />
-        </Table>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div>
+                {this.renderHeader()}
+                <Table title="Contacts" editable="false">
+                    <TableColumn field="id" title="User ID"/>
+                    <TableColumn field="name" title="Name"/>
+                    <TableColumn field="username" title="Username"/>
+                    <TableColumn field="email" title="Email"/>
+                    <TableColumn field="website" title="URL"/>
+                    <TableColumn title="Select" type="checkbox"/>
+                </Table>
+            </div>
+        );
+    }
 }
 
 const App = connect(
-  null,
-  mapDispatchToProps
+    null,
+    mapDispatchToProps
 )(ConnectedApp);
 
 export default App;

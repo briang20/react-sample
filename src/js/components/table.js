@@ -1,9 +1,9 @@
 // src/js/components/table.js
 
-import React, { Component } from 'react';
-import { connect } from "react-redux";
-import { addContact, removeContact, modifyContact } from "../actions/index";
-import { getContactsState } from "../selectors/index";
+import React, {Component} from 'react';
+import {connect} from "react-redux";
+import {addContact, removeContact, modifyContact} from "../actions/index";
+import {getContactsState} from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -14,7 +14,7 @@ function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = state => {
-    return { contacts: getContactsState(state) };
+    return {contacts: getContactsState(state)};
 };
 
 function toggleCheckbox(event) {
@@ -23,8 +23,7 @@ function toggleCheckbox(event) {
     var image = target.getElementsByTagName('img')[0]; // Get the img to change the look
 
     if (event.type === 'click' ||
-        (event.type === 'keydown' && event.keyCode === 32))
-    {
+        (event.type === 'keydown' && event.keyCode === 32)) {
         if (state.toLowerCase() === 'true') {
             target.setAttribute('aria-checked', 'false');
             image.src = './images/checkbox-unchecked-black.png';
@@ -50,19 +49,19 @@ export class TableColumn extends Component {
         if (props.title != null) this.state.title = props.title;
         if (props.type != null) this.state.type = props.type;
     }
-    
+
     render() {
-        const { title, type } = this.state;
+        const {title, type} = this.state;
         if (type === "checkbox") {
             return (
-                <div id="table-cell" role="checkbox" 
-                    aria-checked="false" 
-                    aria-labelledby="table-header" 
-                    tabindex="0"
-                    onClick={toggleCheckbox}
-                    onKeyDown={this.handleOnClick} >
+                <div id="table-cell" role="checkbox"
+                     aria-checked="false"
+                     aria-labelledby="table-header"
+                     tabindex="0"
+                     onClick={toggleCheckbox}
+                     onKeyDown={this.handleOnClick}>
                     {title + " "}
-                    <img src="./images/checkbox-unchecked-black.png" alt="" />
+                    <img src="./images/checkbox-unchecked-black.png" alt=""/>
                 </div>
             );
         } else {
@@ -103,8 +102,7 @@ class ConnectedTable extends Component {
             <>
                 {Object.keys(keys).map((keyIdx) => {
                     let key = keys[keyIdx];
-                    if (key.type === "checkbox")
-                    {
+                    if (key.type === "checkbox") {
                         return (<div key={keyIdx.toString()}
                                      id="table-cell"
                                      role="checkbox"
@@ -112,9 +110,9 @@ class ConnectedTable extends Component {
                                      aria-labelledby="table-header"
                                      tabindex="0"
                                      onClick={toggleCheckbox}
-                                     onKeyDown={this.handleOnClick} >
-                                    <img src="./images/checkbox-unchecked-black.png" alt="" />
-                                </div>);
+                                     onKeyDown={this.handleOnClick}>
+                            <img src="./images/checkbox-unchecked-black.png" alt=""/>
+                        </div>);
                     } else {
                         return (<div key={key.field.toString()}
                                      id="table-cell"
@@ -132,15 +130,14 @@ class ConnectedTable extends Component {
     // This function renders a single row of data.
     renderRows(columns, data) {
         let keys = [];
-        for (let index = 0; index < React.Children.count(columns); ++index)
-        {
+        for (let index = 0; index < React.Children.count(columns); ++index) {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
         return (
             <>
-            {Object.keys(data).map((item) => {
-                return (<div key={item.toString()} id="table-row">{this.renderCells(keys, data[item])}</div>);
-            })}
+                {Object.keys(data).map((item) => {
+                    return (<div key={item.toString()} id="table-row">{this.renderCells(keys, data[item])}</div>);
+                })}
             </>
         );
     }
@@ -156,7 +153,7 @@ class ConnectedTable extends Component {
                         {this.renderRows(this.props.children, this.props.contacts)}
                     </div>
                 </div>
-                <p className={"usa-footer"} >{this.props.contacts.length} records</p>
+                <p className={"usa-footer"}>{this.props.contacts.length} records</p>
                 <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
                 <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
             </div>

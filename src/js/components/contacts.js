@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-const Contacts = ({ contacts }) => {
+const Contacts = ({contacts}) => {
     return (
         <div>
             <center><h1>Contact List</h1></center>
@@ -11,7 +11,8 @@ const Contacts = ({ contacts }) => {
                     <div>
                         <input className="usa-input" id="name" type="text" defaultValue={contact.name}></input>
                         <input className="usa-input" id="email" type="text" defaultValue={contact.email}></input>
-                        <input className="usa-input" id="catchPhrase" type="text" defaultValue={contact.catchPhrase}></input>
+                        <input className="usa-input" id="catchPhrase" type="text"
+                               defaultValue={contact.catchPhrase}></input>
                     </div>
                 </div>
             ))}
