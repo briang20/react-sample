@@ -7,7 +7,7 @@ import {addContact} from "./js/actions/index";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: contact => dispatch(addContact(contact))
+        addContact: function(contact) {dispatch(addContact(contact))}
     };
 }
 
@@ -21,8 +21,8 @@ class ConnectedApp extends Component {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
         })
-            .then(res => res.json())
-            .then((data) => {
+            .then(function(res){return res.json()})
+            .then((data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
                 for (let contact in data) {
                     this.props.addContact(data[contact]);
                 }

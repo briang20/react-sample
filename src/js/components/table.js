@@ -7,9 +7,9 @@ import {getContactsState} from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: contact => dispatch(addContact(contact)),
-        removeContact: contact => dispatch(removeContact(contact)),
-        modifyContact: (contact, newContact) => dispatch(modifyContact(contact, newContact))
+        addContact: function(contact) {dispatch(addContact(contact))},
+        removeContact: function(contact) {dispatch(removeContact(contact))},
+        modifyContact: function(contact, newContact) {dispatch(modifyContact(contact, newContact))}
     };
 }
 
@@ -54,19 +54,14 @@ export class TableColumn extends Component {
         const {title, type} = this.state;
         if (type === "checkbox") {
             return (
-                <div id={"table-cell"} role={"checkbox"}
-                     aria-checked={"false"}
-                     aria-labelledby={"table-header"}
-                     tabindex={"0"}
-                     onClick={toggleCheckbox}
-                     onKeyDown={this.handleOnClick}>
-                    {title + " "}
-                    <img src={"./images/checkbox-unchecked-black.png"} alt={""}/>
+                <div id={"table-cell"}>
+                    <input type="checkbox" id="selectAll" name="selection" value="selectAll" />
+                    <label htmlFor="selectAll">{title}</label>
                 </div>
             );
         } else {
             return (
-                <div id={"table-cell"}>{title}</div> //TODO: set this to the same style as "usa-table th"
+                <div id={"table-cell"}>{title}</div> //TODO: set this to the same style as "usa-table th"?
             );
         }
     }
@@ -106,14 +101,9 @@ class ConnectedTable extends Component {
                     if (key.type === "checkbox") {
                         return (<div key={keyIdx.toString()}
                                      name={"selected"}
-                                     id={"table-cell"}
-                                     role={"checkbox"}
-                                     aria-checked={"false"}
-                                     aria-labelledby={"table-header"}
-                                     tabindex={"0"}
-                                     onClick={toggleCheckbox}
-                                     onKeyDown={this.handleOnClick}>
-                            <img src={"./images/checkbox-unchecked-black.png"} alt={""}/>
+                                     id={"table-cell"}>
+                            <input type="checkbox" id="selectRow" name="selection" value={data} />
+                            <label htmlFor="selectRow"></label>
                         </div>);
                     } else {
                         return (<div key={key.field.toString()}
@@ -165,6 +155,7 @@ class ConnectedTable extends Component {
     handleDeleteRows() {
         //TODO: get the selected rows and pass them here.
         //TODO: maybe prompt for confirmation of the delete action?
+        // Not exactly sure how to get the selected boxes here. Should I query the document? Or should I use the state?
         //this.props.removeContact({});
     }
 
