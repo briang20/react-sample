@@ -3,7 +3,7 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addContact, removeContact, modifyContact} from "../actions/index";
-import {getContactsState, getSortingState} from "../selectors/index";
+import {getContactsState, getCurrentSearchFilter, getSortingState} from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
@@ -17,7 +17,8 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = state => {
     return {
         contacts: getContactsState(state),
-        currentSortMethod: getSortingState(state)
+        currentSortMethod: getSortingState(state),
+        currentSearchFilter: getCurrentSearchFilter(state)
     };
 };
 
@@ -100,7 +101,13 @@ class ConnectedTable extends Component {
         for (let index = 0; index < React.Children.count(columns); ++index) {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
-        const sortedData = [...data].sort(sortTypes[this.props.currentSortMethod].fn);
+        //TODO: figure out why the `indexOf` function is returning -1 on partial matches
+        const filteredData = [...data].filter(item => {
+            if (this.props.currentSearchFilter !== '')
+                return Object.values(item).indexOf(this.props.currentSearchFilter) !== -1
+            return true;
+        });
+        const sortedData = [...filteredData].sort(sortTypes[this.props.currentSortMethod].fn);
         return (
             <>
                 {Object.keys(sortedData).map((item) => {

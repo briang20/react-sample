@@ -4,15 +4,21 @@ import './css/uswds-theme.scss';
 import './App.css';
 import Table from './js/components/table';
 import TableColumn from './js/components/table-column';
-import {addContact} from "./js/actions/index";
+import {addContact, changeSearchFilter} from "./js/actions/index";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function(contact) {dispatch(addContact(contact))}
+        addContact: function(contact) {dispatch(addContact(contact))},
+        changeSearchFilter: function(filter) {dispatch(changeSearchFilter(filter))}
     };
 }
 
 class ConnectedApp extends Component {
+    constructor(props) {
+        super(props);
+        this.handleTextChange = this.handleTextChange.bind(this);
+    }
+
     componentDidMount() {
         this.queryApi();
     }
@@ -64,14 +70,15 @@ class ConnectedApp extends Component {
     }
 
     handleTextChange(event) {
-
+        const target = event.currentTarget;
+        this.props.changeSearchFilter(target.value);
     }
 
     render() {
         return (
             <div>
                 {this.renderHeader()}
-                <input type={"text"} id={"usa-input"} name={"filter"} defaultValue={"Search"} onChange={this.handleTextChange} />
+                <input type={"text"} id={"usa-input"} name={"filter"} placeholder={"Search"} onChange={this.handleTextChange} />
                 <p></p>
                 <Table title="Contacts" editable="false">
                     <TableColumn field="id" title="User ID"/>
