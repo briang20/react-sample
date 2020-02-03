@@ -1,9 +1,10 @@
 // src/js/reducers/index.js
 
-import {ADD_CONTACT, REMOVE_CONTACT, MODIFY_CONTACT} from "../constants/action-types";
+import {ADD_CONTACT, REMOVE_CONTACT, MODIFY_CONTACT, CHANGE_SORTING} from "../constants/action-types";
 
 const initialState = {
-    contacts: []
+    contacts: [],
+    currentSortMethod: 'default'
 };
 
 function rootReducer(state = initialState, action) {
@@ -24,6 +25,11 @@ function rootReducer(state = initialState, action) {
                     return action.payload;
                 return obj;
             })
+        });
+    }
+    if (action.type === CHANGE_SORTING) {
+        return Object.assign({}, state, {
+            currentSortMethod: action.payload
         });
     }
 

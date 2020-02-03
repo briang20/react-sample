@@ -3,7 +3,8 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addContact, removeContact, modifyContact} from "../actions/index";
-import {getContactsState} from "../selectors/index";
+import {getContactsState, getSortingState} from "../selectors/index";
+import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -14,7 +15,10 @@ function mapDispatchToProps(dispatch) {
 }
 
 const mapStateToProps = state => {
-    return {contacts: getContactsState(state)};
+    return {
+        contacts: getContactsState(state),
+        currentSortMethod: getSortingState(state)
+    };
 };
 
 function toggleCheckbox(event) {
@@ -37,42 +41,13 @@ function toggleCheckbox(event) {
     }
 }
 
-export class TableColumn extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            title: "",
-            field: "",
-            type: "text"
-        };
-        if (props.field != null) this.state.title = this.state.field = props.field;
-        if (props.title != null) this.state.title = props.title;
-        if (props.type != null) this.state.type = props.type;
-    }
-
-    render() {
-        const {title, type} = this.state;
-        if (type === "checkbox") {
-            return (
-                <div id={"table-cell"}>
-                    <input type="checkbox" id="selectAll" name="selection" value="selectAll" />
-                    <label htmlFor="selectAll">{title}</label>
-                </div>
-            );
-        } else {
-            return (
-                <div id={"table-cell"}>{title}</div> //TODO: set this to the same style as "usa-table th"?
-            );
-        }
-    }
-}
-
 class ConnectedTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
             title: "",
-            editable: false
+            editable: false,
+            currentSort: 'default'
         };
         if (props.title != null) this.state.title = props.title;
         if (props.editable != null) this.state.editable = props.editable;
@@ -125,10 +100,11 @@ class ConnectedTable extends Component {
         for (let index = 0; index < React.Children.count(columns); ++index) {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
+        const sortedData = [...data].sort(sortTypes[this.props.currentSortMethod].fn);
         return (
             <>
-                {Object.keys(data).map((item) => {
-                    return (<div key={item.toString()} id={"table-row"}>{this.renderCells(keys, data[item])}</div>);
+                {Object.keys(sortedData).map((item) => {
+                    return (<div key={item.toString()} id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
                 })}
             </>
         );

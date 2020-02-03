@@ -2,7 +2,8 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import './css/uswds-theme.scss';
 import './App.css';
-import Table, {TableColumn} from './js/components/table';
+import Table from './js/components/table';
+import TableColumn from './js/components/table-column';
 import {addContact} from "./js/actions/index";
 
 function mapDispatchToProps(dispatch) {
@@ -62,10 +63,16 @@ class ConnectedApp extends Component {
         );
     }
 
+    handleTextChange(event) {
+
+    }
+
     render() {
         return (
             <div>
                 {this.renderHeader()}
+                <input type={"text"} id={"usa-input"} name={"filter"} defaultValue={"Search"} onChange={this.handleTextChange} />
+                <p></p>
                 <Table title="Contacts" editable="false">
                     <TableColumn field="id" title="User ID"/>
                     <TableColumn field="name" title="Name"/>
