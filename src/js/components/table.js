@@ -8,9 +8,9 @@ import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function(contact) {dispatch(addContact(contact))},
-        removeContact: function(contact) {dispatch(removeContact(contact))},
-        modifyContact: function(contact, newContact) {dispatch(modifyContact(contact, newContact))}
+        addContact: function (contact) {dispatch(addContact(contact))},
+        removeContact: function (contact) {dispatch(removeContact(contact))},
+        modifyContact: function (contact, newContact) {dispatch(modifyContact(contact, newContact))}
     };
 }
 
@@ -78,7 +78,7 @@ class ConnectedTable extends Component {
                         return (<div key={keyIdx.toString()}
                                      name={"selected"}
                                      id={"table-cell"}>
-                            <input type="checkbox" id="selectRow" name="selection" value={data} />
+                            <input type="checkbox" id="selectRow" name="selection" value={data}/>
                             <label htmlFor="selectRow"></label>
                         </div>);
                     } else {
@@ -111,7 +111,8 @@ class ConnectedTable extends Component {
         return (
             <>
                 {Object.keys(sortedData).map((item) => {
-                    return (<div key={item.toString()} id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
+                    return (
+                        <div key={item.toString()} id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
                 })}
             </>
         );
@@ -128,7 +129,9 @@ class ConnectedTable extends Component {
                         {this.renderRows(this.props.children, this.props.contacts)}
                     </div>
                 </div>
-                <p className={"usa-footer"}>{this.props.contacts.length} records</p>
+                <small>
+                    <p className={"usa-footer"}>{this.props.contacts.length} records</p>
+                </small>
                 <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
                 <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
             </div>

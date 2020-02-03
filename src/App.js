@@ -20,11 +20,13 @@ class ConnectedApp extends Component {
     }
 
     componentDidMount() {
-        this.queryApi();
+        this.fetchContacts()
+            .catch(console.log);
     }
 
-    queryApi() {
-        fetch('https://jsonplaceholder.typicode.com/users', {
+    //TODO: convert this to redux-thunk
+    fetchContacts() {
+        return fetch('https://jsonplaceholder.typicode.com/users', {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
         })
@@ -34,31 +36,6 @@ class ConnectedApp extends Component {
                     this.props.addContact(data[contact]);
                 }
             })
-            .catch(console.log)
-
-        // var config = require('./.settings.json');
-        // const opts = {
-        //   "token": config.main.token,
-        //   "data": {
-        //     "name": "name",
-        //     "email": "internetEmail",
-        //     "catchPhrase": "otherCatchPhrase",
-        //     _repeat: 10
-        //   }
-        // }
-        // fetch('https://app.fakejson.com/q', {
-        //   method: 'post',
-        //   body: JSON.stringify(opts),
-        //   headers: { 'Content-Type': 'application/json' },
-        // })
-        // .then(res => res.json())
-        // .then((data) => {
-        //   for (let contact in data)
-        //   {
-        //     this.props.addContact(data[contact]);
-        //   }
-        // })
-        // .catch(console.log)
     }
 
     renderHeader() {
