@@ -101,10 +101,17 @@ class ConnectedTable extends Component {
         for (let index = 0; index < React.Children.count(columns); ++index) {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
-        //TODO: figure out why the `indexOf` function is returning -1 on partial matches
+
+        //TODO: figure out how to filter out the fields we don't care about
         const filteredData = [...data].filter(item => {
-            if (this.props.currentSearchFilter !== '')
-                return Object.values(item).indexOf(this.props.currentSearchFilter) !== -1
+            if (this.props.currentSearchFilter !== '') {
+                const array = Object.values(item);
+                for (const element of array) {
+                    if (element.toString().indexOf(this.props.currentSearchFilter) !== -1)
+                        return true;
+                }
+                return false;
+            }
             return true;
         });
         const sortedData = [...filteredData].sort(sortTypes[this.props.currentSortMethod].fn);
