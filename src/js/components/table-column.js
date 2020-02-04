@@ -33,7 +33,6 @@ class ConnectedTableColumn extends Component {
     }
 
     handleClick(event) {
-        const target = event.target;
         const {ascending} = this.state;
         let sortType = "";
         if (ascending === false) {
@@ -44,15 +43,13 @@ class ConnectedTableColumn extends Component {
                 ascending: true
             });
             sortType = "asc_by_" + this.state.field;
-        }
-        else {
+        } else {
             this.setState({
                 ascending: false
             });
             sortType = "dsc_by_" + this.state.field;
         }
 
-        console.log(sortType)
         this.props.changeSorting(sortType);
     }
 

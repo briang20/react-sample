@@ -2,15 +2,17 @@
 
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {addContact, removeContact, modifyContact} from "../actions/index";
-import {getContactsState, getCurrentSearchFilter, getSortingState} from "../selectors/index";
+import {addContact, removeContact, modifyContact, addSelectedItem, removeSelectedItem} from "../actions/index";
+import {getContactsState, getCurrentSearchFilter, getCurrentSelectedItemList, getSortingState} from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
         addContact: function (contact) {dispatch(addContact(contact))},
         removeContact: function (contact) {dispatch(removeContact(contact))},
-        modifyContact: function (contact, newContact) {dispatch(modifyContact(contact, newContact))}
+        modifyContact: function (contact, newContact) {dispatch(modifyContact(contact, newContact))},
+        addSelectedItem: function (item) {dispatch(addSelectedItem(item))},
+        removeSelectedItem: function (item) {dispatch(removeSelectedItem(item))}
     };
 }
 
@@ -18,7 +20,8 @@ const mapStateToProps = state => {
     return {
         contacts: getContactsState(state),
         currentSortMethod: getSortingState(state),
-        currentSearchFilter: getCurrentSearchFilter(state)
+        currentSearchFilter: getCurrentSearchFilter(state),
+        currentSelectedItems: getCurrentSelectedItemList(state)
     };
 };
 
@@ -52,6 +55,8 @@ class ConnectedTable extends Component {
         };
         if (props.title != null) this.state.title = props.title;
         if (props.editable != null) this.state.editable = props.editable;
+        this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
+        this.handleDeleteRows = this.handleDeleteRows.bind(this);
     }
 
     handleOnClick(event) {
@@ -61,10 +66,20 @@ class ConnectedTable extends Component {
 
     handleFocusOut(event, key, data) {
         const target = event.target;
+        // Before we actually apply this data, we should sanitize the input
         let newData = Object.assign({}, data);
         target.contentEditable = false;
         newData[key] = target.textContent;
         this.props.modifyContact(data, newData);
+    }
+
+    handleCheckboxChanged(event, data) {
+        const target = event.currentTarget;
+        const targetRow = data;
+        if (target.checked === true)
+            this.props.addSelectedItem(targetRow);
+        else
+            this.props.removeSelectedItem(targetRow);
     }
 
     // This function is here to render a single cell of a row
@@ -78,8 +93,11 @@ class ConnectedTable extends Component {
                         return (<div key={keyIdx.toString()}
                                      name={"selected"}
                                      id={"table-cell"}>
-                            <input type="checkbox" id="selectRow" name="selection" value={data}/>
-                            <label htmlFor="selectRow"></label>
+                            <input key={keyIdx.toString()}
+                                   type={"checkbox"}
+                                   id={"selectRow"}
+                                   name={"selection"}
+                                   onChange={(event) => this.handleCheckboxChanged(event, data)} />
                         </div>);
                     } else {
                         return (<div key={key.field.toString()}
@@ -102,6 +120,7 @@ class ConnectedTable extends Component {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
 
+        // Filter out the contacts that we do not care about
         //TODO: figure out how to filter out the fields we don't care about
         const filteredData = [...data].filter(item => {
             if (this.props.currentSearchFilter !== '') {
@@ -114,6 +133,7 @@ class ConnectedTable extends Component {
             }
             return true;
         });
+        // Sort the data based on our current sorting method
         const sortedData = [...filteredData].sort(sortTypes[this.props.currentSortMethod].fn);
         return (
             <>
@@ -146,10 +166,11 @@ class ConnectedTable extends Component {
     }
 
     handleDeleteRows() {
-        //TODO: get the selected rows and pass them here.
         //TODO: maybe prompt for confirmation of the delete action?
-        // Not exactly sure how to get the selected boxes here. Should I query the document? Or should I use the state?
-        //this.props.removeContact({});
+        for (let item of this.props.currentSelectedItems) {
+            this.props.removeContact(item);
+        }
+        //TODO: figure out why checkboxes are still checked
     }
 
     handleAddRow() {
