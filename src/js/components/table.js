@@ -157,7 +157,6 @@ class ConnectedTable extends Component {
     }
 
     handleAddRow() {
-        //TODO: figure out how we want to actually allow the user to edit the new row before adding a new record
         this.props.addContact([{}]);
     }
 }

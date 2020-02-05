@@ -24,7 +24,6 @@ class ConnectedApp extends Component {
             .catch(console.log);
     }
 
-    //TODO: convert this to redux-thunk
     fetchContacts() {
         const config = require('./.settings.json');
         return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
@@ -39,6 +38,19 @@ class ConnectedApp extends Component {
                     this.props.addContact(contact);
                 }
             })
+    }
+
+    postContacts(opts) {
+        const config = require('./.settings.json');
+        return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(opts)
+        })
+            .then(function (res) {
+                return res.json()
+            })
+            .then(this.fetchContacts)
     }
 
     renderHeader() {
