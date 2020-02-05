@@ -14,9 +14,9 @@ function mapDispatchToProps(dispatch) {
         changeSearchFilter: function (filter) {
             dispatch(changeSearchFilter(filter))
         },
-        fetchContacts: function (type, opts, fnCallback) {
-            dispatch(fetchContacts(type, opts, fnCallback))
-        },
+        // fetchContacts: function (type, opts, fnCallback) {
+        //     dispatch(fetchContacts(type, opts, fnCallback))
+        // },
     };
 }
 
