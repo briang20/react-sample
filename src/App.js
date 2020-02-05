@@ -26,7 +26,7 @@ class ConnectedApp extends Component {
 
     //TODO: convert this to redux-thunk
     fetchContacts() {
-        var config = require('./.settings.json');
+        const config = require('./.settings.json');
         return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
@@ -35,8 +35,8 @@ class ConnectedApp extends Component {
                 return res.json()
             })
             .then((data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
-                for (let contact in data) {
-                    this.props.addContact(data[contact]);
+                for (let contact of data) {
+                    this.props.addContact(contact);
                 }
             })
     }

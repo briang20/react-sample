@@ -46,6 +46,7 @@ class ConnectedTable extends Component {
         // bind this to the callbacks
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
         this.handleDeleteRows = this.handleDeleteRows.bind(this);
+        this.handleAddRow = this.handleAddRow.bind(this);
     }
 
     handleOnClick(event) {
@@ -157,7 +158,7 @@ class ConnectedTable extends Component {
 
     handleAddRow() {
         //TODO: figure out how we want to actually allow the user to edit the new row before adding a new record
-        //this.props.addContact({});
+        this.props.addContact([{}]);
     }
 }
 
