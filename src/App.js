@@ -27,7 +27,7 @@ class ConnectedApp extends Component {
     //TODO: convert this to redux-thunk
     fetchContacts() {
         var config = require('./.settings.json');
-        return fetch(config.main.apiUrl, {
+        return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
             method: 'get',
             headers: {'Content-Type': 'application/json'},
         })
