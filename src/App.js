@@ -8,8 +8,15 @@ import {addContact, changeSearchFilter} from "./js/actions/index";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function(contact) {dispatch(addContact(contact))},
-        changeSearchFilter: function(filter) {dispatch(changeSearchFilter(filter))}
+        addContact: function (contact) {
+            dispatch(addContact(contact))
+        },
+        changeSearchFilter: function (filter) {
+            dispatch(changeSearchFilter(filter))
+        },
+        fetchContacts: function (type, opts, fnCallback) {
+            dispatch(fetchContacts(type, opts, fnCallback))
+        },
     };
 }
 
@@ -20,37 +27,40 @@ class ConnectedApp extends Component {
     }
 
     componentDidMount() {
-        this.fetchContacts()
-            .catch(console.log);
+        this.getContacts();
     }
 
-    fetchContacts() {
+    fetchContacts(type, opts, fnCallback) {
         const config = require('./.settings.json');
         return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
-            method: 'get',
+            method: type,
             headers: {'Content-Type': 'application/json'},
+            body: opts
         })
             .then(function (res) {
                 return res.json()
             })
-            .then((data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
-                for (let contact of data) {
-                    this.props.addContact(contact);
-                }
-            })
+            .then(fnCallback)
+    }
+
+    getContacts() {
+        this.fetchContacts('get', null, (data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
+            for (let contact of data) {
+                this.props.addContact(contact);
+            }
+        }).catch(console.log);
     }
 
     postContacts(opts) {
-        const config = require('./.settings.json');
-        return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
-            method: 'post',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(opts)
-        })
-            .then(function (res) {
-                return res.json()
-            })
-            .then(this.fetchContacts)
+        this.fetchContacts('post', JSON.stringify(opts), this.getContacts).catch(console.log);
+    }
+
+    modifyContacts(opts) {
+        this.fetchContacts('put', JSON.stringify(opts), this.getContacts).catch(console.log);
+    }
+
+    deleteContacts(opts) {
+        this.fetchContacts('delete', JSON.stringify(opts), this.getContacts).catch(console.log);
     }
 
     renderHeader() {
