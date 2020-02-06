@@ -48,18 +48,47 @@ export function clearContacts() {
     return {type: CLEAR_CONTACTS}
 }
 
-// export function fetchContacts(type, opts, fnCallback) {
-//     return function (dispatch) {
-//         const config = require('../../.settings.json');
-//         return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
-//             method: type,
-//             headers: {'Content-Type': 'application/json'},
-//             body: opts
-//         })
-//             .then(res => res.json(),
-//                 error => console.log('An error occurred.', error))
-//             .then(data =>
-//                 dispatch(fnCallback(data))
-//             )
-//     }
-// }
+export function fetchContacts(type, opts, fnCallback, key) {
+    return (dispatch, getState, api) => {
+        let url = api ? api : 'http://jsonplaceholder.typicode.com/users';
+        if (type !== 'get' && type !== 'post') url = url + "/" + key;
+        return fetch(url, {
+            method: type,
+            headers: {'Content-Type': 'application/json'},
+            body: opts
+        })
+            .then(res => res.json(),
+                error => console.log('An error occurred.', error))
+            .then(data => fnCallback(data))
+    };
+}
+
+export function getContacts() {
+    return (dispatch, getState, api) => {
+        dispatch(fetchContacts('get', null, function (data) {
+            dispatch(clearContacts());
+            for (let contact of data) {
+                contact.selected = false;
+                dispatch(addContact(contact));
+            }
+        }));
+    }
+}
+
+export function postContacts(opts) {
+    return (dispatch, getState, api) => {
+        dispatch(fetchContacts('post', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+    }
+}
+
+export function modifyContacts(opts) {
+    return (dispatch, getState, api) => {
+        dispatch(fetchContacts('put', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+    }
+}
+
+export function deleteContacts(opts) {
+    return (dispatch, getState, api) => {
+        dispatch(fetchContacts('delete', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+    }
+}

@@ -9,7 +9,10 @@ import {
     modifyContact,
     addSelectedItem,
     removeSelectedItem,
-    clearSelectedItems
+    clearSelectedItems,
+    postContacts,
+    modifyContacts,
+    deleteContacts,
 } from "../actions/index";
 import {
     getContactsState,
@@ -39,6 +42,15 @@ function mapDispatchToProps(dispatch) {
         },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
+        },
+        postContacts: function (opts) {
+            dispatch(postContacts(opts))
+        },
+        modifyContacts: function (opts) {
+            dispatch(modifyContacts(opts))
+        },
+        deleteContacts: function (opts) {
+            dispatch(deleteContacts(opts))
         },
     };
 }
@@ -78,11 +90,12 @@ class ConnectedTable extends Component {
 
     handleFocusOut(event, key, data) {
         const target = event.target;
-        // Before we actually apply this data, we should sanitize the input
+        //TODO: Before we actually apply this data, we need to sanitize the input
         let newData = Object.assign({}, data);
         target.contentEditable = false;
         newData[key] = target.textContent;
-        this.props.modifyContact(data, newData);
+        delete newData.selected; // Remove this from the data
+        this.props.modifyContacts(newData);
     }
 
     handleCheckboxChanged(event, data) {
@@ -185,13 +198,15 @@ class ConnectedTable extends Component {
     handleDeleteRows() {
         //TODO: maybe prompt for confirmation of the delete action?
         for (let item of this.props.currentSelectedItems) {
-            this.props.removeContact(item);
+            //this.props.removeContact(item);
+            this.props.deleteContacts(item);
         }
         this.props.clearSelectedItems();
     }
 
     handleAddRow() {
-        this.props.addContact([{}]);
+        //this.props.addContact([{}]);
+        this.props.postContacts({id: this.props.contacts.length + 1});
     }
 }
 

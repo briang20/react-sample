@@ -1,11 +1,11 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import './css/uswds-theme.scss';
-import './App.css';
-import Table from './js/components/table';
-import TableColumn from './js/components/table-column';
-import {addContact, clearContacts, changeSearchFilter} from "./js/actions/index";
-import {getCurrentSearchFilter} from "./js/selectors";
+import '../css/uswds-theme.scss';
+import '../css/App.css';
+import Table from './components/table';
+import TableColumn from './components/table-column';
+import {addContact, clearContacts, changeSearchFilter, getContacts} from "./actions/index";
+import {getCurrentSearchFilter} from "./selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -18,9 +18,9 @@ function mapDispatchToProps(dispatch) {
         clearContacts: function () {
             dispatch(clearContacts())
         },
-        // fetchContacts: function (type, opts, fnCallback) {
-        //     dispatch(fetchContacts(type, opts, fnCallback))
-        // },
+        getContacts: function () {
+            dispatch(getContacts())
+        },
     };
 }
 
@@ -37,42 +37,7 @@ class ConnectedApp extends Component {
     }
 
     componentDidMount() {
-        this.getContacts();
-    }
-
-    fetchContacts(type, opts, fnCallback) {
-        const config = require('./.settings.json');
-        return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
-            method: type,
-            headers: {'Content-Type': 'application/json'},
-            body: opts
-        })
-            .then(function (res) {
-                return res.json()
-            })
-            .then(fnCallback)
-    }
-
-    getContacts() {
-        this.fetchContacts('get', null, (data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
-            this.props.clearContacts();
-            for (let contact of data) {
-                contact.selected = false;
-                this.props.addContact(contact);
-            }
-        }).catch(console.log);
-    }
-
-    postContacts(opts) {
-        this.fetchContacts('post', JSON.stringify(opts), this.getContacts).catch(console.log);
-    }
-
-    modifyContacts(opts) {
-        this.fetchContacts('put', JSON.stringify(opts), this.getContacts).catch(console.log);
-    }
-
-    deleteContacts(opts) {
-        this.fetchContacts('delete', JSON.stringify(opts), this.getContacts).catch(console.log);
+        this.props.getContacts();
     }
 
     renderHeader() {

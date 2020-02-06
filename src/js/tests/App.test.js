@@ -4,7 +4,7 @@ import {Provider} from 'react-redux'
 import {render, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import rootReducer, {initialState} from '../reducers/index'
-import App from '../../App';
+import App from '../App';
 
 function renderWithRedux(
     ui,
