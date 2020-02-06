@@ -1,5 +1,13 @@
+#table-container {
+  @media screen and (min-width: 768px) {
+    margin: auto;
+    padding: 10px;
+    border: 3px solid;
+  }
+}
+
 .usa-table {
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 767px) {
     display: flex;
     flex-flow: row wrap;
     width: 100%;
@@ -8,7 +16,7 @@
 }
 
 .usa-table #table-body {
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 767px) {
     display: flex;
     flex-flow: row wrap;
   }
@@ -16,7 +24,7 @@
 }
 
 .usa-table #table-heading {
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 767px) {
     display: flex;
     flex: 1 0 100%;
     flex-flow: row wrap;
@@ -26,7 +34,7 @@
 }
 
 .usa-table #table-row {
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 767px) {
     display: flex;
     flex: 1 0 100%;
     flex-flow: row wrap;
@@ -36,9 +44,11 @@
 }
 
 .usa-table #table-cell {
-  @media screen and (max-width: 800px) {
+  @media screen and (max-width: 767px) {
     flex: 1 0 50%;
+    min-width: 50vw;
   }
+  min-height: 32px;
   border: 1px solid #999999;
   display: table-cell;
   padding: 3px 10px;

@@ -1,19 +1,27 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {changeSorting} from "../actions/index";
-import {getSortingState} from "../selectors/index";
+import {addSelectedItem, changeSorting, clearSelectedItems} from "../actions/index";
+import {getSortingState, getSelectedItemsList, getContactsList} from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
         changeSorting: function (sortFn) {
             dispatch(changeSorting(sortFn))
-        }
+        },
+        addSelectedItem: function (item) {
+            dispatch(addSelectedItem(item))
+        },
+        clearSelectedItems: function () {
+            dispatch(clearSelectedItems())
+        },
     };
 }
 
 const mapStateToProps = state => {
     return {
-        currentSortMethod: getSortingState(state)
+        currentSortMethod: getSortingState(state),
+        contacts: getContactsList(state),
+        selectedItems: getSelectedItemsList(state),
     };
 }
 
@@ -30,6 +38,7 @@ class ConnectedTableColumn extends Component {
         if (props.title != null) this.state.title = props.title;
         if (props.type != null) this.state.type = props.type;
         this.handleClick = this.handleClick.bind(this);
+        this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
     }
 
     handleClick(event) {
@@ -53,12 +62,26 @@ class ConnectedTableColumn extends Component {
         this.props.changeSorting(sortType);
     }
 
+    handleCheckboxChanged(event) {
+        const target = event.currentTarget;
+        let checked = target.checked;
+        if (checked === false)
+            this.props.clearSelectedItems();
+        else
+            for (let contact of this.props.contacts)
+                this.props.addSelectedItem(contact);
+    }
+
     render() {
         const {title, type} = this.state;
         if (type === "checkbox") {
+            let isAllChecked = false;
+            if (this.props.contacts.length > 0)
+                isAllChecked = this.props.contacts.length === this.props.selectedItems.length;
             return (
                 <div id={"table-cell"}>
-                    <input type="checkbox" id="selectAll" name="selection" value="selectAll"/>
+                    <input type="checkbox" id="selectAll" name="selection" value="selectAll" checked={isAllChecked}
+                           onChange={(event) => this.handleCheckboxChanged(event)}/>
                     <label htmlFor="selectAll">{title}</label>
                 </div>
             );

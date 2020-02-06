@@ -3,28 +3,50 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import '../../css/table-theme.scss';
-import {addContact, removeContact, modifyContact, addSelectedItem, removeSelectedItem} from "../actions/index";
+import {
+    addContact,
+    removeContact,
+    modifyContact,
+    addSelectedItem,
+    removeSelectedItem,
+    clearSelectedItems
+} from "../actions/index";
 import {
     getContactsState,
     getCurrentSearchFilter,
     getCurrentSelectedItemList,
+    getSelectedItemsList,
     getSortingState
 } from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function (contact) {dispatch(addContact(contact))},
-        removeContact: function (contact) {dispatch(removeContact(contact))},
-        modifyContact: function (contact, newContact) {dispatch(modifyContact(contact, newContact))},
-        addSelectedItem: function (item) {dispatch(addSelectedItem(item))},
-        removeSelectedItem: function (item) {dispatch(removeSelectedItem(item))}
+        addContact: function (contact) {
+            dispatch(addContact(contact))
+        },
+        removeContact: function (contact) {
+            dispatch(removeContact(contact))
+        },
+        modifyContact: function (contact, newContact) {
+            dispatch(modifyContact(contact, newContact))
+        },
+        addSelectedItem: function (item) {
+            dispatch(addSelectedItem(item))
+        },
+        removeSelectedItem: function (item) {
+            dispatch(removeSelectedItem(item))
+        },
+        clearSelectedItems: function () {
+            dispatch(clearSelectedItems())
+        },
     };
 }
 
 const mapStateToProps = state => {
     return {
         contacts: getContactsState(state),
+        selectedItems: getSelectedItemsList(state),
         currentSortMethod: getSortingState(state),
         currentSearchFilter: getCurrentSearchFilter(state),
         currentSelectedItems: getCurrentSelectedItemList(state)
@@ -85,6 +107,7 @@ class ConnectedTable extends Component {
                                data-testid={"select-row-single"}
                                id={"selectRow"}
                                name={"selection"}
+                               checked={data.selected}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
                     </div>);
                 } else {
@@ -133,20 +156,28 @@ class ConnectedTable extends Component {
         });
 
         return (
-            <div key={"div-table"} className={"usa-table"}>
+            <div key={"div-table"} className={"usa-table"} id={"table-container"}>
+                <div key={"buttons"}>
+                    <button id={"addRow"}
+                            className={"usa-button"}
+                            data-testid={"add-row"}
+                            onClick={this.handleAddRow}>Add Row
+                    </button>
+                    <button id={"saveChanges"}
+                            className={"usa-button"}
+                            data-testid={"delete-row"}
+                            onClick={this.handleDeleteRows}>Delete Selected Rows
+                    </button>
+                </div>
+                <small>
+                    <p className={"usa-footer"}>1-{filteredData.length} of {this.props.contacts.length}</p>
+                </small>
                 <div key={"div-table-heading"} id={"table-heading"}>
                     {this.props.children}
                 </div>
                 <div key={"div-row"} id={"table-body"}>
                     {this.renderRows(this.props.children, filteredData)}
                 </div>
-                <small>
-                    <p className={"usa-footer"}>Showing {filteredData.length} of {this.props.contacts.length} records</p>
-                </small>
-                <button id={"addRow"} data-testid={"add-row"} onClick={this.handleAddRow}>Add Row</button>
-                <button id={"saveChanges"} data-testid={"delete-row"} onClick={this.handleDeleteRows}>Delete
-                    Selected Rows
-                </button>
             </div>
         );
     }
@@ -156,6 +187,7 @@ class ConnectedTable extends Component {
         for (let item of this.props.currentSelectedItems) {
             this.props.removeContact(item);
         }
+        this.props.clearSelectedItems();
     }
 
     handleAddRow() {

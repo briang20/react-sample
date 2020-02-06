@@ -4,7 +4,7 @@ import './css/uswds-theme.scss';
 import './App.css';
 import Table from './js/components/table';
 import TableColumn from './js/components/table-column';
-import {addContact, changeSearchFilter} from "./js/actions/index";
+import {addContact, clearContacts, changeSearchFilter} from "./js/actions/index";
 import {getCurrentSearchFilter} from "./js/selectors";
 
 function mapDispatchToProps(dispatch) {
@@ -14,6 +14,9 @@ function mapDispatchToProps(dispatch) {
         },
         changeSearchFilter: function (filter) {
             dispatch(changeSearchFilter(filter))
+        },
+        clearContacts: function () {
+            dispatch(clearContacts())
         },
         // fetchContacts: function (type, opts, fnCallback) {
         //     dispatch(fetchContacts(type, opts, fnCallback))
@@ -52,7 +55,9 @@ class ConnectedApp extends Component {
 
     getContacts() {
         this.fetchContacts('get', null, (data) => { // The '=>' operator doesn't work in IE11 and I can't get the props without 'this'?
+            this.props.clearContacts();
             for (let contact of data) {
+                contact.selected = false;
                 this.props.addContact(contact);
             }
         }).catch(console.log);
@@ -100,6 +105,7 @@ class ConnectedApp extends Component {
                     <TableColumn field="website" title="URL"/>
                     <TableColumn title="Select" type="checkbox"/>
                 </Table>
+                <button id={"backToTop"}><a href="#top" id={"topText"}>Top</a></button>
             </div>
         );
     }

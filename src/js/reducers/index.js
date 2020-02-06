@@ -6,7 +6,10 @@ import {
     MODIFY_CONTACT,
     CHANGE_SORTING,
     CHANGE_SEARCH_FILTER,
-    ADD_SELECTED_ITEM, REMOVE_SELECTED_ITEM
+    ADD_SELECTED_ITEM,
+    REMOVE_SELECTED_ITEM,
+    CLEAR_SELECTED_ITEMS,
+    CLEAR_CONTACTS
 } from "../constants/action-types";
 
 export const initialState = {
@@ -49,12 +52,37 @@ function rootReducer(state = initialState, action) {
     }
     if (action.type === ADD_SELECTED_ITEM) {
         return Object.assign({}, state, {
+            contacts: state.contacts.map(contact => {
+                if (contact === action.payload)
+                    contact.selected = true;
+                return contact;
+            }),
             currentSelectedItems: state.currentSelectedItems.concat(action.payload)
         });
     }
     if (action.type === REMOVE_SELECTED_ITEM) {
         return Object.assign({}, state, {
+            contacts: state.contacts.map(contact => {
+                if (contact === action.payload)
+                    contact.selected = false;
+                return contact;
+            }),
             currentSelectedItems: state.currentSelectedItems.filter(item => item !== action.payload)
+        });
+    }
+    if (action.type === CLEAR_SELECTED_ITEMS) {
+        return Object.assign({}, state, {
+            currentSelectedItems: [],
+            contacts: state.contacts.map(obj => {
+                obj.selected = false;
+                return obj;
+            })
+        });
+    }
+    if (action.type === CLEAR_CONTACTS) {
+        return Object.assign({}, state, {
+            currentSelectedItems: [],
+            contacts: []
         });
     }
 

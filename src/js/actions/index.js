@@ -7,7 +7,9 @@ import {
     CHANGE_SORTING,
     CHANGE_SEARCH_FILTER,
     ADD_SELECTED_ITEM,
-    REMOVE_SELECTED_ITEM
+    REMOVE_SELECTED_ITEM,
+    CLEAR_SELECTED_ITEMS,
+    CLEAR_CONTACTS
 } from "../constants/action-types";
 
 export function addContact(payload) {
@@ -36,6 +38,14 @@ export function addSelectedItem(payload) {
 
 export function removeSelectedItem(payload) {
     return {type: REMOVE_SELECTED_ITEM, payload}
+}
+
+export function clearSelectedItems() {
+    return {type: CLEAR_SELECTED_ITEMS}
+}
+
+export function clearContacts() {
+    return {type: CLEAR_CONTACTS}
 }
 
 // export function fetchContacts(type, opts, fnCallback) {
