@@ -78,18 +78,16 @@ class ConnectedTable extends Component {
         return (Object.keys(keys).map((keyIdx) => {
                 let key = keys[keyIdx];
                 if (key.type === "checkbox") {
-                    return (<div key={keyIdx.toString()}
+                    return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()}
                                  name={"selected"}
                                  id={"table-cell"}>
-                        <input key={keyIdx.toString()}
-                               type={"checkbox"}
+                        <input type={"checkbox"}
                                id={"selectRow"}
                                name={"selection"}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
                     </div>);
                 } else {
-                    return (<div key={key.field.toString()}
-                                 id={"table-cell"}
+                    return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()} id={"table-cell"}
                                  contentEditable={this.state.editable}
                                  onClick={this.handleOnClick}
                                  onBlur={(event) => this.handleFocusOut(event, key.field, data)}>
@@ -124,7 +122,8 @@ class ConnectedTable extends Component {
         const sortedData = [...filteredData].sort(sortTypes[this.props.currentSortMethod].fn);
         return (Object.keys(sortedData).map((item) => {
             return (
-                <div key={item.toString()} id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
+                <div key={JSON.stringify(sortedData[item])}
+                     id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
         }));
     }
 
@@ -138,12 +137,12 @@ class ConnectedTable extends Component {
                     <div id={"table-body"}>
                         {this.renderRows(this.props.children, this.props.contacts)}
                     </div>
+                    <small>
+                        <p className={"usa-footer"}>{this.props.contacts.length} records</p>
+                    </small>
+                    <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
+                    <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
                 </div>
-                <small>
-                    <p className={"usa-footer"}>{this.props.contacts.length} records</p>
-                </small>
-                <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
-                <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
             </div>
         );
     }
@@ -153,7 +152,6 @@ class ConnectedTable extends Component {
         for (let item of this.props.currentSelectedItems) {
             this.props.removeContact(item);
         }
-        //TODO: figure out why checkboxes are still checked
     }
 
     handleAddRow() {
