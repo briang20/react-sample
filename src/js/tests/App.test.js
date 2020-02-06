@@ -117,6 +117,43 @@ it('should be able to select a row', function () {
     expect(store.getState().currentSelectedItems.length).toBe(1);
 });
 
+it('should be able to select all rows', function () {
+    const newState = Object.assign({}, initialState, {
+        contacts: initialState.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}])
+    });
+    const {getByTestId, store} = renderWithRedux(<App/>, {
+        initialState: newState,
+    });
+
+    fireEvent.click(getByTestId('add-row'));
+    expect(store.getState().contacts.length).toBe(3);
+    fireEvent.click(getByTestId('add-row'));
+    expect(store.getState().contacts.length).toBe(4);
+    expect(store.getState().currentSelectedItems.length).toBe(0);
+    fireEvent.click(getByTestId('select-all-rows'));
+    expect(store.getState().currentSelectedItems.length).toBe(4);
+});
+
+it('should be able to delete all rows', function () {
+    const newState = Object.assign({}, initialState, {
+        contacts: initialState.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}])
+    });
+    const {getByTestId, store} = renderWithRedux(<App/>, {
+        initialState: newState,
+    });
+
+    fireEvent.click(getByTestId('add-row'));
+    expect(store.getState().contacts.length).toBe(3);
+    fireEvent.click(getByTestId('add-row'));
+    expect(store.getState().contacts.length).toBe(4);
+    expect(store.getState().currentSelectedItems.length).toBe(0);
+    fireEvent.click(getByTestId('select-all-rows'));
+    expect(store.getState().currentSelectedItems.length).toBe(4);
+    fireEvent.click(getByTestId('delete-row'));
+    expect(store.getState().contacts.length).toBe(0);
+    expect(store.getState().currentSelectedItems.length).toBe(0);
+});
+
 it('should be able to deselect a row', function () {
     const {getByTestId, store} = renderWithRedux(<App/>, {
         initialState: initialState,
@@ -155,5 +192,5 @@ it('should be able to filter data using search', function () {
     fireEvent.change(searchBox, {target: {value: '1'}});
     expect(searchBox.value).toBe("1");
     expect(store.getState().currentSearchFilter).toBe(searchBox.value);
-    expect(getByText("Showing 1 of 2 records")).toBeInTheDocument();
+    expect(getByText("1-1 of 2")).toBeInTheDocument();
 });

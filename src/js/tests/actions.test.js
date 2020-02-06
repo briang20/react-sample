@@ -6,7 +6,9 @@ import {
     changeSorting,
     changeSearchFilter,
     addSelectedItem,
-    removeSelectedItem
+    removeSelectedItem,
+    clearSelectedItems,
+    clearContacts
 } from "../actions/index";
 import {
     ADD_CONTACT,
@@ -14,7 +16,10 @@ import {
     MODIFY_CONTACT,
     CHANGE_SORTING,
     CHANGE_SEARCH_FILTER,
-    ADD_SELECTED_ITEM, REMOVE_SELECTED_ITEM
+    ADD_SELECTED_ITEM,
+    REMOVE_SELECTED_ITEM,
+    CLEAR_SELECTED_ITEMS,
+    CLEAR_CONTACTS
 } from "../constants/action-types";
 
 const middleware = [];
@@ -101,5 +106,27 @@ it('should dispatch an removeSelected action', function () {
 
     const actions = store.getActions();
     const expectedPayload = {type: REMOVE_SELECTED_ITEM, payload: opts};
+    expect(actions).toEqual([expectedPayload])
+});
+
+it('should dispatch an clearSelectedItems action', function () {
+    // Initialize mockstore with empty state
+    const initialState = {};
+    const store = mockStore(initialState);
+    store.dispatch(clearSelectedItems());
+
+    const actions = store.getActions();
+    const expectedPayload = {type: CLEAR_SELECTED_ITEMS};
+    expect(actions).toEqual([expectedPayload])
+});
+
+it('should dispatch an clearContacts action', function () {
+    // Initialize mockstore with empty state
+    const initialState = {};
+    const store = mockStore(initialState);
+    store.dispatch(clearContacts());
+
+    const actions = store.getActions();
+    const expectedPayload = {type: CLEAR_CONTACTS};
     expect(actions).toEqual([expectedPayload])
 });
