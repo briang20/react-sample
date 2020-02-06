@@ -38,18 +38,18 @@ export function removeSelectedItem(payload) {
     return {type: REMOVE_SELECTED_ITEM, payload}
 }
 
-export function fetchContacts(type, opts, fnCallback) {
-    return function (dispatch) {
-        const config = require('../../.settings.json');
-        return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
-            method: type,
-            headers: {'Content-Type': 'application/json'},
-            body: opts
-        })
-            .then(res => res.json(),
-                error => console.log('An error occurred.', error))
-            .then(data =>
-                dispatch(fnCallback(data))
-            )
-    }
-}
+// export function fetchContacts(type, opts, fnCallback) {
+//     return function (dispatch) {
+//         const config = require('../../.settings.json');
+//         return fetch(config.main.apiUrl ? config.main.apiUrl : 'http://jsonplaceholder.typicode.com/users', {
+//             method: type,
+//             headers: {'Content-Type': 'application/json'},
+//             body: opts
+//         })
+//             .then(res => res.json(),
+//                 error => console.log('An error occurred.', error))
+//             .then(data =>
+//                 dispatch(fnCallback(data))
+//             )
+//     }
+// }

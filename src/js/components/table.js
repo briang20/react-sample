@@ -82,12 +82,15 @@ class ConnectedTable extends Component {
                                  name={"selected"}
                                  id={"table-cell"}>
                         <input type={"checkbox"}
+                               data-testid={"select-row-single"}
                                id={"selectRow"}
                                name={"selection"}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
                     </div>);
                 } else {
-                    return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()} id={"table-cell"}
+                    return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()}
+                                 data-testid={key.field + "-value"}
+                                 id={"table-cell"}
                                  contentEditable={this.state.editable}
                                  onClick={this.handleOnClick}
                                  onBlur={(event) => this.handleFocusOut(event, key.field, data)}>
@@ -105,9 +108,19 @@ class ConnectedTable extends Component {
             keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
         }
 
+        // Sort the data based on our current sorting method
+        const sortedData = [...data].sort(sortTypes[this.props.currentSortMethod].fn);
+        return (Object.keys(sortedData).map((item) => {
+            return (
+                <div key={JSON.stringify(sortedData[item])}
+                     id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
+        }));
+    }
+
+    render() {
         // Filter out the contacts that we do not care about
         //TODO: figure out how to filter out the fields we don't care about
-        const filteredData = [...data].filter(item => {
+        const filteredData = [...this.props.contacts].filter(item => {
             if (this.props.currentSearchFilter === '')
                 return true;
 
@@ -118,31 +131,22 @@ class ConnectedTable extends Component {
             }
             return false;
         });
-        // Sort the data based on our current sorting method
-        const sortedData = [...filteredData].sort(sortTypes[this.props.currentSortMethod].fn);
-        return (Object.keys(sortedData).map((item) => {
-            return (
-                <div key={JSON.stringify(sortedData[item])}
-                     id={"table-row"}>{this.renderCells(keys, sortedData[item])}</div>);
-        }));
-    }
 
-    render() {
         return (
-            <div>
-                <div className={"usa-table"}>
-                    <div id={"table-heading"}>
-                        {this.props.children}
-                    </div>
-                    <div id={"table-body"}>
-                        {this.renderRows(this.props.children, this.props.contacts)}
-                    </div>
-                    <small>
-                        <p className={"usa-footer"}>{this.props.contacts.length} records</p>
-                    </small>
-                    <button id={"addRow"} onClick={this.handleAddRow}>Add Row</button>
-                    <button id={"saveChanges"} onClick={this.handleDeleteRows}>Delete Selected Rows</button>
+            <div key={"div-table"} className={"usa-table"}>
+                <div key={"div-table-heading"} id={"table-heading"}>
+                    {this.props.children}
                 </div>
+                <div key={"div-row"} id={"table-body"}>
+                    {this.renderRows(this.props.children, filteredData)}
+                </div>
+                <small>
+                    <p className={"usa-footer"}>Showing {filteredData.length} of {this.props.contacts.length} records</p>
+                </small>
+                <button id={"addRow"} data-testid={"add-row"} onClick={this.handleAddRow}>Add Row</button>
+                <button id={"saveChanges"} data-testid={"delete-row"} onClick={this.handleDeleteRows}>Delete
+                    Selected Rows
+                </button>
             </div>
         );
     }

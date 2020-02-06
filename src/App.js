@@ -5,6 +5,7 @@ import './App.css';
 import Table from './js/components/table';
 import TableColumn from './js/components/table-column';
 import {addContact, changeSearchFilter} from "./js/actions/index";
+import {getCurrentSearchFilter} from "./js/selectors";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -19,6 +20,12 @@ function mapDispatchToProps(dispatch) {
         // },
     };
 }
+
+const mapStateToProps = state => {
+    return {
+        currentSearchFilter: getCurrentSearchFilter(state)
+    };
+};
 
 class ConnectedApp extends Component {
     constructor(props) {
@@ -81,6 +88,8 @@ class ConnectedApp extends Component {
             <div className={"usa-content"}>
                 {this.renderHeader()}
                 <input type={"text"} className={"usa-input"} name={"filter"} placeholder={"Search"}
+                       data-testid={"search-filter"}
+                       value={this.props.currentSearchFilter}
                        onChange={this.handleTextChange}/>
                 <p></p>
                 <Table title="Contacts" editable="false">
@@ -97,7 +106,7 @@ class ConnectedApp extends Component {
 }
 
 const App = connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps
 )(ConnectedApp);
 

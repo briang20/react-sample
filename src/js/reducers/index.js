@@ -9,7 +9,7 @@ import {
     ADD_SELECTED_ITEM, REMOVE_SELECTED_ITEM
 } from "../constants/action-types";
 
-const initialState = {
+export const initialState = {
     contacts: [],
     currentSortMethod: 'default',
     currentSearchFilter: '',

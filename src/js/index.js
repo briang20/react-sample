@@ -1,5 +1,5 @@
-import store from './js/storage/index';
-import {addContact} from './js/storage/index';
+import store from './storage/index';
+import {addContact} from './actions/index';
 
 // For debugging help
 window.store = store;

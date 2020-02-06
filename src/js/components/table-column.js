@@ -64,7 +64,8 @@ class ConnectedTableColumn extends Component {
             );
         } else {
             return (
-                <div name={title} id={"table-cell"} onClick={this.handleClick}>{title}</div> //TODO: set this to the same style as "usa-table th"?
+                <div data-testid={"column-" + this.state.field} name={title} id={"table-cell"}
+                     onClick={this.handleClick}>{title}</div> //TODO: set this to the same style as "usa-table th"?
             );
         }
     }
