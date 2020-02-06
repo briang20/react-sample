@@ -1,14 +1,16 @@
 import React from "react";
-import {createStore} from 'redux'
+import {applyMiddleware, createStore} from 'redux'
 import {Provider} from 'react-redux'
 import {render, fireEvent} from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import rootReducer, {initialState} from '../reducers/index'
 import App from '../App';
+import thunk from "redux-thunk";
 
+const api = '';
 function renderWithRedux(
     ui,
-    {initialState, store = createStore(rootReducer, initialState)} = {}
+    {initialState, store = createStore(rootReducer, initialState, applyMiddleware(thunk.withExtraArgument(api)))} = {}
 ) {
     return {
         ...render(<Provider store={store}>{ui}</Provider>),
