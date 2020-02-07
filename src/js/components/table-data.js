@@ -2,15 +2,10 @@
 
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import Button from 'react-bootstrap/Button';
-import ButtonToolbar from 'react-bootstrap/ButtonToolbar';
-import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Form from 'react-bootstrap/Form';
 import FormCheck from 'react-bootstrap/FormCheck';
 import '../../css/table-theme.scss';
 import {
-    addContact,
-    removeContact,
     modifyContact,
     addSelectedItem,
     removeSelectedItem,
@@ -35,7 +30,7 @@ function mapDispatchToProps(dispatch) {
         },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
-        },
+        }
     };
 }
 
@@ -77,7 +72,6 @@ class ConnectedTable extends Component {
         newData[key.field] = target.value;
         delete newData.selected;
         this.props.modifyContact(data, newData);
-        // this.props.modifyContacts(newData);
     }
 
     handleTextboxChanged(event, readonly) {
@@ -97,14 +91,16 @@ class ConnectedTable extends Component {
 
     renderData(columns, data) {
         return (Object.keys(columns).map((colIdx) => {
-            if (columns[colIdx].type === "checkbox") {
+            let column = columns[colIdx];
+            if (column.type === "checkbox") {
+                let value = (data) ? data.selected : false;
                 return (
                     <td>
                         <FormCheck data-testid={"select-row-single"}
                                    inline
                                    type={"checkbox"}
                                    label={"Selected"}
-                                   checked={data.selected}
+                                   checked={value}
                                    onChange={(event) => this.handleCheckboxChanged(event, data)}
                         />
                     </td>
@@ -112,13 +108,13 @@ class ConnectedTable extends Component {
             } else {
                 return (
                     <td>
-                        <Form.Control data-testid={columns[colIdx].field + "-input"}
+                        <Form.Control data-testid={column.field + "-input"}
                                       id={"table-input"}
-                                      type="text"
-                                      placeholder={columns[colIdx].field}
-                                      defaultValue={data[columns[colIdx].field]}
-                                      disabled={columns[colIdx].readonly}
-                                      onBlur={(event) => this.handleFocusOut(event, columns[colIdx], data)}/>
+                                      type={"text"}
+                                      placeholder={column.field}
+                                      defaultValue={value}
+                                      disabled={column.readonly}
+                                      onBlur={(event) => this.handleFocusOut(event, column, data)}/>
                     </td>
                 );
             }

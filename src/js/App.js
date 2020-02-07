@@ -17,7 +17,9 @@ import {
     deleteContacts,
     getContacts, modifyContact,
     putContacts,
-    postContacts, removeContact
+    postContacts,
+    removeContact,
+    clearSelectedItems
 } from "./actions/index";
 import {getCurrentSearchFilter, getContactsList, getSortingState, getCurrentSelectedItemList} from "./selectors/index";
 import ButtonToolbar from "react-bootstrap/ButtonToolbar";
@@ -33,6 +35,9 @@ function mapDispatchToProps(dispatch) {
         },
         removeContact: function (contact) {
             dispatch(removeContact(contact))
+        },
+        clearSelectedItems: function () {
+            dispatch(clearSelectedItems())
         },
         modifyContact: function (contact, newContact) {
             dispatch(modifyContact(contact, newContact))
