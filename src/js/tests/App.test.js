@@ -24,11 +24,11 @@ function renderWithRedux(
 it('should render columns correctly', function () {
     const {getByText} = renderWithRedux(<App/>);
 
-    expect(getByText('User ID')).toBeInTheDocument();
+    expect(getByText('#')).toBeInTheDocument();
     expect(getByText('Name')).toBeInTheDocument();
-    expect(getByText('Username')).toBeInTheDocument();
+    expect(getByText('User')).toBeInTheDocument();
     expect(getByText('Email')).toBeInTheDocument();
-    expect(getByText('URL')).toBeInTheDocument();
+    expect(getByText('Website')).toBeInTheDocument();
 });
 
 it('should be able to sort columns', function () {
@@ -105,6 +105,7 @@ it('should be able to edit a row', function () {
     expect(store.getState().contacts[0].id).toBe(1);
 
     const name_element = getByTestId('name-input');
+    expect(name_element).toBeInTheDocument();
     fireEvent.change(name_element, {target: {value: 'test1'}});
     fireEvent.blur(name_element);
     expect(store.getState().contacts[0].name).toBe("test1");
@@ -206,10 +207,18 @@ it('should be able to filter data using search', function () {
         initialState: newState,
     });
 
+    let searchForm = getByTestId('search-form');
+    expect(searchForm).toBeInTheDocument();
+
     let searchBox = getByTestId('search-filter');
     expect(searchBox).toBeInTheDocument();
+
+    let searchBtn = getByTestId('search-button');
+    expect(searchBtn).toBeInTheDocument();
+
     fireEvent.change(searchBox, {target: {value: '1'}});
     expect(searchBox.value).toBe("1");
+    fireEvent.click(searchBtn);
     expect(store.getState().currentSearchFilter).toBe(searchBox.value);
     expect(getByText("1-1 of 2")).toBeInTheDocument();
 });

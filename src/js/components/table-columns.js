@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addSelectedItem, changeSorting, clearSelectedItems} from "../actions/index";
 import {getSortingState, getSelectedItemsList, getContactsList} from "../selectors/index";
+import FormCheck from "react-bootstrap/FormCheck";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -25,38 +26,26 @@ const mapStateToProps = state => {
     };
 }
 
-class ConnectedTableColumn extends Component {
+class ConnectedTableColumns extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: "",
-            field: "",
-            type: "text",
-            ascending: null
+            columns: []
         };
-        if (props.field != null) this.state.title = this.state.field = props.field;
-        if (props.title != null) this.state.title = props.title;
-        if (props.type != null) this.state.type = props.type;
+        if (props.columns != null) this.state.columns = props.columns;
         this.handleClick = this.handleClick.bind(this);
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
     }
 
-    handleClick(event) {
-        const {ascending} = this.state;
+    handleClick(event, column) {
+        const {ascending} = column;
         let sortType = "";
         if (ascending === false) {
-            this.setState({
-                title: this.state.title,
-                field: this.state.field,
-                type: this.state.type,
-                ascending: true
-            });
-            sortType = "asc_by_" + this.state.field;
+            column.ascending = true;
+            sortType = "asc_by_" + column.field;
         } else {
-            this.setState({
-                ascending: false
-            });
-            sortType = "dsc_by_" + this.state.field;
+            column.ascending = false;
+            sortType = "dsc_by_" + column.field;
         }
 
         this.props.changeSorting(sortType);
@@ -72,32 +61,49 @@ class ConnectedTableColumn extends Component {
                 this.props.addSelectedItem(contact);
     }
 
-    render() {
-        const {title, type} = this.state;
-        if (type === "checkbox") {
+    renderColumn(data) {
+        if (data.type === "checkbox") {
             let isAllChecked = false;
             if (this.props.contacts.length > 0)
                 isAllChecked = this.props.contacts.length === this.props.selectedItems.length;
+
             return (
-                <div id={"table-cell"}>
-                    <input type="checkbox" id="selectAll" name="selection" value="selectAll" checked={isAllChecked}
-                           data-testid={"select-all-rows"}
-                           onChange={(event) => this.handleCheckboxChanged(event)}/>
-                    <label htmlFor="selectAll">{title}</label>
-                </div>
+                <th>
+                    <FormCheck inline
+                               data-testid={"select-all-rows"}
+                               id="selectAll"
+                               type={"checkbox"}
+                               checked={isAllChecked}
+                               onChange={(event) => this.handleCheckboxChanged(event)}
+                    />
+                    <FormCheck.Label htmlFor="selectAll">{data.title}</FormCheck.Label>
+                </th>
             );
         } else {
             return (
-                <div data-testid={"column-" + this.state.field} name={title} id={"table-cell"}
-                     onClick={this.handleClick}>{title}</div> //TODO: set this to the same style as "usa-table th"?
-            );
+                <th data-testid={"column-" + data.field}
+                    onClick={(event) => this.handleClick(event, data)}>{data.title}</th>
+            )
         }
+    }
+
+    render() {
+        const {columns} = this.state;
+        return (
+            <thead>
+            <tr>
+                {Object.keys(columns).map((column) => {
+                    return this.renderColumn(columns[column])
+                })}
+            </tr>
+            </thead>
+        );
     }
 }
 
-const TableColumn = connect(
+const TableColumns = connect(
     mapStateToProps,
     mapDispatchToProps
-)(ConnectedTableColumn);
+)(ConnectedTableColumns);
 
-export default TableColumn;
+export default TableColumns;

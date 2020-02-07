@@ -1,22 +1,24 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import '../css/uswds-theme.scss';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css';
-import Table from './components/table';
-import TableColumn from './components/table-column';
-import {addContact, clearContacts, changeSearchFilter, getContacts} from "./actions/index";
-import {getCurrentSearchFilter} from "./selectors/index";
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import FormControl from 'react-bootstrap/FormControl'
+import Nav from 'react-bootstrap/Nav'
+import Navbar from 'react-bootstrap/Navbar'
+import Table from 'react-bootstrap/Table'
+import TableColumns from './components/table-columns';
+import TableData from './components/table-data';
+import {changeSearchFilter, getContacts} from "./actions/index";
+import {getCurrentSearchFilter, getContactsList, getSortingState} from "./selectors/index";
+import {sortTypes} from "./constants/sort-types";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function (contact) {
-            dispatch(addContact(contact))
-        },
         changeSearchFilter: function (filter) {
             dispatch(changeSearchFilter(filter))
-        },
-        clearContacts: function () {
-            dispatch(clearContacts())
         },
         getContacts: function () {
             dispatch(getContacts())
@@ -26,51 +28,62 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
     return {
-        currentSearchFilter: getCurrentSearchFilter(state)
+        contacts: getContactsList(state),
+        currentSortMethod: getSortingState(state),
+        currentSearchFilter: getCurrentSearchFilter(state),
     };
 };
 
 class ConnectedApp extends Component {
     constructor(props) {
         super(props);
-        this.handleTextChange = this.handleTextChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     componentDidMount() {
         this.props.getContacts();
     }
 
-    renderHeader() {
-        return (
-            <div className="usa-header">
-                <h2>Contacts Page</h2>
-            </div>
-        );
-    }
+    handleSubmit(event) {
+        const searchInput = document.getElementById('filter');
 
-    handleTextChange(event) {
-        const target = event.currentTarget;
-        this.props.changeSearchFilter(target.value);
+        console.log(searchInput.value);
+        this.props.changeSearchFilter(searchInput.value);
+        event.preventDefault();
     }
 
     render() {
+        const columns = [
+            {title: '#', field: 'id', readonly: true},
+            {title: 'Name', field: 'name'},
+            {title: 'User', field: 'username'},
+            {title: 'Email', field: 'email'},
+            {title: 'Website', field: 'website'},
+            {title: 'Select All', field: '', type: 'checkbox'}
+        ];
         return (
             <div className={"usa-content"}>
-                {this.renderHeader()}
-                <input type={"text"} className={"usa-input"} name={"filter"} placeholder={"Search"}
-                       data-testid={"search-filter"}
-                       value={this.props.currentSearchFilter}
-                       onChange={this.handleTextChange}/>
-                <p></p>
-                <Table title="Contacts" editable="false">
-                    <TableColumn field="id" title="User ID" readonly={true}/>
-                    <TableColumn field="name" title="Name"/>
-                    <TableColumn field="username" title="Username"/>
-                    <TableColumn field="email" title="Email"/>
-                    <TableColumn field="website" title="URL"/>
-                    <TableColumn title="Select" type="checkbox"/>
+                <Navbar bg="primary" variant="dark" sticky={"top"}>
+                    <Navbar.Brand href="#home">Contacts</Navbar.Brand>
+                    <Nav className="mr-auto">
+                        <Nav.Link href="#home">Home</Nav.Link>
+                    </Nav>
+                    <Form data-testid={"search-form"} onSubmit={this.handleSubmit} inline>
+                        <FormControl data-testid={"search-filter"} type="text" placeholder="Search" className="mr-sm-2"
+                                     id="filter"/>
+                        <Button data-testid={"search-button"} type="submit" variant="outline-light">Search</Button>
+                    </Form>
+                </Navbar>
+                <Table responsive={"sm"}
+                       size={"sm"}
+                       hover={true}
+                       bordered={true}
+                       striped={true}
+                       variant="">
+                    <TableColumns columns={columns}/>
+                    <TableData columns={columns}/>
                 </Table>
-                <button id={"backToTop"}><a href="#top" id={"topText"}>Top</a></button>
+                <button id={"backToTop"}><a href="#top" id={"topText"}>Top ^</a></button>
             </div>
         );
     }
