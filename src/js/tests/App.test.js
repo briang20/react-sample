@@ -88,9 +88,11 @@ it('should be able to add a row', function () {
 
     fireEvent.click(getByTestId('add-row'));
     expect(store.getState().contacts.length).toBe(1);
+    expect(store.getState().contacts[0].id).toBe(1);
 
     fireEvent.click(getByTestId('add-row'));
     expect(store.getState().contacts.length).toBe(2);
+    expect(store.getState().contacts[1].id).toBe(2);
 });
 
 it('should be able to edit a row', function () {

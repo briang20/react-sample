@@ -26,7 +26,6 @@ function rootReducer(state = initialState, action) {
         });
     }
     if (action.type === REMOVE_CONTACT) {
-        console.log(action.payload);
         return Object.assign({}, state, {
             contacts: state.contacts.filter(contact => contact !== action.payload)
         });

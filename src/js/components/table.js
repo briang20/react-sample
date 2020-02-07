@@ -89,6 +89,7 @@ class ConnectedTable extends Component {
         let newData = Object.assign({}, data);
         newData[key] = target.value;
         delete newData.selected;
+        this.props.modifyContact(data, newData);
         this.props.modifyContacts(newData);
     }
 
@@ -193,15 +194,16 @@ class ConnectedTable extends Component {
     handleDeleteRows() {
         //TODO: maybe prompt for confirmation of the delete action?
         for (let item of this.props.currentSelectedItems) {
-            //this.props.removeContact(item);
+            this.props.removeContact(item);
             this.props.deleteContacts(item);
         }
         this.props.clearSelectedItems();
     }
 
     handleAddRow() {
-        //this.props.addContact([{}]);
-        this.props.postContacts({id: this.props.contacts.length + 1});
+        const opts = {id: this.props.contacts.length + 1};
+        this.props.addContact([opts]);
+        this.props.postContacts(opts);
     }
 }
 
