@@ -83,7 +83,7 @@ export function postContacts(opts) {
     }
 }
 
-export function modifyContacts(opts) {
+export function putContacts(opts) {
     return (dispatch, getState, api) => {
         dispatch(fetchContacts('put', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
     }

@@ -15,10 +15,6 @@ import {
     addSelectedItem,
     removeSelectedItem,
     clearSelectedItems,
-    getContacts,
-    postContacts,
-    modifyContacts,
-    deleteContacts,
 } from "../actions/index";
 import {
     getContactsState,
@@ -31,15 +27,6 @@ import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function (contact) {
-            dispatch(addContact(contact))
-        },
-        removeContact: function (contact) {
-            dispatch(removeContact(contact))
-        },
-        modifyContact: function (contact, newContact) {
-            dispatch(modifyContact(contact, newContact))
-        },
         addSelectedItem: function (item) {
             dispatch(addSelectedItem(item))
         },
@@ -48,18 +35,6 @@ function mapDispatchToProps(dispatch) {
         },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
-        },
-        getContacts: function (opts) {
-            dispatch(getContacts(opts))
-        },
-        postContacts: function (opts) {
-            dispatch(postContacts(opts))
-        },
-        modifyContacts: function (opts) {
-            dispatch(modifyContacts(opts))
-        },
-        deleteContacts: function (opts) {
-            dispatch(deleteContacts(opts))
         },
     };
 }
@@ -86,10 +61,7 @@ class ConnectedTable extends Component {
 
         // bind this to the callbacks
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
-        this.handleAddRow = this.handleAddRow.bind(this);
-        this.handleDeleteRows = this.handleDeleteRows.bind(this);
         this.handleTextboxChanged = this.handleTextboxChanged.bind(this);
-        this.handleCheckForUpdates = this.handleCheckForUpdates.bind(this);
     }
 
     handleFocusOut(event, key, data) {
@@ -121,25 +93,6 @@ class ConnectedTable extends Component {
             this.props.addSelectedItem(targetRow);
         else
             this.props.removeSelectedItem(targetRow);
-    }
-
-    handleDeleteRows() {
-        //TODO: maybe prompt for confirmation of the delete action?
-        for (let item of this.props.currentSelectedItems) {
-            this.props.removeContact(item);
-            // this.props.deleteContacts(item);
-        }
-        this.props.clearSelectedItems();
-    }
-
-    handleAddRow() {
-        const opts = {id: this.props.contacts.length + 1};
-        this.props.addContact([opts]);
-        // this.props.postContacts(opts);
-    }
-
-    handleCheckForUpdates() {
-        this.props.getContacts();
     }
 
     renderData(columns, data) {
@@ -185,35 +138,9 @@ class ConnectedTable extends Component {
     render() {
         // Filter out the contacts that we do not care about
         const {columns} = this.state;
-        const filteredData = [...this.props.contacts].filter(item => {
-            if (this.props.currentSearchFilter === '')
-                return true;
-
-            const array = Object.values(item);
-            for (const element of array) {
-                //TODO: figure out how to filter out the fields we don't care about
-                if (element.toString().indexOf(this.props.currentSearchFilter) !== -1)
-                    return true;
-            }
-            return false;
-        });
-
         return (
             <tbody>
-            {this.renderRows(columns, filteredData)}
-            <small>
-                <p className={"usa-footer"}>1-{filteredData.length} of {this.props.contacts.length}</p>
-            </small>
-            <ButtonToolbar aria-label="Button toolbar that modify the table">
-                <ButtonGroup aria-label="Table CRUD Buttons">
-                    <Button data-testid={"save-table"} variant="primary">Save Changes</Button>
-                    <Button data-testid={"refresh-table"} variant="primary"
-                            onClick={this.handleCheckForUpdates}>Refresh</Button>
-                    <Button data-testid={"add-row"} variant="secondary" onClick={this.handleAddRow}>Add Row</Button>
-                    <Button data-testid={"delete-row"} variant="secondary" onClick={this.handleDeleteRows}>Delete
-                        Selected</Button>
-                </ButtonGroup>
-            </ButtonToolbar>
+                {this.renderRows(columns, this.props.data)}
             </tbody>
         );
     }

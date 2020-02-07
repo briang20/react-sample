@@ -11,17 +11,43 @@ import Navbar from 'react-bootstrap/Navbar'
 import Table from 'react-bootstrap/Table'
 import TableColumns from './components/table-columns';
 import TableData from './components/table-data';
-import {changeSearchFilter, getContacts} from "./actions/index";
-import {getCurrentSearchFilter, getContactsList, getSortingState} from "./selectors/index";
-import {sortTypes} from "./constants/sort-types";
+import {
+    addContact,
+    changeSearchFilter,
+    deleteContacts,
+    getContacts, modifyContact,
+    putContacts,
+    postContacts, removeContact
+} from "./actions/index";
+import {getCurrentSearchFilter, getContactsList, getSortingState, getCurrentSelectedItemList} from "./selectors/index";
+import ButtonToolbar from "react-bootstrap/ButtonToolbar";
+import ButtonGroup from "react-bootstrap/ButtonGroup";
 
 function mapDispatchToProps(dispatch) {
     return {
         changeSearchFilter: function (filter) {
             dispatch(changeSearchFilter(filter))
         },
+        addContact: function (contact) {
+            dispatch(addContact(contact))
+        },
+        removeContact: function (contact) {
+            dispatch(removeContact(contact))
+        },
+        modifyContact: function (contact, newContact) {
+            dispatch(modifyContact(contact, newContact))
+        },
         getContacts: function () {
             dispatch(getContacts())
+        },
+        postContacts: function (opts) {
+            dispatch(postContacts(opts))
+        },
+        putContacts: function (opts) {
+            dispatch(putContacts(opts))
+        },
+        deleteContacts: function (opts) {
+            dispatch(deleteContacts(opts))
         },
     };
 }
@@ -31,13 +57,28 @@ const mapStateToProps = state => {
         contacts: getContactsList(state),
         currentSortMethod: getSortingState(state),
         currentSearchFilter: getCurrentSearchFilter(state),
+        currentSelectedItems: getCurrentSelectedItemList(state),
     };
 };
 
 class ConnectedApp extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            columns: [
+                {title: '#', field: 'id', readonly: true},
+                {title: 'Name', field: 'name'},
+                {title: 'User', field: 'username'},
+                {title: 'Email', field: 'email'},
+                {title: 'Website', field: 'website'},
+                {title: 'Select All', field: '', type: 'checkbox'}
+            ]
+        };
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleAddRow = this.handleAddRow.bind(this);
+        this.handleSaveData = this.handleSaveData.bind(this);
+        this.handleDeleteRows = this.handleDeleteRows.bind(this);
+        this.handleCheckForUpdates = this.handleCheckForUpdates.bind(this);
     }
 
     componentDidMount() {
@@ -45,22 +86,50 @@ class ConnectedApp extends Component {
     }
 
     handleSubmit(event) {
-        const searchInput = document.getElementById('filter');
-
-        console.log(searchInput.value);
-        this.props.changeSearchFilter(searchInput.value);
         event.preventDefault();
+        const searchInput = document.getElementById('filter');
+        this.props.changeSearchFilter(searchInput.value);
+    }
+
+    handleDeleteRows() {
+        //TODO: maybe prompt for confirmation of the delete action?
+        for (let item of this.props.currentSelectedItems) {
+            this.props.removeContact(item);
+        }
+        this.props.clearSelectedItems();
+    }
+
+    handleAddRow() {
+        const opts = {id: this.props.contacts.length + 1};
+        this.props.addContact([opts]);
+    }
+
+    handleCheckForUpdates() {
+        this.props.getContacts();
+    }
+
+    handleSaveData() {
+        //TODO: go through the history table and do the final calls
+
+        // this.props.postContacts(opts);
+        // this.props.deleteContacts(opts);
+        // this.props.modifyContacts(opts);
     }
 
     render() {
-        const columns = [
-            {title: '#', field: 'id', readonly: true},
-            {title: 'Name', field: 'name'},
-            {title: 'User', field: 'username'},
-            {title: 'Email', field: 'email'},
-            {title: 'Website', field: 'website'},
-            {title: 'Select All', field: '', type: 'checkbox'}
-        ];
+        const {columns} = this.state;
+        const filteredData = [...this.props.contacts].filter(item => {
+            if (this.props.currentSearchFilter === '')
+                return true;
+
+            const array = Object.values(item);
+            for (const element of array) {
+                if (element.toString().indexOf(this.props.currentSearchFilter) !== -1)
+                    return true;
+            }
+            return false;
+        });
+
         return (
             <div className={"usa-content"}>
                 <Navbar bg="primary" variant="dark" sticky={"top"}>
@@ -81,8 +150,21 @@ class ConnectedApp extends Component {
                        striped={true}
                        variant="">
                     <TableColumns columns={columns}/>
-                    <TableData columns={columns}/>
+                    <TableData columns={columns} data={filteredData}/>
                 </Table>
+                <small>
+                    <p className={"usa-footer"}>1-{filteredData.length} of {this.props.contacts.length}</p>
+                </small>
+                <ButtonToolbar aria-label="Button toolbar that do actions on the table">
+                    <ButtonGroup aria-label="Group of table CRUD buttons">
+                        <Button data-testid={"save-table"} variant="primary">Save Changes</Button>
+                        <Button data-testid={"refresh-table"} variant="primary"
+                                onClick={this.handleCheckForUpdates}>Refresh</Button>
+                        <Button data-testid={"add-row"} variant="secondary" onClick={this.handleAddRow}>Add Row</Button>
+                        <Button data-testid={"delete-row"} variant="secondary" onClick={this.handleDeleteRows}>Delete
+                            Selected</Button>
+                    </ButtonGroup>
+                </ButtonToolbar>
                 <button id={"backToTop"}><a href="#top" id={"topText"}>Top ^</a></button>
             </div>
         );
