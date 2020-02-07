@@ -7,8 +7,8 @@ export const sortTypes = {
     },
     asc_by_name: {
         fn: (a, b) => {
-            const nameA = a.name.toUpperCase();
-            const nameB = b.name.toUpperCase();
+            const nameA = a.name ? a.name.toUpperCase() : '';
+            const nameB = b.name ? b.name.toUpperCase() : '';
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
             return 0;
@@ -16,8 +16,8 @@ export const sortTypes = {
     },
     dsc_by_name: {
         fn: (a, b) => {
-            const nameA = a.name.toUpperCase();
-            const nameB = b.name.toUpperCase();
+            const nameA = a.name ? a.name.toUpperCase() : '';
+            const nameB = b.name ? b.name.toUpperCase() : '';
             if (nameA > nameB) return -1;
             if (nameA < nameB) return 1;
             return 0;
@@ -25,8 +25,8 @@ export const sortTypes = {
     },
     asc_by_username: {
         fn: (a, b) => {
-            const nameA = a.username.toUpperCase();
-            const nameB = b.username.toUpperCase();
+            const nameA = a.username ? a.username.toUpperCase() : '';
+            const nameB = b.username ? b.username.toUpperCase() : '';
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
             return 0;
@@ -34,8 +34,8 @@ export const sortTypes = {
     },
     dsc_by_username: {
         fn: (a, b) => {
-            const nameA = a.username.toUpperCase();
-            const nameB = b.username.toUpperCase();
+            const nameA = a.username ? a.username.toUpperCase() : '';
+            const nameB = b.username ? b.username.toUpperCase() : '';
             if (nameA > nameB) return -1;
             if (nameA < nameB) return 1;
             return 0;
@@ -43,8 +43,8 @@ export const sortTypes = {
     },
     asc_by_email: {
         fn: (a, b) => {
-            const nameA = a.email.toUpperCase();
-            const nameB = b.email.toUpperCase();
+            const nameA = a.email ? a.email.toUpperCase() : '';
+            const nameB = b.email ? b.email.toUpperCase() : '';
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
             return 0;
@@ -52,8 +52,8 @@ export const sortTypes = {
     },
     dsc_by_email: {
         fn: (a, b) => {
-            const nameA = a.email.toUpperCase();
-            const nameB = b.email.toUpperCase();
+            const nameA = a.email ? a.email.toUpperCase() : '';
+            const nameB = b.email ? b.email.toUpperCase() : '';
             if (nameA > nameB) return -1;
             if (nameA < nameB) return 1;
             return 0;
@@ -61,8 +61,8 @@ export const sortTypes = {
     },
     asc_by_website: {
         fn: (a, b) => {
-            const nameA = a.website.toUpperCase();
-            const nameB = b.website.toUpperCase();
+            const nameA = a.website ? a.website.toUpperCase() : '';
+            const nameB = b.website ? b.website.toUpperCase() : '';
             if (nameA < nameB) return -1;
             if (nameA > nameB) return 1;
             return 0;
@@ -70,8 +70,8 @@ export const sortTypes = {
     },
     dsc_by_website: {
         fn: (a, b) => {
-            const nameA = a.website.toUpperCase();
-            const nameB = b.website.toUpperCase();
+            const nameA = a.website ? a.website.toUpperCase() : '';
+            const nameB = b.website ? b.website.toUpperCase() : '';
             if (nameA > nameB) return -1;
             if (nameA < nameB) return 1;
             return 0;

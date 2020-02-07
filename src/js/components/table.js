@@ -81,16 +81,31 @@ class ConnectedTable extends Component {
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
         this.handleDeleteRows = this.handleDeleteRows.bind(this);
         this.handleAddRow = this.handleAddRow.bind(this);
+        this.handleTextboxChanged = this.handleTextboxChanged.bind(this);
     }
 
     handleFocusOut(event, key, data) {
         const target = event.target;
         //TODO: Before we actually apply this data, we need to sanitize the input
+        const oldValue = data[key.field] ? data[key.field] : '';
+        if (key.readonly === true ||
+            target.value === oldValue.toString()) {
+            return;
+        }
+
         let newData = Object.assign({}, data);
-        newData[key] = target.value;
+        newData[key.field] = target.value;
         delete newData.selected;
         this.props.modifyContact(data, newData);
         this.props.modifyContacts(newData);
+    }
+
+    handleTextboxChanged(event, readonly) {
+        const target = event.target;
+        if (readonly === true)
+            target.value = target.defaultValue;
+        // else
+        //     target.defaultValue = target.value;
     }
 
     handleCheckboxChanged(event, data) {
@@ -125,8 +140,9 @@ class ConnectedTable extends Component {
                         <input type={"text"}
                                data-testid={key.field + "-input"}
                                name={"field"}
-                               onChange={(event) => this.handleFocusOut(event, key.field, data)}
-                               value={data[key.field]}/>
+                               onChange={(event) => this.handleTextboxChanged(event, key.readonly)}
+                               onBlur={(event) => this.handleFocusOut(event, key, data)}
+                               defaultValue={data[key.field]}/>
                     </div>);
                 }
             })
@@ -137,7 +153,11 @@ class ConnectedTable extends Component {
     renderRows(columns, data) {
         let keys = [];
         for (let index = 0; index < React.Children.count(columns); ++index) {
-            keys = keys.concat({field: columns[index].props.field, type: columns[index].props.type});
+            keys = keys.concat({
+                field: columns[index].props.field,
+                type: columns[index].props.type,
+                readonly: columns[index].props.readonly
+            });
         }
 
         // Sort the data based on our current sorting method

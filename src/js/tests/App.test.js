@@ -102,10 +102,27 @@ it('should be able to edit a row', function () {
 
     fireEvent.click(getByTestId('add-row'));
     expect(store.getState().contacts.length).toBe(1);
+    expect(store.getState().contacts[0].id).toBe(1);
 
     const name_element = getByTestId('name-input');
     fireEvent.change(name_element, {target: {value: 'test1'}});
+    fireEvent.blur(name_element);
     expect(store.getState().contacts[0].name).toBe("test1");
+});
+
+it('should not be able to edit a readonly column', function () {
+    const {getByTestId, store} = renderWithRedux(<App/>, {
+        initialState: initialState,
+    });
+
+    fireEvent.click(getByTestId('add-row'));
+    expect(store.getState().contacts.length).toBe(1);
+    expect(store.getState().contacts[0].id).toBe(1);
+
+    const id_element = getByTestId('id-input');
+    fireEvent.change(id_element, {target: {value: '2'}});
+    fireEvent.blur(id_element);
+    expect(store.getState().contacts[0].id).toBe(1);
 });
 
 it('should be able to select a row', function () {
