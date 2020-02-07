@@ -83,18 +83,12 @@ class ConnectedTable extends Component {
         this.handleAddRow = this.handleAddRow.bind(this);
     }
 
-    handleOnClick(event) {
-        const target = event.target;
-        target.contentEditable = true;
-    }
-
     handleFocusOut(event, key, data) {
         const target = event.target;
         //TODO: Before we actually apply this data, we need to sanitize the input
         let newData = Object.assign({}, data);
-        target.contentEditable = false;
-        newData[key] = target.textContent;
-        delete newData.selected; // Remove this from the data
+        newData[key] = target.value;
+        delete newData.selected;
         this.props.modifyContacts(newData);
     }
 
@@ -126,11 +120,12 @@ class ConnectedTable extends Component {
                 } else {
                     return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()}
                                  data-testid={key.field + "-value"}
-                                 id={"table-cell"}
-                                 contentEditable={this.state.editable}
-                                 onClick={this.handleOnClick}
-                                 onBlur={(event) => this.handleFocusOut(event, key.field, data)}>
-                        {data[key.field]}
+                                 id={"table-cell"}>
+                        <input type={"text"}
+                               data-testid={key.field + "-input"}
+                               name={"field"}
+                               onChange={(event) => this.handleFocusOut(event, key.field, data)}
+                               value={data[key.field]}/>
                     </div>);
                 }
             })

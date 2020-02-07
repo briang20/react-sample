@@ -63,7 +63,7 @@ class ConnectedApp extends Component {
                        onChange={this.handleTextChange}/>
                 <p></p>
                 <Table title="Contacts" editable="false">
-                    <TableColumn field="id" title="User ID"/>
+                    <TableColumn field="id" title="User ID" readonly={true}/>
                     <TableColumn field="name" title="Name"/>
                     <TableColumn field="username" title="Username"/>
                     <TableColumn field="email" title="Email"/>
