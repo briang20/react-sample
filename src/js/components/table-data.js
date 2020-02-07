@@ -28,6 +28,9 @@ function mapDispatchToProps(dispatch) {
         removeSelectedItem: function (item) {
             dispatch(removeSelectedItem(item))
         },
+        modifyContact: function (data, newData) {
+            dispatch(modifyContact(data, newData))
+        },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
         }
@@ -56,7 +59,6 @@ class ConnectedTable extends Component {
 
         // bind this to the callbacks
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
-        this.handleTextboxChanged = this.handleTextboxChanged.bind(this);
     }
 
     handleFocusOut(event, key, data) {
@@ -72,12 +74,6 @@ class ConnectedTable extends Component {
         newData[key.field] = target.value;
         delete newData.selected;
         this.props.modifyContact(data, newData);
-    }
-
-    handleTextboxChanged(event, readonly) {
-        const target = event.target;
-        if (readonly === true)
-            target.value = target.defaultValue;
     }
 
     handleCheckboxChanged(event, data) {
@@ -106,6 +102,7 @@ class ConnectedTable extends Component {
                     </td>
                 );
             } else {
+                let value = (data && data[column.field]) ? data[column.field] : null;
                 return (
                     <td>
                         <Form.Control data-testid={column.field + "-input"}
@@ -136,7 +133,7 @@ class ConnectedTable extends Component {
         const {columns} = this.state;
         return (
             <tbody>
-                {this.renderRows(columns, this.props.data)}
+            {this.renderRows(columns, this.props.data)}
             </tbody>
         );
     }

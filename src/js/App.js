@@ -81,7 +81,7 @@ class ConnectedApp extends Component {
         };
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleAddRow = this.handleAddRow.bind(this);
-        this.handleSaveData = this.handleSaveData.bind(this);
+        this.handleSaveChanges = this.handleSaveChanges.bind(this);
         this.handleDeleteRows = this.handleDeleteRows.bind(this);
         this.handleCheckForUpdates = this.handleCheckForUpdates.bind(this);
     }
@@ -113,7 +113,7 @@ class ConnectedApp extends Component {
         this.props.getContacts();
     }
 
-    handleSaveData() {
+    handleSaveChanges() {
         //TODO: go through the history table and do the final calls
 
         // this.props.postContacts(opts);
@@ -162,7 +162,8 @@ class ConnectedApp extends Component {
                 </small>
                 <ButtonToolbar aria-label="Button toolbar that do actions on the table">
                     <ButtonGroup aria-label="Group of table CRUD buttons">
-                        <Button data-testid={"save-table"} variant="primary">Save Changes</Button>
+                        <Button data-testid={"save-table"} variant="primary"
+                                onClick={this.handleSaveChanges}> Save Changes</Button>
                         <Button data-testid={"refresh-table"} variant="primary"
                                 onClick={this.handleCheckForUpdates}>Refresh</Button>
                         <Button data-testid={"add-row"} variant="secondary" onClick={this.handleAddRow}>Add Row</Button>
