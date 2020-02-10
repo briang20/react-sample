@@ -74,7 +74,7 @@ class ConnectedApp extends Component {
         return (
             <div className="usa-header">
                 <h2>Contacts Page</h2>
-                <input type={"text"} className={"usa-input"} name={"filter"} placeholder={"Search"}
+                <input type={"text"} className={"usa-search"} name={"filter"} placeholder={"Search"}
                        data-testid={"search-filter"}
                        value={this.props.currentSearchFilter}
                        onChange={this.handleTextChange}/>

@@ -149,8 +149,14 @@ it('should be able to select all rows', function () {
     fireEvent.click(getByTestId('add-row'));
     expect(store.getState().contacts.length).toBe(4);
     expect(store.getState().currentSelectedItems.length).toBe(0);
+
+    // Check if checking select all adds all contacts as selected
     fireEvent.click(getByTestId('select-all-rows'));
-    expect(store.getState().currentSelectedItems.length).toBe(4);
+    expect(store.getState().currentSelectedItems.length).toBe(store.getState().contacts.length);
+
+    // Check if unchecking select all removes all selected rows
+    fireEvent.click(getByTestId('select-all-rows'));
+    expect(store.getState().currentSelectedItems.length).toBe(0);
 });
 
 it('should be able to delete all rows', function () {
@@ -166,8 +172,12 @@ it('should be able to delete all rows', function () {
     fireEvent.click(getByTestId('add-row'));
     expect(store.getState().contacts.length).toBe(4);
     expect(store.getState().currentSelectedItems.length).toBe(0);
+
+    // Select all rows
     fireEvent.click(getByTestId('select-all-rows'));
-    expect(store.getState().currentSelectedItems.length).toBe(4);
+    expect(store.getState().currentSelectedItems.length).toBe(store.getState().contacts.length);
+
+    // Delete the rows
     fireEvent.click(getByTestId('delete-row'));
     expect(store.getState().contacts.length).toBe(0);
     expect(store.getState().currentSelectedItems.length).toBe(0);
