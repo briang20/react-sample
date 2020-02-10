@@ -2,11 +2,16 @@
   @media screen and (min-width: 768px) {
     margin: auto;
     padding: 10px;
-    border: 3px solid;
   }
 }
 
+.usa-header {
+  background-color: $color-blue-warm-5;
+  border-bottom: 1px solid $color-blue-warm-5;
+}
+
 .usa-footer {
+  // Make sure the footer is on it's own and not next to any floating members
   clear: both;
 }
 
