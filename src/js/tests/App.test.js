@@ -104,7 +104,7 @@ it('should be able to edit a row', function () {
     expect(store.getState().contacts.length).toBe(1);
     expect(store.getState().contacts[0].id).toBe(1);
 
-    const name_element = getByTestId('name-input');
+    const name_element = getByTestId('name-input-1');
     fireEvent.change(name_element, {target: {value: 'test1'}});
     fireEvent.blur(name_element);
     expect(store.getState().contacts[0].name).toBe("test1");
@@ -119,7 +119,7 @@ it('should not be able to edit a readonly column', function () {
     expect(store.getState().contacts.length).toBe(1);
     expect(store.getState().contacts[0].id).toBe(1);
 
-    const id_element = getByTestId('id-input');
+    const id_element = getByTestId('id-input-1');
     fireEvent.change(id_element, {target: {value: '2'}});
     fireEvent.blur(id_element);
     expect(store.getState().contacts[0].id).toBe(1);
@@ -222,4 +222,24 @@ it('should be able to filter data using search', function () {
     expect(searchBox.value).toBe("1");
     expect(store.getState().currentSearchFilter).toBe(searchBox.value);
     expect(getByText("1-1 of 2")).toBeInTheDocument();
+});
+
+it('should be able to refresh the table data', function () {
+    const newState = Object.assign({}, initialState, {
+        contacts: initialState.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}])
+    });
+    const {getByText, getByTestId, store} = renderWithRedux(<App/>, {
+        initialState: newState,
+    });
+
+    const name_element = getByTestId('name-input-1');
+    fireEvent.change(name_element, {target: {value: 'test1'}});
+    expect(name_element.value).toBe("test1");
+
+    const refreshButton = getByTestId('refresh-table');
+    expect(refreshButton).toBeInTheDocument();
+    fireEvent.click(refreshButton);
+    console.log(store.getState().contacts[0]);
+    expect(store.getState().contacts.length).toBe(2);
+    expect(name_element.value).toBe("test");
 });

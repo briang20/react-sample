@@ -135,7 +135,7 @@ class ConnectedTable extends Component {
                                  data-testid={key.field + "-value"}
                                  id={"table-cell"}>
                         <input type={"text"}
-                               data-testid={key.field + "-input"}
+                               data-testid={key.field + "-input-" + data.id}
                                name={"field"}
                                onChange={(event) => this.handleTextboxChanged(event, key.readonly)}
                                onBlur={(event) => this.handleFocusOut(event, key, data)}
