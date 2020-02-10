@@ -50,7 +50,7 @@ export function clearContacts() {
 
 export function fetchContacts(type, opts, fnCallback, key) {
     return (dispatch, getState, api) => {
-        let url = api ? api : 'http://jsonplaceholder.typicode.com/users';
+        let url = api ? api : 'https://my-json-server.typicode.com/RavenX8/react-sample/users';
         if (type !== 'get' && type !== 'post') url = url + "/" + key;
         return fetch(url, {
             method: type,

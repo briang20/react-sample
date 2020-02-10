@@ -11,8 +11,6 @@ import {
 import {
     getContactsState,
     getCurrentSearchFilter,
-    getCurrentSelectedItemList,
-    getSelectedItemsList,
     getSortingState
 } from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
