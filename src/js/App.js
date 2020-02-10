@@ -128,7 +128,7 @@ class ConnectedApp extends Component {
                 <div className={"usa-content"}>
                     <Table title="Contacts" editable="false" data={filteredData}>
                         <TableColumn title="" type="checkbox"/>
-                        <TableColumn field="id" title="User ID" readonly={true}/>
+                        <TableColumn field="id" title="#" readonly={true}/>
                         <TableColumn field="name" title="Name"/>
                         <TableColumn field="username" title="Username"/>
                         <TableColumn field="email" title="Email"/>

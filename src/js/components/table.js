@@ -98,6 +98,7 @@ class ConnectedTable extends Component {
                                id={"selectRow"}
                                className={"usa-checkbox__input"}
                                name={"selection"}
+                               disabled={key.readonly}
                                checked={data.selected}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
                     </div>);
@@ -108,6 +109,7 @@ class ConnectedTable extends Component {
                         <input type={"text"}
                                data-testid={key.field + "-input-" + data.id}
                                name={"field"}
+                               disabled={key.readonly}
                                onChange={(event) => this.handleTextboxChanged(event, key.readonly)}
                                onBlur={(event) => this.handleFocusOut(event, key, data)}
                                defaultValue={data[key.field]}/>
