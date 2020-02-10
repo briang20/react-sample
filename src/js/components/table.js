@@ -37,10 +37,8 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = state => {
     return {
         contacts: getContactsState(state),
-        selectedItems: getSelectedItemsList(state),
         currentSortMethod: getSortingState(state),
-        currentSearchFilter: getCurrentSearchFilter(state),
-        currentSelectedItems: getCurrentSelectedItemList(state)
+        currentSearchFilter: getCurrentSearchFilter(state)
     };
 };
 
@@ -48,13 +46,8 @@ class ConnectedTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            title: "",
-            editable: false,
             currentSort: 'default'
         };
-        // update internal state with our props
-        if (props.title != null) this.state.title = props.title;
-        if (props.editable != null) this.state.editable = props.editable;
 
         // bind this to the callbacks
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
@@ -112,7 +105,7 @@ class ConnectedTable extends Component {
                     </div>);
                 } else {
                     return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()}
-                                 data-testid={key.field + "-value"}
+                                 data-testid={key.field + "-value-" + data.id}
                                  id={"table-cell"}>
                         <input type={"text"}
                                data-testid={key.field + "-input-" + data.id}
