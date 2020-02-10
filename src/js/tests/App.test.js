@@ -8,6 +8,7 @@ import App from '../App';
 import thunk from "redux-thunk";
 
 const api = '';
+
 function renderWithRedux(
     ui,
     {initialState, store = createStore(rootReducer, initialState, applyMiddleware(thunk.withExtraArgument(api)))} = {}
@@ -43,6 +44,13 @@ it('should be able to sort columns', function () {
             },
             {
                 id: '2',
+                name: 'a',
+                username: 'sally',
+                email: 'sally@sally.co',
+                website: 'sally.co'
+            },
+            {
+                id: '3',
                 name: 'a',
                 username: 'sally',
                 email: 'sally@sally.co',
@@ -140,7 +148,7 @@ it('should be able to select all rows', function () {
     const newState = Object.assign({}, initialState, {
         contacts: initialState.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}])
     });
-    const {getByTestId, store} = renderWithRedux(<App/>, {
+    const {getByTestId, getAllByTestId, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
 
@@ -152,6 +160,12 @@ it('should be able to select all rows', function () {
 
     // Check if checking select all adds all contacts as selected
     fireEvent.click(getByTestId('select-all-rows'));
+
+    // Make sure that all of the check boxes are checked
+    const select_boxes = getAllByTestId('select-row-single');
+    for (let checkbox of select_boxes)
+        expect(checkbox).toBeChecked();
+
     expect(store.getState().currentSelectedItems.length).toBe(store.getState().contacts.length);
 
     // Check if unchecking select all removes all selected rows
