@@ -3,15 +3,10 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {
-    addContact,
-    removeContact,
     modifyContact,
     addSelectedItem,
     removeSelectedItem,
-    clearSelectedItems,
-    postContacts,
     modifyContacts,
-    deleteContacts,
 } from "../actions/index";
 import {
     getContactsState,
@@ -24,12 +19,6 @@ import {sortTypes} from "../constants/sort-types"
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function (contact) {
-            dispatch(addContact(contact))
-        },
-        removeContact: function (contact) {
-            dispatch(removeContact(contact))
-        },
         modifyContact: function (contact, newContact) {
             dispatch(modifyContact(contact, newContact))
         },
@@ -39,17 +28,8 @@ function mapDispatchToProps(dispatch) {
         removeSelectedItem: function (item) {
             dispatch(removeSelectedItem(item))
         },
-        clearSelectedItems: function () {
-            dispatch(clearSelectedItems())
-        },
-        postContacts: function (opts) {
-            dispatch(postContacts(opts))
-        },
         modifyContacts: function (opts) {
             dispatch(modifyContacts(opts))
-        },
-        deleteContacts: function (opts) {
-            dispatch(deleteContacts(opts))
         },
     };
 }

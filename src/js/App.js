@@ -6,7 +6,6 @@ import Table from './components/table';
 import TableColumn from './components/table-column';
 import {
     addContact,
-    clearContacts,
     changeSearchFilter,
     getContacts,
     removeContact,
@@ -30,9 +29,6 @@ function mapDispatchToProps(dispatch) {
         },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
-        },
-        clearContacts: function () {
-            dispatch(clearContacts())
         },
         getContacts: function () {
             dispatch(getContacts())
