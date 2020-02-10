@@ -9,7 +9,7 @@ import {
     addSelectedItem,
     removeSelectedItem,
     clearSelectedItems,
-    clearContacts
+    clearContacts, clearReplayBuffer
 } from "../actions/index";
 import {
     ADD_CONTACT,
@@ -20,7 +20,7 @@ import {
     ADD_SELECTED_ITEM,
     REMOVE_SELECTED_ITEM,
     CLEAR_SELECTED_ITEMS,
-    CLEAR_CONTACTS
+    CLEAR_CONTACTS, CLEAR_REPLAY
 } from "../constants/action-types";
 
 const middleware = [thunk];
@@ -129,5 +129,16 @@ it('should dispatch an clearContacts action', function () {
 
     const actions = store.getActions();
     const expectedPayload = {type: CLEAR_CONTACTS};
+    expect(actions).toEqual([expectedPayload])
+});
+
+it('should dispatch an clearReplayBuffer action', function () {
+    // Initialize mockstore with empty state
+    const initialState = {};
+    const store = mockStore(initialState);
+    store.dispatch(clearReplayBuffer());
+
+    const actions = store.getActions();
+    const expectedPayload = {type: CLEAR_REPLAY};
     expect(actions).toEqual([expectedPayload])
 });

@@ -257,3 +257,31 @@ it('should be able to refresh the table data', function () {
     expect(store.getState().contacts.length).toBe(2);
     // expect(name_element.value).toBe("test1");
 });
+
+it('should be able to save the table data replay buffer', function () {
+    const newState = Object.assign({}, initialState, {
+        contacts: initialState.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}])
+    });
+    const {getByTestId, store} = renderWithRedux(<App/>, {
+        initialState: newState,
+    });
+
+    const addButton = getByTestId('add-row');
+    expect(addButton).toBeInTheDocument();
+    fireEvent.click(addButton);
+
+    const name_element = getByTestId('name-input-1');
+    fireEvent.change(name_element, {target: {value: 'wrongText'}});
+    fireEvent.blur(name_element);
+    expect(name_element.value).toBe("wrongText");
+
+    const saveButton = getByTestId('save-table');
+    expect(saveButton).toBeInTheDocument();
+    fireEvent.click(saveButton);
+
+    const refreshButton = getByTestId('refresh-table');
+    expect(refreshButton).toBeInTheDocument();
+    fireEvent.click(refreshButton);
+
+    expect(store.getState().contacts[0].name).toBe("wrongText");
+});
