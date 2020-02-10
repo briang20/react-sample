@@ -111,6 +111,11 @@ class ConnectedApp extends Component {
             return false;
         });
 
+        let shownCountText = '0-';
+        if (filteredData.length > 0)
+            shownCountText = '1-';
+        shownCountText = shownCountText + filteredData.length + ' of ' + this.props.contacts.length;
+
         return (
             <>
                 <div className="usa-header">
@@ -129,13 +134,12 @@ class ConnectedApp extends Component {
                         <TableColumn field="email" title="Email"/>
                         <TableColumn field="website" title="URL"/>
                     </Table>
-                    <button id={"backToTop"}><a href="#top" id={"topText"}>Top</a></button>
-                </div>
-                <div className={"usa-footer"}>
                     <small>
-                        <p>1-{filteredData.length} of {this.props.contacts.length}</p>
+                        <p>{shownCountText}</p>
                     </small>
-                    <div key={"buttons"}>
+                </div>
+                <footer className="usa-footer usa-footer--slim">
+                    <div key={"buttons"} className={"no-floating"}>
                         <button id={"saveChanges"}
                                 className={"usa-button"}
                                 data-testid={"save-table"}
@@ -157,7 +161,10 @@ class ConnectedApp extends Component {
                                 onClick={this.handleDeleteRows}>Delete Selected Rows
                         </button>
                     </div>
-                </div>
+                    <div className="grid-container usa-footer__return-to-top">
+                        <a href="#">Return to top</a>
+                    </div>
+                </footer>
             </>
         );
     }

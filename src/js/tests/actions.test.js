@@ -1,4 +1,5 @@
 import configureStore from 'redux-mock-store';
+import thunk from 'redux-thunk'
 import {
     addContact,
     removeContact,
@@ -22,7 +23,7 @@ import {
     CLEAR_CONTACTS
 } from "../constants/action-types";
 
-const middleware = [];
+const middleware = [thunk];
 const mockStore = configureStore(middleware);
 
 it('should dispatch an add contact action', function () {
