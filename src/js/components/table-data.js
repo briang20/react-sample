@@ -95,6 +95,7 @@ class ConnectedTable extends Component {
                         <FormCheck data-testid={"select-row-single"}
                                    inline
                                    type={"checkbox"}
+                                   className={"usa-checkbox__input"}
                                    label={""}
                                    checked={value}
                                    onChange={(event) => this.handleCheckboxChanged(event, data)}
@@ -107,6 +108,7 @@ class ConnectedTable extends Component {
                     <td>
                         <Form.Control data-testid={column.field + "-input"}
                                       id={"table-input"}
+                                      className={"usa-input"}
                                       type={"text"}
                                       placeholder={column.field}
                                       defaultValue={value}

@@ -143,9 +143,13 @@ class ConnectedApp extends Component {
                         <Nav.Link href="#home">Home</Nav.Link>
                     </Nav>
                     <Form data-testid={"search-form"} onSubmit={this.handleSubmit} inline>
-                        <FormControl data-testid={"search-filter"} type="text" placeholder="Search" className="mr-sm-2"
+                        <FormControl data-testid={"search-filter"} type="text"
+                                     placeholder="Search" className={"usa-input mr-sm-2"}
                                      id="filter"/>
-                        <Button data-testid={"search-button"} type="submit" variant="outline-light">Search</Button>
+                        <Button data-testid={"search-button"}
+                                type="submit"
+                                className={"usa-button"}
+                                variant="outline-light">Search</Button>
                     </Form>
                 </Navbar>
                 <Table responsive={"sm"}
@@ -153,7 +157,8 @@ class ConnectedApp extends Component {
                        hover={true}
                        bordered={true}
                        striped={true}
-                       variant="">
+                       variant=""
+                       className={"usa-table"}>
                     <TableColumns columns={columns}/>
                     <TableData columns={columns} data={filteredData}/>
                 </Table>
@@ -163,11 +168,17 @@ class ConnectedApp extends Component {
                 <ButtonToolbar aria-label="Button toolbar that do actions on the table">
                     <ButtonGroup aria-label="Group of table CRUD buttons">
                         <Button data-testid={"save-table"} variant="primary"
+                                className={"usa-button"}
                                 onClick={this.handleSaveChanges}> Save Changes</Button>
                         <Button data-testid={"refresh-table"} variant="primary"
+                                className={"usa-button"}
                                 onClick={this.handleCheckForUpdates}>Refresh</Button>
-                        <Button data-testid={"add-row"} variant="secondary" onClick={this.handleAddRow}>Add Row</Button>
-                        <Button data-testid={"delete-row"} variant="secondary" onClick={this.handleDeleteRows}>Delete
+                        <Button data-testid={"add-row"} variant="secondary"
+                                className={"usa-button"}
+                                onClick={this.handleAddRow}>Add Row</Button>
+                        <Button data-testid={"delete-row"} variant="secondary"
+                                className={"usa-button"}
+                                onClick={this.handleDeleteRows}>Delete
                             Selected</Button>
                     </ButtonGroup>
                 </ButtonToolbar>
