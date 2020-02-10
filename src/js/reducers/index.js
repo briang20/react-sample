@@ -9,25 +9,29 @@ import {
     ADD_SELECTED_ITEM,
     REMOVE_SELECTED_ITEM,
     CLEAR_SELECTED_ITEMS,
-    CLEAR_CONTACTS
+    CLEAR_CONTACTS,
+    CLEAR_REPLAY
 } from "../constants/action-types";
 
 export const initialState = {
     contacts: [],
     currentSortMethod: 'default',
     currentSearchFilter: '',
-    currentSelectedItems: []
+    currentSelectedItems: [],
+    replayBuffer: []
 };
 
 function rootReducer(state = initialState, action) {
     if (action.type === ADD_CONTACT) {
         return Object.assign({}, state, {
-            contacts: state.contacts.concat(action.payload)
+            contacts: state.contacts.concat(action.payload),
+            replayBuffer: state.replayBuffer.concat({type: 'post', data: action.payload})
         });
     }
     if (action.type === REMOVE_CONTACT) {
         return Object.assign({}, state, {
-            contacts: state.contacts.filter(contact => contact !== action.payload)
+            contacts: state.contacts.filter(contact => contact !== action.payload),
+            replayBuffer: state.replayBuffer.concat({type: 'delete', data: action.payload})
         });
     }
     if (action.type === MODIFY_CONTACT) {
@@ -36,7 +40,8 @@ function rootReducer(state = initialState, action) {
                 if (obj === action.oldPayload)
                     return action.payload;
                 return obj;
-            })
+            }),
+            replayBuffer: state.replayBuffer.concat({type: 'put', data: action.payload})
         });
     }
     if (action.type === CHANGE_SORTING) {
@@ -82,6 +87,11 @@ function rootReducer(state = initialState, action) {
         return Object.assign({}, state, {
             currentSelectedItems: [],
             contacts: []
+        });
+    }
+    if (action.type === CLEAR_REPLAY) {
+        return Object.assign({}, state, {
+            replayBuffer: []
         });
     }
 

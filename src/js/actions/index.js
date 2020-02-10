@@ -9,7 +9,7 @@ import {
     ADD_SELECTED_ITEM,
     REMOVE_SELECTED_ITEM,
     CLEAR_SELECTED_ITEMS,
-    CLEAR_CONTACTS
+    CLEAR_CONTACTS, CLEAR_REPLAY
 } from "../constants/action-types";
 
 export function addContact(payload) {
@@ -46,6 +46,10 @@ export function clearSelectedItems() {
 
 export function clearContacts() {
     return {type: CLEAR_CONTACTS}
+}
+
+export function clearReplayBuffer() {
+    return {type: CLEAR_REPLAY}
 }
 
 export function fetchContacts(type, opts, fnCallback, key) {

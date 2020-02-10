@@ -12,9 +12,9 @@ import {
     clearSelectedItems,
     postContacts,
     modifyContacts,
-    deleteContacts
+    deleteContacts, clearReplayBuffer
 } from "./actions/index";
-import {getContactsState, getCurrentSearchFilter, getCurrentSelectedItemList} from "./selectors/index";
+import {getContactsState, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -42,6 +42,9 @@ function mapDispatchToProps(dispatch) {
         deleteContacts: function (opts) {
             dispatch(deleteContacts(opts))
         },
+        clearReplayBuffer: function () {
+            dispatch(clearReplayBuffer())
+        },
     };
 }
 
@@ -49,7 +52,8 @@ const mapStateToProps = state => {
     return {
         contacts: getContactsState(state),
         currentSearchFilter: getCurrentSearchFilter(state),
-        currentSelectedItems: getCurrentSelectedItemList(state)
+        currentSelectedItems: getCurrentSelectedItemList(state),
+        replayBuffer: getReplayList(state)
     };
 };
 
@@ -76,7 +80,6 @@ class ConnectedApp extends Component {
         //TODO: maybe prompt for confirmation of the delete action?
         for (let item of this.props.currentSelectedItems) {
             this.props.removeContact(item);
-            this.props.deleteContacts(item);
         }
         this.props.clearSelectedItems();
     }
@@ -84,7 +87,7 @@ class ConnectedApp extends Component {
     handleAddRow() {
         const opts = {id: this.props.contacts.length + 1};
         this.props.addContact([opts]);
-        this.props.postContacts(opts);
+        // this.props.postContacts(opts);
     }
 
     handleRefreshTable() {
@@ -92,9 +95,22 @@ class ConnectedApp extends Component {
     }
 
     handleSaveTable() {
-        // this.props.postContacts(opts);
-        // this.props.deleteContacts(opts);
-        // this.props.modifyContacts(opts);
+        for (const action of this.props.replayBuffer) {
+            switch (action.type) {
+                case 'delete':
+                    this.props.deleteContacts(action.data);
+                    break;
+                case 'post':
+                    this.props.postContacts(action.data);
+                    break;
+                case 'put':
+                    this.props.modifyContacts(action.data);
+                    break;
+                default:
+                    console.log('got unknown action', action);
+            }
+        }
+        this.props.clearReplayBuffer();
     }
 
     render() {

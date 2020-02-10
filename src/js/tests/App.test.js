@@ -25,7 +25,7 @@ function renderWithRedux(
 it('should render columns correctly', function () {
     const {getByText} = renderWithRedux(<App/>);
 
-    expect(getByText('User ID')).toBeInTheDocument();
+    expect(getByText('#')).toBeInTheDocument();
     expect(getByText('Name')).toBeInTheDocument();
     expect(getByText('Username')).toBeInTheDocument();
     expect(getByText('Email')).toBeInTheDocument();

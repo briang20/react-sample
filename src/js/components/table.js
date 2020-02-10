@@ -65,7 +65,6 @@ class ConnectedTable extends Component {
         newData[key.field] = target.value;
         delete newData.selected;
         this.props.modifyContact(data, newData);
-        this.props.modifyContacts(newData);
     }
 
     handleTextboxChanged(event, readonly) {
