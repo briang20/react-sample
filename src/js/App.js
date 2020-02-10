@@ -117,45 +117,49 @@ class ConnectedApp extends Component {
         });
 
         return (
-            <div className={"usa-content"}>
-                {this.renderHeader()}
-                <p></p>
-                <Table title="Contacts" editable="false" data={filteredData}>
-                    <TableColumn title="" type="checkbox"/>
-                    <TableColumn field="id" title="User ID" readonly={true}/>
-                    <TableColumn field="name" title="Name"/>
-                    <TableColumn field="username" title="Username"/>
-                    <TableColumn field="email" title="Email"/>
-                    <TableColumn field="website" title="URL"/>
-                </Table>
-                <p></p>
-                <small>
-                    <p className={"usa-footer"}>1-{filteredData.length} of {this.props.contacts.length}</p>
-                </small>
-                <div key={"buttons"}>
-                    <button id={"saveChanges"}
-                            className={"usa-button"}
-                            data-testid={"save-table"}
-                            onClick={this.handleDeleteRows}>Save
-                    </button>
-                    <button id={"refreshTable"}
-                            className={"usa-button"}
-                            data-testid={"refresh-table"}
-                            onClick={this.handleRefreshTable}>Refresh
-                    </button>
-                    <button id={"addRow"}
-                            className={"usa-button"}
-                            data-testid={"add-row"}
-                            onClick={this.handleAddRow}>Add Row
-                    </button>
-                    <button id={"deleteRow"}
-                            className={"usa-button"}
-                            data-testid={"delete-row"}
-                            onClick={this.handleDeleteRows}>Delete Selected Rows
-                    </button>
+            <>
+                <div className={"usa-content"}>
+                    {this.renderHeader()}
+                    <p></p>
+                    <Table title="Contacts" editable="false" data={filteredData}>
+                        <TableColumn title="" type="checkbox"/>
+                        <TableColumn field="id" title="User ID" readonly={true}/>
+                        <TableColumn field="name" title="Name"/>
+                        <TableColumn field="username" title="Username"/>
+                        <TableColumn field="email" title="Email"/>
+                        <TableColumn field="website" title="URL"/>
+                    </Table>
+                    <p></p>
+                    <button id={"backToTop"}><a href="#top" id={"topText"}>Top</a></button>
                 </div>
-                <button id={"backToTop"}><a href="#top" id={"topText"}>Top</a></button>
-            </div>
+                <div className={"usa-footer"}>
+                    <small>
+                        <p>1-{filteredData.length} of {this.props.contacts.length}</p>
+                    </small>
+                    <div key={"buttons"}>
+                        <button id={"saveChanges"}
+                                className={"usa-button"}
+                                data-testid={"save-table"}
+                                onClick={this.handleDeleteRows}>Save
+                        </button>
+                        <button id={"refreshTable"}
+                                className={"usa-button"}
+                                data-testid={"refresh-table"}
+                                onClick={this.handleRefreshTable}>Refresh
+                        </button>
+                        <button id={"addRow"}
+                                className={"usa-button"}
+                                data-testid={"add-row"}
+                                onClick={this.handleAddRow}>Add Row
+                        </button>
+                        <button id={"deleteRow"}
+                                className={"usa-button"}
+                                data-testid={"delete-row"}
+                                onClick={this.handleDeleteRows}>Delete Selected Rows
+                        </button>
+                    </div>
+                </div>
+            </>
         );
     }
 }
