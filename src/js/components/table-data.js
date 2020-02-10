@@ -95,7 +95,7 @@ class ConnectedTable extends Component {
                         <FormCheck data-testid={"select-row-single"}
                                    inline
                                    type={"checkbox"}
-                                   label={"Selected"}
+                                   label={""}
                                    checked={value}
                                    onChange={(event) => this.handleCheckboxChanged(event, data)}
                         />

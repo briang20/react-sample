@@ -71,12 +71,12 @@ class ConnectedApp extends Component {
         super(props);
         this.state = {
             columns: [
+                {title: '', field: '', type: 'checkbox'},
                 {title: '#', field: 'id', readonly: true},
                 {title: 'Name', field: 'name'},
                 {title: 'User', field: 'username'},
                 {title: 'Email', field: 'email'},
                 {title: 'Website', field: 'website'},
-                {title: 'Select All', field: '', type: 'checkbox'}
             ]
         };
         this.handleSubmit = this.handleSubmit.bind(this);
