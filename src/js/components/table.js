@@ -2,7 +2,6 @@
 
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import '../../css/table-theme.scss';
 import {
     addContact,
     removeContact,
@@ -79,8 +78,6 @@ class ConnectedTable extends Component {
 
         // bind this to the callbacks
         this.handleCheckboxChanged = this.handleCheckboxChanged.bind(this);
-        this.handleDeleteRows = this.handleDeleteRows.bind(this);
-        this.handleAddRow = this.handleAddRow.bind(this);
         this.handleTextboxChanged = this.handleTextboxChanged.bind(this);
     }
 
@@ -104,8 +101,6 @@ class ConnectedTable extends Component {
         const target = event.target;
         if (readonly === true)
             target.value = target.defaultValue;
-        // else
-        //     target.defaultValue = target.value;
     }
 
     handleCheckboxChanged(event, data) {
@@ -125,10 +120,12 @@ class ConnectedTable extends Component {
                 if (key.type === "checkbox") {
                     return (<div key={JSON.stringify(data) + "_" + keyIdx.toString()}
                                  name={"selected"}
+                                 className={"usa-checkbox"}
                                  id={"table-cell"}>
                         <input type={"checkbox"}
                                data-testid={"select-row-single"}
                                id={"selectRow"}
+                               className={"usa-checkbox__input"}
                                name={"selection"}
                                checked={data.selected}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
@@ -170,60 +167,16 @@ class ConnectedTable extends Component {
     }
 
     render() {
-        // Filter out the contacts that we do not care about
-        //TODO: figure out how to filter out the fields we don't care about
-        const filteredData = [...this.props.contacts].filter(item => {
-            if (this.props.currentSearchFilter === '')
-                return true;
-
-            const array = Object.values(item);
-            for (const element of array) {
-                if (element.toString().indexOf(this.props.currentSearchFilter) !== -1)
-                    return true;
-            }
-            return false;
-        });
-
         return (
             <div key={"div-table"} className={"usa-table"} id={"table-container"}>
-                <div key={"buttons"}>
-                    <button id={"addRow"}
-                            className={"usa-button"}
-                            data-testid={"add-row"}
-                            onClick={this.handleAddRow}>Add Row
-                    </button>
-                    <button id={"saveChanges"}
-                            className={"usa-button"}
-                            data-testid={"delete-row"}
-                            onClick={this.handleDeleteRows}>Delete Selected Rows
-                    </button>
-                </div>
-                <small>
-                    <p className={"usa-footer"}>1-{filteredData.length} of {this.props.contacts.length}</p>
-                </small>
                 <div key={"div-table-heading"} id={"table-heading"}>
                     {this.props.children}
                 </div>
                 <div key={"div-row"} id={"table-body"}>
-                    {this.renderRows(this.props.children, filteredData)}
+                    {this.renderRows(this.props.children, this.props.data)}
                 </div>
             </div>
         );
-    }
-
-    handleDeleteRows() {
-        //TODO: maybe prompt for confirmation of the delete action?
-        for (let item of this.props.currentSelectedItems) {
-            this.props.removeContact(item);
-            this.props.deleteContacts(item);
-        }
-        this.props.clearSelectedItems();
-    }
-
-    handleAddRow() {
-        const opts = {id: this.props.contacts.length + 1};
-        this.props.addContact([opts]);
-        this.props.postContacts(opts);
     }
 }
 

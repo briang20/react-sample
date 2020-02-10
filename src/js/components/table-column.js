@@ -79,8 +79,9 @@ class ConnectedTableColumn extends Component {
             if (this.props.contacts.length > 0)
                 isAllChecked = this.props.contacts.length === this.props.selectedItems.length;
             return (
-                <div id={"table-cell"}>
-                    <input type="checkbox" id="selectAll" name="selection" value="selectAll" checked={isAllChecked}
+                <div id={"table-cell"} className={"usa-checkbox"}>
+                    <input type="checkbox" id="selectAll" className={"usa-checkbox__input"} name="selection"
+                           value="selectAll" checked={isAllChecked}
                            data-testid={"select-all-rows"}
                            onChange={(event) => this.handleCheckboxChanged(event)}/>
                     <label htmlFor="selectAll">{title}</label>
