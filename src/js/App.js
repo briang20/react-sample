@@ -93,7 +93,7 @@ class ConnectedApp extends Component {
     handleRefreshTable() {
         //TODO: maybe show a alert that there are unsaved changes?
         if (this.props.replayBuffer.length > 0) {
-
+            // await for alert here
         }
         this.props.getContacts();
         this.props.clearReplayBuffer();
@@ -114,6 +114,7 @@ class ConnectedApp extends Component {
                 default:
                     console.log('got unknown action', action);
             }
+
         }
         this.props.clearReplayBuffer();
     }
@@ -147,19 +148,19 @@ class ConnectedApp extends Component {
                            onChange={this.handleTextChange}/>
                 </div>
                 <div className={"usa-content"}>
-                    <Table title="Contacts" editable="false" data={filteredData}>
-                        <TableColumn title="" type="checkbox"/>
-                        <TableColumn field="id" title="#" readonly={true}/>
-                        <TableColumn field="name" title="Name"/>
-                        <TableColumn field="username" title="Username"/>
-                        <TableColumn field="email" title="Email"/>
-                        <TableColumn field="website" title="URL"/>
+                    <Table title={"Contacts"} data={filteredData}>
+                        <TableColumn title={""} type={"checkbox"}/>
+                        <TableColumn field={"id"} title={"#"} type={"text"} readonly={true}/>
+                        <TableColumn field={"name"} title={"Name"} type={"text"}/>
+                        <TableColumn field={"username"} title={"Username"} type={"text"}/>
+                        <TableColumn field={"email"} title={"Email"} type={"email"}/>
+                        <TableColumn field={"website"} title={"URL"} type={"text"}/>
                     </Table>
                     <small>
                         <p>{shownCountText}</p>
                     </small>
                 </div>
-                <footer className="usa-footer usa-footer--slim">
+                <footer className={"usa-footer usa-footer--slim"}>
                     <div key={"buttons"} className={"no-floating"}>
                         <button id={"saveChanges"}
                                 className={"usa-button"}
@@ -182,8 +183,8 @@ class ConnectedApp extends Component {
                                 onClick={this.handleDeleteRows}>Delete Selected Rows
                         </button>
                     </div>
-                    <div className="grid-container usa-footer__return-to-top">
-                        <a href="#">Return to top</a>
+                    <div className={"grid-container usa-footer__return-to-top"}>
+                        <a href={"#top"}>Return to top</a>
                     </div>
                 </footer>
             </>
