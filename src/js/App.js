@@ -87,11 +87,12 @@ class ConnectedApp extends Component {
     handleAddRow() {
         const opts = {id: this.props.contacts.length + 1};
         this.props.addContact([opts]);
-        // this.props.postContacts(opts);
     }
 
     handleRefreshTable() {
+        //TODO: maybe show a alert that there are unsaved changes?
         this.props.getContacts();
+        this.props.clearReplayBuffer();
     }
 
     handleSaveTable() {
