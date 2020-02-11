@@ -4,6 +4,7 @@ import {
     ADD_CONTACT,
     REMOVE_CONTACT,
     MODIFY_CONTACT,
+    UPDATE_CONTACTS,
     CHANGE_SORTING,
     CHANGE_SEARCH_FILTER,
     ADD_SELECTED_ITEM,
@@ -22,6 +23,11 @@ export const initialState = {
 };
 
 function rootReducer(state = initialState, action) {
+    if (action.type === UPDATE_CONTACTS) {
+        return Object.assign({}, state, {
+            contacts: state.contacts.concat(action.payload)
+        });
+    }
     if (action.type === ADD_CONTACT) {
         return Object.assign({}, state, {
             contacts: state.contacts.concat(action.payload),

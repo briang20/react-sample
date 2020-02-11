@@ -4,6 +4,7 @@ import {
     ADD_CONTACT,
     REMOVE_CONTACT,
     MODIFY_CONTACT,
+    UPDATE_CONTACTS,
     CHANGE_SORTING,
     CHANGE_SEARCH_FILTER,
     ADD_SELECTED_ITEM,
@@ -11,6 +12,10 @@ import {
     CLEAR_SELECTED_ITEMS,
     CLEAR_CONTACTS, CLEAR_REPLAY
 } from "../constants/action-types";
+
+export function updateContacts(payload) {
+    return {type: UPDATE_CONTACTS, payload}
+}
 
 export function addContact(payload) {
     return {type: ADD_CONTACT, payload}
@@ -75,7 +80,7 @@ export function getContacts() {
             dispatch(clearContacts());
             for (let contact of data) {
                 contact.selected = false;
-                dispatch(addContact(contact));
+                dispatch(updateContacts(contact));
             }
         }));
     }
