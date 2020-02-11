@@ -70,6 +70,8 @@ export function fetchContacts(type, opts, fnCallback, key) {
 export function getContacts() {
     return (dispatch, getState, api) => {
         dispatch(fetchContacts('get', null, function (data) {
+            if (!data) return;
+
             dispatch(clearContacts());
             for (let contact of data) {
                 contact.selected = false;
