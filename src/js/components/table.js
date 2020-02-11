@@ -11,7 +11,7 @@ import {
 import {
     getContactsList,
     getCurrentSearchFilter,
-    getCurrentSortMethod
+    getCurrentSortMethod, getReplayList
 } from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
 
@@ -36,7 +36,8 @@ const mapStateToProps = state => {
     return {
         contacts: getContactsList(state),
         currentSortMethod: getCurrentSortMethod(state),
-        currentSearchFilter: getCurrentSearchFilter(state)
+        currentSearchFilter: getCurrentSearchFilter(state),
+        replayBuffer: getReplayList(state)
     };
 };
 
@@ -60,11 +61,19 @@ class ConnectedTable extends Component {
             target.value === oldValue.toString()) {
             return;
         }
+        let payload = {id: data.id, field: key.field, value: target.value}
 
-        let newData = Object.assign({}, data);
-        newData[key.field] = target.value;
-        delete newData.selected;
-        this.props.modifyContact(data, newData);
+        let newData = null;
+        const contact = this.props.replayBuffer.find(element => element.id === data.id);
+        if (!contact) {
+            newData = Object.assign({}, data);
+            newData[key.field] = target.value;
+            delete newData.selected;
+        } else {
+            newData[key.field] = target.value;
+        }
+
+        this.props.modifyContact(data, payload);
     }
 
     handleTextboxChanged(event, readonly) {
