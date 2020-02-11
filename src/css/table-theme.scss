@@ -21,6 +21,7 @@
     flex-flow: row wrap;
     width: 100%;
   }
+  width: 100%;
   float: left;
 }
 
@@ -42,6 +43,11 @@
   background-color: #EEE;
 }
 
+.usa-table #table-heading #table-cell {
+  font-weight: $theme-font-weight-bold;
+  background-color: color("base-lightest");
+}
+
 .usa-table #table-row {
   @media screen and (max-width: 767px) {
     display: flex;
@@ -60,6 +66,12 @@
   min-height: 40px;
   border: 1px solid #999999;
   display: table-cell;
+  text-align: left;
+
+  @include u-border(1px, "base-dark");
+  background-color: color("white");
+  font-weight: $theme-font-weight-normal;
+  padding: units(1) units(1);
 }
 
 .usa-table #table-cell input {
