@@ -26,13 +26,26 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
                 replayBuffer: state.replayBuffer.concat({type: 'delete', data: action.payload})
             });
         case MODIFY_CONTACT:
+            const contact = state.replayBuffer.find(element => element.id === action.payload.id);
+            if (!contact) {
+
+            }
+
             return Object.assign({}, state, {
                 contacts: state.contacts.map(obj => {
-                    if (obj === action.oldPayload)
-                        return action.payload;
+                    if (obj === action.oldPayload) {
+                        let newData = Object.assign({}, obj);
+                        newData[action.payload.field] = action.payload.value;
+                        return newData;
+                    }
                     return obj;
                 }),
-                replayBuffer: state.replayBuffer.concat({type: 'put', data: action.payload})
+                replayBuffer: state.replayBuffer.map(event => {
+                    if (event.type === 'put' && event.data.id === action.payload.id) {
+
+                    }
+                    return event;
+                })
             });
         case CLEAR_CONTACTS:
             return Object.assign({}, state, {
