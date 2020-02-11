@@ -12,9 +12,10 @@ import {
     clearSelectedItems,
     postContacts,
     modifyContacts,
-    deleteContacts, clearReplayBuffer
+    deleteContacts,
+    clearReplayBuffer
 } from "./actions/index";
-import {getContactsState, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
+import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -50,7 +51,7 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
     return {
-        contacts: getContactsState(state),
+        contacts: getContactsList(state),
         currentSearchFilter: getCurrentSearchFilter(state),
         currentSelectedItems: getCurrentSelectedItemList(state),
         replayBuffer: getReplayList(state)
@@ -91,6 +92,9 @@ class ConnectedApp extends Component {
 
     handleRefreshTable() {
         //TODO: maybe show a alert that there are unsaved changes?
+        if (this.props.replayBuffer.length > 0) {
+
+        }
         this.props.getContacts();
         this.props.clearReplayBuffer();
     }

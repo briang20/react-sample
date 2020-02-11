@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {addSelectedItem, changeSorting, clearSelectedItems} from "../actions/index";
-import {getSortingState, getSelectedItemsList, getContactsList} from "../selectors/index";
+import {getCurrentSortMethod, getSelectedItemsList, getContactsList} from "../selectors/index";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -19,7 +19,7 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
     return {
-        currentSortMethod: getSortingState(state),
+        currentSortMethod: getCurrentSortMethod(state),
         contacts: getContactsList(state),
         selectedItems: getSelectedItemsList(state),
     };

@@ -9,9 +9,9 @@ import {
     modifyContacts,
 } from "../actions/index";
 import {
-    getContactsState,
+    getContactsList,
     getCurrentSearchFilter,
-    getSortingState
+    getCurrentSortMethod
 } from "../selectors/index";
 import {sortTypes} from "../constants/sort-types"
 
@@ -34,8 +34,8 @@ function mapDispatchToProps(dispatch) {
 
 const mapStateToProps = state => {
     return {
-        contacts: getContactsState(state),
-        currentSortMethod: getSortingState(state),
+        contacts: getContactsList(state),
+        currentSortMethod: getCurrentSortMethod(state),
         currentSearchFilter: getCurrentSearchFilter(state)
     };
 };
