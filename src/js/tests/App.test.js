@@ -6,6 +6,17 @@ import '@testing-library/jest-dom/extend-expect'
 import reducer from '../reducers/index'
 import App from '../App';
 import thunk from "redux-thunk";
+import {createMiddleware} from "redux-callapi-middleware";
+
+const onSuccess = (response) => {
+    if (!response.ok) {
+        throw new Error('Error');
+    }
+    return response;
+}
+
+const callApi = (url, options) => fetch(url, options).then(onSuccess);
+const apiMiddleware = createMiddleware({callApi});
 
 const api = '';
 const initialState = {
@@ -13,9 +24,11 @@ const initialState = {
     sorter: {currentSortMethod: "default", currentSearchFilter: ""}
 };
 
+const middleware = [thunk.withExtraArgument(api), apiMiddleware];
+
 function renderWithRedux(
     ui,
-    {initialState, store = createStore(reducer, initialState, applyMiddleware(thunk.withExtraArgument(api)))} = {}
+    {initialState, store = createStore(reducer, initialState, applyMiddleware(...middleware))} = {}
 ) {
     return {
         ...render(<Provider store={store}>{ui}</Provider>),

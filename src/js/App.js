@@ -87,10 +87,13 @@ class ConnectedApp extends Component {
 
     handleAddRow() {
         let id = 1;
-        const lastContact = this.props.contacts.reduce(function (a, b) {
-            return a.id < b.id ? b : a;
-        });
-        if (lastContact) id = lastContact.id + 1;
+        if (this.props.contacts.length > 0) {
+            const lastContact = this.props.contacts.reduce(function (a, b) {
+                return a.id < b.id ? b : a;
+            });
+            if (lastContact) id = lastContact.id + 1;
+        }
+
         const opts = {id: id};
         this.props.addContact(opts);
     }
