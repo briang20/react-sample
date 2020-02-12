@@ -61,18 +61,7 @@ class ConnectedTable extends Component {
             target.value === oldValue.toString()) {
             return;
         }
-        let payload = {id: data.id, field: key.field, value: target.value}
-
-        let newData = null;
-        const contact = this.props.replayBuffer.find(element => element.id === data.id);
-        if (!contact) {
-            newData = Object.assign({}, data);
-            newData[key.field] = target.value;
-            delete newData.selected;
-        } else {
-            newData[key.field] = target.value;
-        }
-
+        let payload = {id: data.id, field: key.field, value: target.value};
         this.props.modifyContact(data, payload);
     }
 
@@ -106,6 +95,7 @@ class ConnectedTable extends Component {
                                id={"selectRow"}
                                className={"usa-checkbox__input"}
                                name={"selection"}
+                               tabIndex={data.id}
                                disabled={key.readonly}
                                checked={data.selected}
                                onChange={(event) => this.handleCheckboxChanged(event, data)}/>
@@ -117,6 +107,7 @@ class ConnectedTable extends Component {
                         <input type={"text"}
                                data-testid={key.field + "-input-" + data.id}
                                name={"field"}
+                               tabIndex={data.id}
                                disabled={key.readonly}
                                onChange={(event) => this.handleTextboxChanged(event, key.readonly)}
                                onBlur={(event) => this.handleFocusOut(event, key, data)}

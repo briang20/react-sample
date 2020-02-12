@@ -87,7 +87,7 @@ class ConnectedApp extends Component {
 
     handleAddRow() {
         const opts = {id: this.props.contacts.length + 1};
-        this.props.addContact([opts]);
+        this.props.addContact(opts);
     }
 
     handleRefreshTable() {
@@ -100,7 +100,32 @@ class ConnectedApp extends Component {
     }
 
     handleSaveTable() {
+        let actions = [];
         for (const action of this.props.replayBuffer) {
+            switch (action.type) {
+                case 'post':
+                case 'delete':
+                    actions.push(action);
+                    break;
+                case 'put':
+                    let contact = actions.find(element => element.data.id === action.data.id);
+                    if (!contact) {
+                        contact = Object.assign({}, this.props.contacts.find(element => element.id === action.data.id));
+                        contact[action.data.field] = action.data.value;
+                        delete contact.selected;
+                        actions.push({type: 'put', data: contact});
+                    } else {
+                        contact.data[action.data.field] = action.data.value;
+                    }
+                    break;
+                default:
+                    console.log('got unknown action', action);
+            }
+
+        }
+
+        for (const action of actions) {
+            console.log(action);
             switch (action.type) {
                 case 'delete':
                     this.props.deleteContacts(action.data);
