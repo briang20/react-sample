@@ -314,15 +314,19 @@ it('should be able to save the table data replay buffer', function () {
     const addButton = getByTestId('add-row');
     expect(addButton).toBeInTheDocument();
     fireEvent.click(addButton);
+    expect(store.getState().contacts.replayBuffer.length).toBe(1);
 
     const name_element = getByTestId('name-input-1');
+    expect(name_element).toBeInTheDocument();
     fireEvent.change(name_element, {target: {value: 'wrongText'}});
     fireEvent.blur(name_element);
     expect(name_element.value).toBe("wrongText");
+    expect(store.getState().contacts.replayBuffer.length).toBe(2);
 
     const saveButton = getByTestId('save-table');
     expect(saveButton).toBeInTheDocument();
     fireEvent.click(saveButton);
+    expect(store.getState().contacts.replayBuffer.length).toBe(0);
 
     const refreshButton = getByTestId('refresh-table');
     expect(refreshButton).toBeInTheDocument();
