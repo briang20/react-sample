@@ -1,5 +1,6 @@
 // src/actions/index.js
 
+import {CALL_API} from "redux-callapi-middleware";
 import {
     ADD_CONTACT,
     REMOVE_CONTACT,
@@ -61,13 +62,19 @@ export function fetchContacts(type, opts, fnCallback, key) {
     return (dispatch, getState, api) => {
         let url = api ? api : 'https://my-json-server.typicode.com/RavenX8/react-sample/users';
         if (type !== 'get' && type !== 'post') url = url + "/" + key;
-        return fetch(url, {
-            method: type,
-            headers: {'Content-Type': 'application/json'},
-            body: opts
+
+        return dispatch({
+            [CALL_API]: {
+                types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+                endpoint: url,
+                options: {
+                    method: type,
+                    headers: {'Content-Type': 'application/json'},
+                    body: opts
+                }
+            }
         })
-            .then(res => res.json(),
-                error => console.log('An error occurred.', error))
+            .then(res => res.payload.json())
             .then(data => fnCallback(data))
     };
 }
