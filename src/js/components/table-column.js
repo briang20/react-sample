@@ -83,6 +83,7 @@ class ConnectedTableColumn extends Component {
                     <input type="checkbox" id="selectAll" className={"usa-checkbox__input"} name="selection"
                            value="selectAll" checked={isAllChecked}
                            data-testid={"select-all-rows"}
+                           tabIndex={1}
                            onChange={(event) => this.handleCheckboxChanged(event)}/>
                     <label htmlFor="selectAll">{title}</label>
                 </div>

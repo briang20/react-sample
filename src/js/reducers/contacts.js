@@ -1,4 +1,3 @@
-import {initialState} from "./index";
 import {
     ADD_CONTACT, ADD_SELECTED_ITEM,
     CLEAR_CONTACTS,
@@ -7,7 +6,6 @@ import {
     REMOVE_CONTACT, REMOVE_SELECTED_ITEM,
     UPDATE_CONTACTS
 } from "../constants/action-types";
-
 
 export default function contacts(state = {contacts: [], replayBuffer: [], currentSelectedItems: []}, action) {
     switch (action.type) {
@@ -27,14 +25,6 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
             });
         case MODIFY_CONTACT:
             return Object.assign({}, state, {
-                contacts: state.contacts.map(obj => {
-                    if (obj === action.oldPayload) {
-                        let newData = Object.assign({}, obj);
-                        newData[action.payload.field] = action.payload.value;
-                        return newData;
-                    }
-                    return obj;
-                }),
                 replayBuffer: state.replayBuffer.concat({type: 'put', data: action.payload})
             });
         case CLEAR_CONTACTS:

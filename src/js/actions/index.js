@@ -75,7 +75,9 @@ export function fetchContacts(type, opts, fnCallback, key) {
             }
         })
             .then(res => res.payload.json())
-            .then(data => fnCallback(data))
+            .then(data => {
+                if (fnCallback) fnCallback(data)
+            })
     };
 }
 
@@ -95,18 +97,18 @@ export function getContacts() {
 
 export function postContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('post', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+        dispatch(fetchContacts('post', JSON.stringify(opts), null, opts.id));
     }
 }
 
 export function modifyContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('put', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+        dispatch(fetchContacts('put', JSON.stringify(opts), null, opts.id));
     }
 }
 
 export function deleteContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('delete', JSON.stringify(opts), data => dispatch(getContacts()), opts.id));
+        dispatch(fetchContacts('delete', JSON.stringify(opts), null, opts.id));
     }
 }

@@ -19,7 +19,6 @@ const apiMiddleware = createMiddleware({callApi});
 const middleware = [thunk.withExtraArgument(api), apiMiddleware];
 
 export default function configureStore(initialState) {
-    console.log(reducer)
     return createStore(reducer,
         {},
         applyMiddleware(...middleware)

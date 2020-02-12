@@ -125,7 +125,6 @@ class ConnectedApp extends Component {
         }
 
         for (const action of actions) {
-            console.log(action);
             switch (action.type) {
                 case 'delete':
                     this.props.deleteContacts(action.data);
@@ -169,6 +168,7 @@ class ConnectedApp extends Component {
                     <h2 className={"usa-title"}>Contacts Page</h2>
                     <input type={"text"} className={"usa-search"} name={"filter"} placeholder={"Search"}
                            data-testid={"search-filter"}
+                           tabIndex={1}
                            value={this.props.currentSearchFilter}
                            onChange={this.handleTextChange}/>
                 </div>
