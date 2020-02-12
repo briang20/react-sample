@@ -18,7 +18,7 @@ const onSuccess = (response) => {
 const callApi = (url, options) => fetch(url, options).then(onSuccess);
 const apiMiddleware = createMiddleware({callApi});
 
-const api = '';
+const api = 'http://local';
 const initialState = {
     contacts: {contacts: [], replayBuffer: [], currentSelectedItems: []},
     sorter: {currentSortMethod: "default", currentSearchFilter: ""}
@@ -299,7 +299,7 @@ it('should be able to refresh the table data', function () {
     // expect(name_element.value).toBe("test1");
 });
 
-it('should be able to save the table data replay buffer', function () {
+it('should be able to save the table data replay buffer', async function () {
     const newState = Object.assign({}, initialState, {
         contacts: {
             contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
@@ -307,6 +307,17 @@ it('should be able to save the table data replay buffer', function () {
             currentSelectedItems: initialState.contacts.currentSelectedItems
         }
     });
+
+    const fetchMock = require('fetch-mock/es5/client');
+    fetchMock
+        .getOnce(api, {
+            status: 200,
+            body: [{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]
+        }, {overwriteRoutes: false})
+        .getOnce(api, {status: 200, body: [{id: '1', name: 'wrongText'}]}, {overwriteRoutes: false})
+        .postOnce(api, 400)
+        .putOnce(api + '/1', {status: 200, body: {id: 1, name: 'wrongText'}})
+
     const {getByTestId, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
@@ -330,7 +341,8 @@ it('should be able to save the table data replay buffer', function () {
 
     const refreshButton = getByTestId('refresh-table');
     expect(refreshButton).toBeInTheDocument();
-    fireEvent.click(refreshButton);
+    await fireEvent.click(refreshButton);
 
     expect(store.getState().contacts.contacts[0].name).toBe("wrongText");
+    fetchMock.reset();
 });
