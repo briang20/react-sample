@@ -86,7 +86,12 @@ class ConnectedApp extends Component {
     }
 
     handleAddRow() {
-        const opts = {id: this.props.contacts.length + 1};
+        let id = 1;
+        const lastContact = this.props.contacts.reduce(function (a, b) {
+            return a.id < b.id ? b : a;
+        });
+        if (lastContact) id = lastContact.id + 1;
+        const opts = {id: id};
         this.props.addContact(opts);
     }
 
@@ -121,8 +126,9 @@ class ConnectedApp extends Component {
                 default:
                     console.log('got unknown action', action);
             }
-
         }
+        // We processed the buffer, now clear it
+        this.props.clearReplayBuffer();
 
         for (const action of actions) {
             switch (action.type) {
@@ -138,9 +144,7 @@ class ConnectedApp extends Component {
                 default:
                     console.log('got unknown action', action);
             }
-
         }
-        this.props.clearReplayBuffer();
     }
 
     render() {
