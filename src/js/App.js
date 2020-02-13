@@ -219,14 +219,20 @@ class ConnectedApp extends Component {
     }
 
     onRowClick(event) {
-        if (event.dataItem.selected)
+        if (event.dataItem.selected) {
+            event.dataItem.selected = false;
             this.props.removeSelectedItem(event.dataItem);
-        else
+        } else {
+            event.dataItem.selected = true;
             this.props.addSelectedItem(event.dataItem);
+        }
     }
 
     render() {
-        const {data} = this.state;
+        let data = this.state;
+
+        if (data.length !== this.props.contacts.length)
+            data = this.props.contacts;
 
         // Filter out the contacts that we do not care about
         const filteredData = [...data].filter(item => {

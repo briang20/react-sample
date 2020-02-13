@@ -38,11 +38,10 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
         case ADD_SELECTED_ITEM:
             return Object.assign({}, state, {
                 contacts: state.contacts.map(contact => {
-                    if (contact === action.payload)
+                    if (contact.id === action.payload.id)
                         contact.selected = true;
                     return contact;
-                }),
-                currentSelectedItems: state.currentSelectedItems.concat(action.payload)
+                })
             });
         case REMOVE_SELECTED_ITEM:
             return Object.assign({}, state, {
@@ -50,8 +49,7 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
                     if (contact === action.payload)
                         contact.selected = false;
                     return contact;
-                }),
-                currentSelectedItems: state.currentSelectedItems.filter(item => item !== action.payload)
+                })
             });
         case CLEAR_SELECTED_ITEMS:
             return Object.assign({}, state, {
