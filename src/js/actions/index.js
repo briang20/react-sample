@@ -58,7 +58,7 @@ export function clearReplayBuffer() {
     return {type: CLEAR_REPLAY}
 }
 
-export function fetchContacts(type, opts, fnCallback, key) {
+export function fetchContacts(type, opts, key) {
     return (dispatch, getState, api) => {
         let url = api ? api : 'https://my-json-server.typicode.com/RavenX8/react-sample/users';
         if (type !== 'get' && type !== 'post') url = url + "/" + key;
@@ -74,41 +74,36 @@ export function fetchContacts(type, opts, fnCallback, key) {
                 }
             }
         })
-            .then(res => res.payload.json())
-            .then(data => {
-                if (fnCallback) fnCallback(data)
-            })
     };
 }
 
 export function getContacts() {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('get', null, function (data) {
-            if (!data) return;
-
-            dispatch(clearContacts());
-            for (let contact of data) {
-                contact.selected = false;
-                dispatch(updateContacts(contact));
-            }
-        }));
+        dispatch(fetchContacts('get', null,))
+            .then(async res => {
+                if (res.type === 'SUCCESS') {
+                    const data = await res.payload.json();
+                    dispatch(clearContacts());
+                    dispatch(updateContacts(data));
+                }
+            })
     }
 }
 
 export function postContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('post', JSON.stringify(opts), null, opts.id));
+        dispatch(fetchContacts('post', JSON.stringify(opts), opts.id));
     }
 }
 
 export function modifyContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('put', JSON.stringify(opts), null, opts.id));
+        dispatch(fetchContacts('put', JSON.stringify(opts), opts.id));
     }
 }
 
 export function deleteContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('delete', JSON.stringify(opts), null, opts.id));
+        dispatch(fetchContacts('delete', JSON.stringify(opts), opts.id));
     }
 }

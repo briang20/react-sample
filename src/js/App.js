@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
+import {process} from '@progress/kendo-data-query';
+import {Grid, GridColumn, GridToolbar} from '@progress/kendo-react-grid';
+import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
 import '../css/App.css';
-import Table from './components/table';
-import TableColumn from './components/table-column';
 import {
     addContact,
     changeSearchFilter,
@@ -13,9 +14,10 @@ import {
     postContacts,
     modifyContacts,
     deleteContacts,
-    clearReplayBuffer
+    clearReplayBuffer, addSelectedItem, removeSelectedItem, modifyContact
 } from "./actions/index";
 import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
+import {CommandCell} from "./components/command-cell";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -46,6 +48,15 @@ function mapDispatchToProps(dispatch) {
         clearReplayBuffer: function () {
             dispatch(clearReplayBuffer())
         },
+        addSelectedItem: function (item) {
+            dispatch(addSelectedItem(item))
+        },
+        removeSelectedItem: function (item) {
+            dispatch(removeSelectedItem(item))
+        },
+        modifyContact: function (contact, newContact) {
+            dispatch(modifyContact(contact, newContact))
+        },
     };
 }
 
@@ -59,13 +70,114 @@ const mapStateToProps = state => {
 };
 
 class ConnectedApp extends Component {
+    editField = "inEdit";
+    CommandCell;
+    state = {
+        data: [...this.props.contacts]
+    };
+
     constructor(props) {
         super(props);
+
+        this.CommandCell = CommandCell({
+            edit: this.enterEdit,
+            remove: this.remove,
+
+            add: this.add,
+            discard: this.discard,
+
+            update: this.update,
+            cancel: this.cancel,
+
+            editField: this.editField
+        });
+
         this.handleTextChange = this.handleTextChange.bind(this);
-        this.handleDeleteRows = this.handleDeleteRows.bind(this);
-        this.handleAddRow = this.handleAddRow.bind(this);
         this.handleRefreshTable = this.handleRefreshTable.bind(this);
-        this.handleSaveTable = this.handleSaveTable.bind(this);
+        this.onRowClick = this.onRowClick.bind(this);
+        this.onItemChange = this.onItemChange.bind(this);
+        this.updateState = this.updateState.bind(this);
+    }
+
+    enterEdit = (dataItem) => {
+        this.setState({
+            data: this.state.data.map(item =>
+                item.id === dataItem.id ?
+                    {...item, inEdit: true} : item
+            )
+        });
+    }
+
+    remove = (dataItem) => {
+        const data = [...this.state.data];
+        this.props.removeContact(dataItem);
+        this.props.deleteContacts(dataItem);
+
+        this.setState({data});
+    }
+
+    add = (dataItem) => {
+        dataItem.inEdit = undefined;
+        dataItem.id = this.generateId(this.props.contacts);
+        this.props.postContacts(dataItem);
+
+        this.props.contacts.unshift(dataItem);
+        this.setState({
+            data: [...this.state.data]
+        });
+    }
+
+    discard = (dataItem) => {
+        const data = [...this.state.data];
+        this.removeItem(data, dataItem);
+        this.props.removeContact(data);
+
+        this.setState({data});
+    }
+
+    update = (dataItem) => {
+        const data = [...this.state.data];
+        const updatedItem = {...dataItem, inEdit: undefined};
+
+        this.updateItem(data, updatedItem);
+        this.props.modifyContacts(updatedItem);
+
+        this.setState({data});
+    }
+
+    cancel = (dataItem) => {
+        const originalItem = this.props.contacts.find(p => p.id === dataItem.id);
+        const data = this.state.data.map(item => item.id === originalItem.id ? originalItem : item);
+
+        this.setState({data});
+    }
+
+    updateItem = (data, item) => {
+        let index = data.findIndex(p => p === item || (item.id && p.id === item.id));
+        if (index >= 0) {
+            data[index] = {...item};
+        }
+    }
+
+    itemChange = (event) => {
+        const data = this.state.data.map(item =>
+            item.id === event.dataItem.id ?
+                {...item, [event.field]: event.value} : item
+        );
+
+        this.setState({data});
+    }
+
+    addNew = () => {
+        const newDataItem = {inEdit: true};
+
+        this.setState({
+            data: [newDataItem, ...this.state.data]
+        });
+    }
+
+    cancelCurrentChanges = () => {
+        this.setState({data: [...this.props.contacts]});
     }
 
     componentDidMount() {
@@ -77,15 +189,7 @@ class ConnectedApp extends Component {
         this.props.changeSearchFilter(target.value);
     }
 
-    handleDeleteRows() {
-        //TODO: maybe prompt for confirmation of the delete action?
-        for (let item of this.props.currentSelectedItems) {
-            this.props.removeContact(item);
-        }
-        this.props.clearSelectedItems();
-    }
-
-    handleAddRow() {
+    generateId() {
         let id = 1;
         if (this.props.contacts.length > 0) {
             const lastContact = this.props.contacts.reduce(function (a, b) {
@@ -93,66 +197,39 @@ class ConnectedApp extends Component {
             });
             if (lastContact) id = lastContact.id + 1;
         }
-
-        const opts = {id: id};
-        this.props.addContact(opts);
+        return id;
     }
 
     handleRefreshTable() {
-        //TODO: maybe show a alert that there are unsaved changes?
-        if (this.props.replayBuffer.length > 0) {
-            // await for alert here
-        }
         this.props.getContacts();
-        this.props.clearReplayBuffer();
+        this.updateState();
     }
 
-    handleSaveTable() {
-        let actions = [];
-        for (const action of this.props.replayBuffer) {
-            switch (action.type) {
-                case 'post':
-                case 'delete':
-                    actions.push(action);
-                    break;
-                case 'put':
-                    let contact = actions.find(element => element.data.id === action.data.id);
-                    if (!contact) {
-                        contact = Object.assign({}, this.props.contacts.find(element => element.id === action.data.id));
-                        contact[action.data.field] = action.data.value;
-                        delete contact.selected;
-                        actions.push({type: 'put', data: contact});
-                    } else {
-                        contact.data[action.data.field] = action.data.value;
-                    }
-                    break;
-                default:
-                    console.log('got unknown action', action);
-            }
-        }
-        // We processed the buffer, now clear it
-        this.props.clearReplayBuffer();
+    updateState() {
+        this.setState({
+            data: [...this.props.contacts]
+        });
+    }
 
-        for (const action of actions) {
-            switch (action.type) {
-                case 'delete':
-                    this.props.deleteContacts(action.data);
-                    break;
-                case 'post':
-                    this.props.postContacts(action.data);
-                    break;
-                case 'put':
-                    this.props.modifyContacts(action.data);
-                    break;
-                default:
-                    console.log('got unknown action', action);
-            }
-        }
+    onItemChange(event) {
+        console.log(event);
+        const editedItem = event.dataItem;
+        let payload = {id: editedItem.id, field: event.field, value: event.value};
+        this.props.modifyContact(editedItem, payload);
+    }
+
+    onRowClick(event) {
+        if (event.dataItem.selected)
+            this.props.removeSelectedItem(event.dataItem);
+        else
+            this.props.addSelectedItem(event.dataItem);
     }
 
     render() {
+        const {data} = this.state;
+
         // Filter out the contacts that we do not care about
-        const filteredData = [...this.props.contacts].filter(item => {
+        const filteredData = [...data].filter(item => {
             if (this.props.currentSearchFilter === '')
                 return true;
 
@@ -167,8 +244,9 @@ class ConnectedApp extends Component {
         let shownCountText = '0-';
         if (filteredData.length > 0)
             shownCountText = '1-';
-        shownCountText = shownCountText + filteredData.length + ' of ' + this.props.contacts.length;
+        shownCountText = shownCountText + filteredData.length + ' of ' + data.length;
 
+        const hasEditedItem = data.some(p => p.inEdit);
         return (
             <>
                 <div className="usa-header">
@@ -180,41 +258,53 @@ class ConnectedApp extends Component {
                            onChange={this.handleTextChange}/>
                 </div>
                 <div className={"usa-content"}>
-                    <Table title={"Contacts"} data={filteredData}>
-                        <TableColumn title={""} type={"checkbox"}/>
-                        <TableColumn field={"id"} title={"#"} type={"text"} readonly={true}/>
-                        <TableColumn field={"name"} title={"Name"} type={"text"}/>
-                        <TableColumn field={"username"} title={"Username"} type={"text"}/>
-                        <TableColumn field={"email"} title={"Email"} type={"email"}/>
-                        <TableColumn field={"website"} title={"URL"} type={"text"}/>
-                    </Table>
+                    <Grid className={"usa-table"}
+                          data={filteredData}
+                          editable={true}
+                          editField={this.editField}
+                          onItemChange={this.itemChange}
+                          sortable
+                          selectedField={"selected"}
+                          onRowClick={this.onRowClick}
+                    >
+                        <GridToolbar>
+                            <button
+                                title="Refresh"
+                                className="k-button k-primary"
+                                onClick={this.handleRefreshTable}
+                            >
+                                Refresh
+                            </button>
+                            <button
+                                title="Add new"
+                                className="k-button k-primary"
+                                onClick={this.addNew}
+                            >
+                                Add new
+                            </button>
+                            {hasEditedItem && (
+                                <>
+                                    <button
+                                        title="Cancel current changes"
+                                        className="k-button"
+                                        onClick={this.cancelCurrentChanges}
+                                    >
+                                        Cancel current changes
+                                    </button>
+                                </>)}
+                        </GridToolbar>
+                        <GridColumn field="id" title={"#"} width={"50px"} editable={false}/>
+                        <GridColumn field="name" title={"Name"} editor="text"/>
+                        <GridColumn field="username" title={"Username"} editor="text"/>
+                        <GridColumn field="email" title={"Email"} editor="text"/>
+                        <GridColumn field="website" title={"URL"} editor="text"/>
+                        <GridColumn cell={this.CommandCell} width="240px"/>
+                    </Grid>
                     <small>
                         <p>{shownCountText}</p>
                     </small>
                 </div>
                 <footer className={"usa-footer usa-footer--slim"}>
-                    <div key={"buttons"} className={"no-floating"}>
-                        <button id={"saveChanges"}
-                                className={"usa-button"}
-                                data-testid={"save-table"}
-                                onClick={this.handleSaveTable}>Save
-                        </button>
-                        <button id={"refreshTable"}
-                                className={"usa-button"}
-                                data-testid={"refresh-table"}
-                                onClick={this.handleRefreshTable}>Refresh
-                        </button>
-                        <button id={"addRow"}
-                                className={"usa-button"}
-                                data-testid={"add-row"}
-                                onClick={this.handleAddRow}>Add Row
-                        </button>
-                        <button id={"deleteRow"}
-                                className={"usa-button"}
-                                data-testid={"delete-row"}
-                                onClick={this.handleDeleteRows}>Delete Selected Rows
-                        </button>
-                    </div>
                     <div className={"grid-container usa-footer__return-to-top"}>
                         <a href={"#top"}>Return to top</a>
                     </div>

@@ -15,13 +15,11 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
             });
         case ADD_CONTACT:
             return Object.assign({}, state, {
-                contacts: state.contacts.concat(action.payload),
-                replayBuffer: state.replayBuffer.concat({type: 'post', data: action.payload})
+                contacts: state.contacts.concat(action.payload)
             });
         case REMOVE_CONTACT:
             return Object.assign({}, state, {
-                contacts: state.contacts.filter(contact => contact !== action.payload),
-                replayBuffer: state.replayBuffer.concat({type: 'delete', data: action.payload})
+                contacts: state.contacts.filter(contact => contact !== action.payload)
             });
         case MODIFY_CONTACT:
             return Object.assign({}, state, {
