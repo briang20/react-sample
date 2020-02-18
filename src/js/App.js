@@ -21,20 +21,14 @@ import {CommandCell} from "./components/command-cell";
 
 function mapDispatchToProps(dispatch) {
     return {
-        addContact: function (contact) {
-            dispatch(addContact(contact))
-        },
         removeContact: function (contact) {
             dispatch(removeContact(contact))
-        },
-        changeSearchFilter: function (filter) {
-            dispatch(changeSearchFilter(filter))
         },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
         },
         getContacts: function () {
-            dispatch(getContacts())
+            return dispatch(getContacts())
         },
         postContacts: function (opts) {
             dispatch(postContacts(opts))
@@ -44,9 +38,6 @@ function mapDispatchToProps(dispatch) {
         },
         deleteContacts: function (opts) {
             dispatch(deleteContacts(opts))
-        },
-        clearReplayBuffer: function () {
-            dispatch(clearReplayBuffer())
         },
         addSelectedItem: function (item) {
             dispatch(addSelectedItem(item))
@@ -73,7 +64,8 @@ class ConnectedApp extends Component {
     editField = "inEdit";
     CommandCell;
     state = {
-        data: [...this.props.contacts]
+        dataState: {take: 10, skip: 0},
+        contacts: {data: [...this.props.contacts], total: this.props.contacts.length}
     };
 
     constructor(props) {
@@ -91,8 +83,6 @@ class ConnectedApp extends Component {
 
             editField: this.editField
         });
-
-        this.handleTextChange = this.handleTextChange.bind(this);
         this.handleRefreshTable = this.handleRefreshTable.bind(this);
         this.onRowClick = this.onRowClick.bind(this);
         this.onItemChange = this.onItemChange.bind(this);
@@ -101,19 +91,31 @@ class ConnectedApp extends Component {
 
     enterEdit = (dataItem) => {
         this.setState({
-            data: this.state.data.map(item =>
-                item.id === dataItem.id ?
-                    {...item, inEdit: true} : item
-            )
+            ...this.state,
+            contacts: {
+                data: this.state.contacts.data.map(item =>
+                    item.id === dataItem.id ?
+                        {...item, inEdit: true} : item
+                )
+            }
         });
     }
 
     remove = (dataItem) => {
-        const data = [...this.state.data];
+        const data = [...this.state.contacts.data];
         this.props.removeContact(dataItem);
         this.props.deleteContacts(dataItem);
 
-        this.setState({data});
+        this.setState({
+            contacts: {
+                data: data.filter(item => {
+                    if (item === dataItem)
+                        return false;
+                    return true;
+                }),
+                total: data.length
+            }
+        });
     }
 
     add = (dataItem) => {
@@ -123,33 +125,34 @@ class ConnectedApp extends Component {
 
         this.props.contacts.unshift(dataItem);
         this.setState({
-            data: [...this.state.data]
+            ...this.state,
+            contacts: {data: [...this.state.contacts.data], total: this.state.contacts.data.length}
         });
     }
 
     discard = (dataItem) => {
-        const data = [...this.state.data];
+        const data = [...this.state.contacts.data];
         this.removeItem(data, dataItem);
-        this.props.removeContact(data);
+        this.props.removeContact({data});
 
-        this.setState({data});
+        this.setState({contacts: {data, total: data.length}});
     }
 
     update = (dataItem) => {
-        const data = [...this.state.data];
+        const data = [...this.state.contacts.data];
         const updatedItem = {...dataItem, inEdit: undefined};
 
         this.updateItem(data, updatedItem);
         this.props.modifyContacts(updatedItem);
 
-        this.setState({data});
+        this.setState({contacts: {data, total: data.length}});
     }
 
     cancel = (dataItem) => {
         const originalItem = this.props.contacts.find(p => p.id === dataItem.id);
-        const data = this.state.data.map(item => item.id === originalItem.id ? originalItem : item);
+        const data = this.state.contacts.data.map(item => item.id === originalItem.id ? originalItem : item);
 
-        this.setState({data});
+        this.setState({contacts: {data, total: data.length}});
     }
 
     updateItem = (data, item) => {
@@ -160,33 +163,28 @@ class ConnectedApp extends Component {
     }
 
     itemChange = (event) => {
-        const data = this.state.data.map(item =>
+        const data = this.state.contacts.data.map(item =>
             item.id === event.dataItem.id ?
                 {...item, [event.field]: event.value} : item
         );
 
-        this.setState({data});
+        this.setState({contacts: {data, total: data.length}});
     }
 
     addNew = () => {
         const newDataItem = {inEdit: true};
 
         this.setState({
-            data: [newDataItem, ...this.state.data]
+            contacts: {data: [newDataItem, ...this.state.contacts.data], total: this.state.contacts.data.length + 1}
         });
     }
 
     cancelCurrentChanges = () => {
-        this.setState({data: [...this.props.contacts]});
+        this.setState({contacts: {data: [...this.props.contacts], total: this.props.contacts.length}});
     }
 
     componentDidMount() {
         this.handleRefreshTable();
-    }
-
-    handleTextChange(event) {
-        const target = event.currentTarget;
-        this.props.changeSearchFilter(target.value);
     }
 
     generateId() {
@@ -201,13 +199,15 @@ class ConnectedApp extends Component {
     }
 
     handleRefreshTable() {
-        this.props.getContacts();
-        this.updateState();
+        this.props.getContacts()
+            .then(res => {
+                this.updateState();
+            });
     }
 
     updateState() {
         this.setState({
-            data: [...this.props.contacts]
+            contacts: process(this.props.contacts.slice(0), this.state.dataState)
         });
     }
 
@@ -228,49 +228,37 @@ class ConnectedApp extends Component {
         }
     }
 
-    render() {
-        let data = this.state;
-
-        if (data.length !== this.props.contacts.length)
-            data = this.props.contacts;
-
-        // Filter out the contacts that we do not care about
-        const filteredData = [...data].filter(item => {
-            if (this.props.currentSearchFilter === '')
-                return true;
-
-            const array = Object.values(item);
-            for (const element of array) {
-                if (element.toString().indexOf(this.props.currentSearchFilter) !== -1)
-                    return true;
-            }
-            return false;
+    dataStateChange = (event) => {
+        this.setState({
+            contacts: process(this.props.contacts.slice(0), event.data),
+            dataState: event.data
         });
+    }
 
-        let shownCountText = '0-';
-        if (filteredData.length > 0)
-            shownCountText = '1-';
-        shownCountText = shownCountText + filteredData.length + ' of ' + data.length;
+    render() {
+        let {data} = this.state.contacts;
 
         const hasEditedItem = data.some(p => p.inEdit);
         return (
             <>
                 <div className="usa-header">
                     <h2 className={"usa-title"}>Contacts Page</h2>
-                    <input type={"text"} className={"usa-search"} name={"filter"} placeholder={"Search"}
-                           data-testid={"search-filter"}
-                           tabIndex={1}
-                           value={this.props.currentSearchFilter}
-                           onChange={this.handleTextChange}/>
                 </div>
                 <div className={"usa-content"}>
                     <Grid className={"usa-table"}
-                          data={filteredData}
                           editable={true}
+                          sortable={true}
+                          pageable={true}
+                          filterable={true}
+
+                          {...this.state.dataState}
+                          {...this.state.contacts}
+
+                          data={data}
                           editField={this.editField}
-                          onItemChange={this.itemChange}
-                          sortable
                           selectedField={"selected"}
+                          onDataStateChange={this.dataStateChange}
+                          onItemChange={this.itemChange}
                           onRowClick={this.onRowClick}
                     >
                         <GridToolbar>
@@ -299,16 +287,13 @@ class ConnectedApp extends Component {
                                     </button>
                                 </>)}
                         </GridToolbar>
-                        <GridColumn field="id" title={"#"} width={"50px"} editable={false}/>
-                        <GridColumn field="name" title={"Name"} editor="text"/>
-                        <GridColumn field="username" title={"Username"} editor="text"/>
-                        <GridColumn field="email" title={"Email"} editor="text"/>
-                        <GridColumn field="website" title={"URL"} editor="text"/>
-                        <GridColumn cell={this.CommandCell} width="240px"/>
+                        <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}/>
+                        <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}/>
+                        <GridColumn field={"username"} title={"Username"} filter={'text'} editor={"text"}/>
+                        <GridColumn field={"email"} title={"Email"} filter={'text'} editor={"text"}/>
+                        <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}/>
+                        <GridColumn filterable={false} cell={this.CommandCell} width={"240px"}/>
                     </Grid>
-                    <small>
-                        <p>{shownCountText}</p>
-                    </small>
                 </div>
                 <footer className={"usa-footer usa-footer--slim"}>
                     <div className={"grid-container usa-footer__return-to-top"}>

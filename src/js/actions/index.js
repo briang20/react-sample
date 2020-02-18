@@ -58,7 +58,7 @@ export function clearReplayBuffer() {
     return {type: CLEAR_REPLAY}
 }
 
-export function fetchContacts(type, opts, key) {
+export function fetchContacts(type, opts = null, key = '') {
     return (dispatch, getState, api) => {
         let url = api ? api : 'https://my-json-server.typicode.com/RavenX8/react-sample/users';
         if (type !== 'get' && type !== 'post') url = url + "/" + key;
@@ -79,7 +79,7 @@ export function fetchContacts(type, opts, key) {
 
 export function getContacts() {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('get', null,))
+        return dispatch(fetchContacts('get'))
             .then(async res => {
                 if (res.type === 'SUCCESS') {
                     const data = await res.payload.json();
