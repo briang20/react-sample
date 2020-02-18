@@ -26,8 +26,8 @@ export function removeContact(payload) {
     return {type: REMOVE_CONTACT, payload}
 }
 
-export function modifyContact(oldPayload, payload) {
-    return {type: MODIFY_CONTACT, oldPayload, payload}
+export function modifyContact(payload) {
+    return {type: MODIFY_CONTACT, payload}
 }
 
 export function changeSorting(payload) {
@@ -86,24 +86,45 @@ export function getContacts() {
                     dispatch(clearContacts());
                     dispatch(updateContacts(data));
                 }
+                return res.type;
             })
     }
 }
 
 export function postContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('post', JSON.stringify(opts), opts.id));
+        return dispatch(fetchContacts('post', JSON.stringify(opts), opts.id))
+            .then(async res => {
+                if (res.type === 'SUCCESS') {
+                    const data = await res.payload.json();
+                    dispatch(updateContacts(data));
+                }
+                return res.type;
+            });
     }
 }
 
-export function modifyContacts(opts) {
+export function putContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('put', JSON.stringify(opts), opts.id));
+        return dispatch(fetchContacts('put', JSON.stringify(opts), opts.id))
+            .then(async res => {
+                if (res.type === 'SUCCESS') {
+                    const data = await res.payload.json();
+                    dispatch(modifyContact(data));
+                }
+                return res.type;
+            });
     }
 }
 
 export function deleteContacts(opts) {
     return (dispatch, getState, api) => {
-        dispatch(fetchContacts('delete', JSON.stringify(opts), opts.id));
+        return dispatch(fetchContacts('delete', JSON.stringify(opts), opts.id))
+            .then(async res => {
+                if (res.type === 'SUCCESS') {
+                    dispatch(removeContact(opts));
+                }
+                return res.type;
+            });
     }
 }

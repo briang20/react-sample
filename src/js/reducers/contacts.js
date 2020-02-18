@@ -23,7 +23,11 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
             });
         case MODIFY_CONTACT:
             return Object.assign({}, state, {
-                replayBuffer: state.replayBuffer.concat({type: 'put', data: action.payload})
+                contacts: state.contacts.map(contact => {
+                    if (contact.id === action.payload.id)
+                        return action.payload;
+                    return contact;
+                })
             });
         case CLEAR_CONTACTS:
             return Object.assign({}, state, {

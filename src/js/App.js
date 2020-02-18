@@ -6,24 +6,21 @@ import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
 import '../css/App.css';
 import {
-    addContact,
-    changeSearchFilter,
     getContacts,
     removeContact,
     clearSelectedItems,
     postContacts,
-    modifyContacts,
+    putContacts,
     deleteContacts,
-    clearReplayBuffer, addSelectedItem, removeSelectedItem, modifyContact
+    addSelectedItem,
+    removeSelectedItem,
+    modifyContact
 } from "./actions/index";
 import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
 import {CommandCell} from "./components/command-cell";
 
 function mapDispatchToProps(dispatch) {
     return {
-        removeContact: function (contact) {
-            dispatch(removeContact(contact))
-        },
         clearSelectedItems: function () {
             dispatch(clearSelectedItems())
         },
@@ -31,13 +28,13 @@ function mapDispatchToProps(dispatch) {
             return dispatch(getContacts())
         },
         postContacts: function (opts) {
-            dispatch(postContacts(opts))
+            return dispatch(postContacts(opts))
         },
-        modifyContacts: function (opts) {
-            dispatch(modifyContacts(opts))
+        putContacts: function (opts) {
+            return dispatch(putContacts(opts))
         },
         deleteContacts: function (opts) {
-            dispatch(deleteContacts(opts))
+            return dispatch(deleteContacts(opts))
         },
         addSelectedItem: function (item) {
             dispatch(addSelectedItem(item))
@@ -71,6 +68,22 @@ class ConnectedApp extends Component {
     constructor(props) {
         super(props);
 
+        this.handleRefreshTable = this.handleRefreshTable.bind(this);
+        this.onRowClick = this.onRowClick.bind(this);
+        this.onItemChange = this.onItemChange.bind(this);
+        this.updateState = this.updateState.bind(this);
+        this.dataStateChange = this.dataStateChange.bind(this);
+        this.enterEdit = this.enterEdit.bind(this);
+        this.remove = this.remove.bind(this);
+        this.add = this.add.bind(this);
+        this.discard = this.discard.bind(this);
+        this.update = this.update.bind(this);
+        this.discard = this.discard.bind(this);
+        this.cancel = this.cancel.bind(this);
+        this.updateItem = this.updateItem.bind(this);
+        this.itemChange = this.itemChange.bind(this);
+        this.addNew = this.addNew.bind(this);
+
         this.CommandCell = CommandCell({
             edit: this.enterEdit,
             remove: this.remove,
@@ -83,13 +96,9 @@ class ConnectedApp extends Component {
 
             editField: this.editField
         });
-        this.handleRefreshTable = this.handleRefreshTable.bind(this);
-        this.onRowClick = this.onRowClick.bind(this);
-        this.onItemChange = this.onItemChange.bind(this);
-        this.updateState = this.updateState.bind(this);
     }
 
-    enterEdit = (dataItem) => {
+    enterEdit(dataItem) {
         this.setState({
             ...this.state,
             contacts: {
@@ -99,12 +108,28 @@ class ConnectedApp extends Component {
                 )
             }
         });
-    }
+    };
 
-    remove = (dataItem) => {
+    remove(dataItem) {
         const data = [...this.state.contacts.data];
-        this.props.removeContact(dataItem);
-        this.props.deleteContacts(dataItem);
+        this.props.deleteContacts(dataItem).then(this.updateState);
+    };
+
+    add(dataItem) {
+        dataItem.inEdit = undefined;
+        dataItem.id = this.generateId(this.props.contacts);
+        this.props.postContacts(dataItem).then(
+            res => {
+                this.setState({
+                    ...this.state,
+                    contacts: {data: [...this.state.contacts.data], total: this.props.contacts.length}
+                });
+            }
+        )
+    };
+
+    discard(dataItem) {
+        const data = [...this.state.contacts.data];
 
         this.setState({
             contacts: {
@@ -112,76 +137,56 @@ class ConnectedApp extends Component {
                     if (item === dataItem)
                         return false;
                     return true;
-                }),
-                total: data.length
+                }), total: this.props.contacts.length
             }
         });
-    }
+    };
 
-    add = (dataItem) => {
-        dataItem.inEdit = undefined;
-        dataItem.id = this.generateId(this.props.contacts);
-        this.props.postContacts(dataItem);
-
-        this.props.contacts.unshift(dataItem);
-        this.setState({
-            ...this.state,
-            contacts: {data: [...this.state.contacts.data], total: this.state.contacts.data.length}
-        });
-    }
-
-    discard = (dataItem) => {
-        const data = [...this.state.contacts.data];
-        this.removeItem(data, dataItem);
-        this.props.removeContact({data});
-
-        this.setState({contacts: {data, total: data.length}});
-    }
-
-    update = (dataItem) => {
+    update(dataItem) {
         const data = [...this.state.contacts.data];
         const updatedItem = {...dataItem, inEdit: undefined};
 
         this.updateItem(data, updatedItem);
-        this.props.modifyContacts(updatedItem);
+        this.props.putContacts(updatedItem)
+            .then(res => {
+                this.updateState()
+            });
+    };
 
-        this.setState({contacts: {data, total: data.length}});
-    }
-
-    cancel = (dataItem) => {
+    cancel(dataItem) {
         const originalItem = this.props.contacts.find(p => p.id === dataItem.id);
         const data = this.state.contacts.data.map(item => item.id === originalItem.id ? originalItem : item);
 
-        this.setState({contacts: {data, total: data.length}});
-    }
+        this.setState({contacts: {data, total: this.state.contacts.data.total}});
+    };
 
-    updateItem = (data, item) => {
+    updateItem(data, item) {
         let index = data.findIndex(p => p === item || (item.id && p.id === item.id));
         if (index >= 0) {
             data[index] = {...item};
         }
-    }
+    };
 
-    itemChange = (event) => {
+    itemChange(event) {
         const data = this.state.contacts.data.map(item =>
             item.id === event.dataItem.id ?
                 {...item, [event.field]: event.value} : item
         );
 
-        this.setState({contacts: {data, total: data.length}});
-    }
+        this.setState({contacts: {data, total: this.state.contacts.data.total}});
+    };
 
-    addNew = () => {
+    addNew() {
         const newDataItem = {inEdit: true};
 
         this.setState({
-            contacts: {data: [newDataItem, ...this.state.contacts.data], total: this.state.contacts.data.length + 1}
+            contacts: {data: [newDataItem, ...this.state.contacts.data], total: this.props.contacts.length + 1}
         });
-    }
+    };
 
-    cancelCurrentChanges = () => {
+    cancelCurrentChanges() {
         this.setState({contacts: {data: [...this.props.contacts], total: this.props.contacts.length}});
-    }
+    };
 
     componentDidMount() {
         this.handleRefreshTable();
@@ -206,8 +211,12 @@ class ConnectedApp extends Component {
     }
 
     updateState() {
+        const {dataState} = this.state;
+        let newDataState = dataState;
+        if (dataState.skip >= this.props.contacts.length)
+            newDataState.skip = newDataState.skip - newDataState.take;
         this.setState({
-            contacts: process(this.props.contacts.slice(0), this.state.dataState)
+            contacts: process(this.props.contacts.slice(0), newDataState)
         });
     }
 
@@ -228,7 +237,7 @@ class ConnectedApp extends Component {
         }
     }
 
-    dataStateChange = (event) => {
+    dataStateChange(event) {
         this.setState({
             contacts: process(this.props.contacts.slice(0), event.data),
             dataState: event.data
