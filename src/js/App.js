@@ -17,6 +17,7 @@ import {
 } from "./actions/index";
 import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
 import {CommandCell} from "./components/command-cell";
+import DataLoader from "./components/grid-data-loader";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -193,10 +194,6 @@ class ConnectedApp extends Component {
         this.setState({contacts: {data: [...this.props.contacts], total: this.props.contacts.length}});
     };
 
-    componentDidMount() {
-        this.handleRefreshTable();
-    }
-
     generateId() {
         let id = 1;
         if (this.props.contacts.length > 0) {
@@ -312,6 +309,10 @@ class ConnectedApp extends Component {
                         <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}/>
                         <GridColumn filterable={false} cell={this.CommandCell} width={"240px"}/>
                     </Grid>
+                    <DataLoader
+                        dataState={this.state.dataState}
+                        onDataRecieved={this.updateState}
+                    />
                 </div>
                 <footer className={"usa-footer usa-footer--slim"}>
                     <div className={"grid-container usa-footer__return-to-top"}>
