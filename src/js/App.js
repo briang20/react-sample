@@ -7,7 +7,6 @@ import '../css/uswds-theme.scss';
 import '../css/App.css';
 import {
     getContacts,
-    removeContact,
     clearSelectedItems,
     postContacts,
     putContacts,
@@ -83,6 +82,7 @@ class ConnectedApp extends Component {
         this.updateItem = this.updateItem.bind(this);
         this.itemChange = this.itemChange.bind(this);
         this.addNew = this.addNew.bind(this);
+        this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
 
         this.CommandCell = CommandCell({
             edit: this.enterEdit,
@@ -111,7 +111,6 @@ class ConnectedApp extends Component {
     };
 
     remove(dataItem) {
-        const data = [...this.state.contacts.data];
         this.props.deleteContacts(dataItem).then(this.updateState);
     };
 
@@ -184,6 +183,12 @@ class ConnectedApp extends Component {
         });
     };
 
+    deleteSelectedItems() {
+        const selectedItems = this.state.contacts.data.filter(item => item.selected);
+        for (let item of selectedItems)
+            this.remove(item);
+    };
+
     cancelCurrentChanges() {
         this.setState({contacts: {data: [...this.props.contacts], total: this.props.contacts.length}});
     };
@@ -228,11 +233,9 @@ class ConnectedApp extends Component {
     }
 
     onRowClick(event) {
-        if (event.dataItem.selected) {
-            event.dataItem.selected = false;
+        if (event.dataItem.selected === true) {
             this.props.removeSelectedItem(event.dataItem);
         } else {
-            event.dataItem.selected = true;
             this.props.addSelectedItem(event.dataItem);
         }
     }
@@ -248,6 +251,7 @@ class ConnectedApp extends Component {
         let {data} = this.state.contacts;
 
         const hasEditedItem = data.some(p => p.inEdit);
+        const hasSelectedItems = data.some(p => p.selected);
         return (
             <>
                 <div className="usa-header">
@@ -285,16 +289,21 @@ class ConnectedApp extends Component {
                             >
                                 Add new
                             </button>
+                            {hasSelectedItems && (<button
+                                title="Delete Selected Items"
+                                className="k-button"
+                                onClick={this.deleteSelectedItems}
+                            >
+                                Delete Selected Items
+                            </button>)}
                             {hasEditedItem && (
-                                <>
-                                    <button
-                                        title="Cancel current changes"
-                                        className="k-button"
-                                        onClick={this.cancelCurrentChanges}
-                                    >
-                                        Cancel current changes
-                                    </button>
-                                </>)}
+                                <button
+                                    title="Cancel current changes"
+                                    className="k-button"
+                                    onClick={this.cancelCurrentChanges}
+                                >
+                                    Cancel current changes
+                                </button>)}
                         </GridToolbar>
                         <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}/>
                         <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}/>

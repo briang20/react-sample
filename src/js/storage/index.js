@@ -11,7 +11,7 @@ const onSuccess = (response) => {
         throw new Error('Error');
     }
     return response;
-}
+};
 
 const callApi = (url, options) => fetch(url, options).then(onSuccess);
 const apiMiddleware = createMiddleware({callApi});

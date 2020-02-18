@@ -57,7 +57,6 @@ export default function contacts(state = {contacts: [], replayBuffer: [], curren
             });
         case CLEAR_SELECTED_ITEMS:
             return Object.assign({}, state, {
-                currentSelectedItems: [],
                 contacts: state.contacts.map(obj => {
                     obj.selected = false;
                     return obj;
