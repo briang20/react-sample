@@ -18,6 +18,7 @@ import {
 import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
 import {CommandCell} from "./components/command-cell";
 import DataLoader from "./components/grid-data-loader";
+import {ColumnMenu} from "./components/gird-column-menu";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -103,6 +104,7 @@ class ConnectedApp extends Component {
         this.setState({
             ...this.state,
             contacts: {
+                ...this.state.contacts,
                 data: this.state.contacts.data.map(item =>
                     item.id === dataItem.id ?
                         {...item, inEdit: true} : item
@@ -133,6 +135,7 @@ class ConnectedApp extends Component {
 
         this.setState({
             contacts: {
+                ...this.state.contacts,
                 data: data.filter(item => {
                     if (item === dataItem)
                         return false;
@@ -157,7 +160,7 @@ class ConnectedApp extends Component {
         const originalItem = this.props.contacts.find(p => p.id === dataItem.id);
         const data = this.state.contacts.data.map(item => item.id === originalItem.id ? originalItem : item);
 
-        this.setState({contacts: {data, total: this.state.contacts.data.total}});
+        this.setState({contacts: {...this.state.contacts, data}});
     };
 
     updateItem(data, item) {
@@ -173,7 +176,7 @@ class ConnectedApp extends Component {
                 {...item, [event.field]: event.value} : item
         );
 
-        this.setState({contacts: {data, total: this.state.contacts.data.total}});
+        this.setState({contacts: {...this.state.contacts, data}});
     };
 
     addNew() {
@@ -251,68 +254,88 @@ class ConnectedApp extends Component {
         const hasSelectedItems = data.some(p => p.selected);
         return (
             <>
-                <div className="usa-header">
-                    <h2 className={"usa-title"}>Contacts Page</h2>
-                </div>
-                <div className={"usa-content"}>
-                    <Grid className={"usa-table"}
-                          editable={true}
-                          sortable={true}
-                          pageable={true}
-                          filterable={true}
+                <a className="usa-skipnav" href="#main-content">Skip to main content</a>
 
-                          {...this.state.dataState}
-                          {...this.state.contacts}
+                <header className="usa-header usa-header--basic">
+                    <div className="usa-nav-container">
+                        <div className="usa-navbar">
+                            <div className="usa-logo" id="basic-logo">
+                                <em className="usa-logo__text"><a href="/" title="Home" aria-label="Home">Users
+                                    Lookup</a></em>
+                            </div>
+                        </div>
+                    </div>
+                </header>
 
-                          data={data}
-                          editField={this.editField}
-                          selectedField={"selected"}
-                          onDataStateChange={this.dataStateChange}
-                          onItemChange={this.itemChange}
-                          onRowClick={this.onRowClick}
-                    >
-                        <GridToolbar>
-                            <button
-                                title="Refresh"
-                                className="k-button k-primary"
-                                onClick={this.handleRefreshTable}
+
+                <div className="usa-section">
+                    <main className="usa-layout-docs__main usa-prose usa-layout-docs"
+                          id="main-content">
+                        <div className={"usa-content"}>
+                            <Grid className={"usa-table"}
+                                  editable={true}
+                                  sortable={true}
+                                  pageable={true}
+
+                                  {...this.state.dataState}
+                                  {...this.state.contacts}
+
+                                  data={data}
+                                  editField={this.editField}
+                                  selectedField={"selected"}
+                                  onDataStateChange={this.dataStateChange}
+                                  onItemChange={this.itemChange}
+                                  onRowClick={this.onRowClick}
                             >
-                                Refresh
-                            </button>
-                            <button
-                                title="Add new"
-                                className="k-button k-primary"
-                                onClick={this.addNew}
-                            >
-                                Add new
-                            </button>
-                            {hasSelectedItems && (<button
-                                title="Delete Selected Items"
-                                className="k-button"
-                                onClick={this.deleteSelectedItems}
-                            >
-                                Delete Selected Items
-                            </button>)}
-                            {hasEditedItem && (
-                                <button
-                                    title="Cancel current changes"
-                                    className="k-button"
-                                    onClick={this.cancelCurrentChanges}
-                                >
-                                    Cancel current changes
-                                </button>)}
-                        </GridToolbar>
-                        <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}/>
-                        <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}/>
-                        <GridColumn field={"username"} title={"Username"} filter={'text'} editor={"text"}/>
-                        <GridColumn field={"email"} title={"Email"} filter={'text'} editor={"text"}/>
-                        <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}/>
-                        <GridColumn filterable={false} cell={this.CommandCell} width={"240px"}/>
-                    </Grid>
-                    <DataLoader
-                        dataState={this.state.dataState}
-                        onDataRecieved={this.updateState}
-                    />
+                                <GridToolbar>
+                                    <button
+                                        title="Refresh"
+                                        className="k-button k-primary"
+                                        onClick={this.handleRefreshTable}
+                                    >
+                                        Refresh
+                                    </button>
+                                    <button
+                                        title="Add new"
+                                        className="k-button k-primary"
+                                        onClick={this.addNew}
+                                    >
+                                        Add new
+                                    </button>
+                                    {hasSelectedItems && (<button
+                                        title="Delete Selected Items"
+                                        className="k-button"
+                                        onClick={this.deleteSelectedItems}
+                                    >
+                                        Delete Selected Items
+                                    </button>)}
+                                    {hasEditedItem && (
+                                        <button
+                                            title="Cancel current changes"
+                                            className="k-button"
+                                            onClick={this.cancelCurrentChanges}
+                                        >
+                                            Cancel current changes
+                                        </button>)}
+                                </GridToolbar>
+                                <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}
+                                            columnMenu={ColumnMenu}/>
+                                <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}
+                                            columnMenu={ColumnMenu}/>
+                                <GridColumn field={"username"} title={"Username"} filter={'text'} editor={"text"}
+                                            columnMenu={ColumnMenu}/>
+                                <GridColumn field={"email"} title={"Email"} filter={'text'} editor={"text"}
+                                            columnMenu={ColumnMenu}/>
+                                <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}
+                                            columnMenu={ColumnMenu}/>
+                                <GridColumn cell={this.CommandCell} width={"170px"}/>
+                            </Grid>
+                            <DataLoader
+                                dataState={this.state.dataState}
+                                onDataRecieved={this.updateState}
+                            />
+                        </div>
+                    </main>
                 </div>
                 <footer className={"usa-footer usa-footer--slim"}>
                     <div className={"grid-container usa-footer__return-to-top"}>
