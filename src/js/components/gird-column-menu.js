@@ -5,7 +5,7 @@ export class ColumnMenu extends React.Component {
     render() {
         return (
             <div>
-                <GridColumnMenuFilter {...this.props} expanded={true}/>
+                <GridColumnMenuFilter data-testid={"table-menu-filter"} {...this.props} expanded={true}/>
             </div>
         );
     }

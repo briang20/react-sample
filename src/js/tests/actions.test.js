@@ -55,10 +55,10 @@ it('should dispatch an modify contact action', function () {
     const initialState = {};
     const store = mockStore(initialState);
     const opts = {'name': 'test'};
-    store.dispatch(modifyContact(opts, opts));
+    store.dispatch(modifyContact(opts));
 
     const actions = store.getActions();
-    const expectedPayload = {type: MODIFY_CONTACT, oldPayload: opts, payload: opts};
+    const expectedPayload = {type: MODIFY_CONTACT, payload: opts};
     expect(actions).toEqual([expectedPayload])
 });
 

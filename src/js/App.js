@@ -291,6 +291,7 @@ class ConnectedApp extends Component {
                                         title="Refresh"
                                         className="k-button k-primary"
                                         onClick={this.handleRefreshTable}
+                                        data-testid={"refresh-table"}
                                     >
                                         Refresh
                                     </button>
@@ -298,6 +299,7 @@ class ConnectedApp extends Component {
                                         title="Add new"
                                         className="k-button k-primary"
                                         onClick={this.addNew}
+                                        data-testid={"add-row"}
                                     >
                                         Add new
                                     </button>
@@ -305,6 +307,7 @@ class ConnectedApp extends Component {
                                         title="Delete Selected Items"
                                         className="k-button"
                                         onClick={this.deleteSelectedItems}
+                                        data-testid={"delete-selected-row"}
                                     >
                                         Delete Selected Items
                                     </button>)}
@@ -313,6 +316,7 @@ class ConnectedApp extends Component {
                                             title="Cancel current changes"
                                             className="k-button"
                                             onClick={this.cancelCurrentChanges}
+                                            data-testid={"cancel-current-changes"}
                                         >
                                             Cancel current changes
                                         </button>)}

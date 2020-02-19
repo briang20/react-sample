@@ -13,15 +13,16 @@ const onSuccess = (response) => {
         throw new Error('Error');
     }
     return response;
-}
+};
 
+const fetchMock = require('fetch-mock/es5/client');
 const callApi = (url, options) => fetch(url, options).then(onSuccess);
 const apiMiddleware = createMiddleware({callApi});
 
 const api = 'http://local';
 const initialState = {
-    contacts: {contacts: [], replayBuffer: [], currentSelectedItems: []},
-    sorter: {currentSortMethod: "default", currentSearchFilter: ""}
+    contacts: {contacts: [], currentSelectedItems: []},
+    sorter: {currentSearchFilter: ""}
 };
 
 const middleware = [thunk.withExtraArgument(api), apiMiddleware];
@@ -49,98 +50,37 @@ it('should render columns correctly', function () {
     expect(getByText('URL')).toBeInTheDocument();
 });
 
-it('should be able to sort columns', function () {
-    const newState = Object.assign({}, initialState, {
-        contacts: {
-            contacts: initialState.contacts.contacts.concat([
-                {
-                    id: '1',
-                    name: 'b',
-                    username: 'bob',
-                    email: 'bob@bob.co',
-                    website: 'bob.co'
-                },
-                {
-                    id: '2',
-                    name: 'a',
-                    username: 'sally',
-                    email: 'sally@sally.co',
-                    website: 'sally.co'
-                },
-                {
-                    id: '3',
-                    name: 'a',
-                    username: 'sally',
-                    email: 'sally@sally.co',
-                    website: 'sally.co'
-                }]),
-            replayBuffer: initialState.contacts.replayBuffer,
-            currentSelectedItems: initialState.contacts.currentSelectedItems
-        },
-        sorter: {
-            currentSortMethod: initialState.sorter.currentSortMethod,
-            currentSearchFilter: initialState.sorter.currentSearchFilter
-        }
-    });
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: newState,
-    });
-
-    expect(store.getState().sorter.currentSortMethod).toBe("default");
-
-    fireEvent.click(getByTestId('column-id'));
-    expect(store.getState().sorter.currentSortMethod).toBe("dsc_by_id");
-    fireEvent.click(getByTestId('column-id'));
-    expect(store.getState().sorter.currentSortMethod).toBe("asc_by_id");
-
-    fireEvent.click(getByTestId('column-name'));
-    expect(store.getState().sorter.currentSortMethod).toBe("dsc_by_name");
-    fireEvent.click(getByTestId('column-name'));
-    expect(store.getState().sorter.currentSortMethod).toBe("asc_by_name");
-
-    fireEvent.click(getByTestId('column-username'));
-    expect(store.getState().sorter.currentSortMethod).toBe("dsc_by_username");
-    fireEvent.click(getByTestId('column-username'));
-    expect(store.getState().sorter.currentSortMethod).toBe("asc_by_username");
-
-    fireEvent.click(getByTestId('column-email'));
-    expect(store.getState().sorter.currentSortMethod).toBe("dsc_by_email");
-    fireEvent.click(getByTestId('column-email'));
-    expect(store.getState().sorter.currentSortMethod).toBe("asc_by_email");
-
-    fireEvent.click(getByTestId('column-website'));
-    expect(store.getState().sorter.currentSortMethod).toBe("dsc_by_website");
-    fireEvent.click(getByTestId('column-website'));
-    expect(store.getState().sorter.currentSortMethod).toBe("asc_by_website");
-});
-
-it('should be able to add a row', function () {
+it('should be able to add a row', async function () {
     const {getByTestId, store} = renderWithRedux(<App/>, {
         initialState: initialState,
     });
 
     fireEvent.click(getByTestId('add-row'));
+    fireEvent.click(getByTestId('final-add-row'));
     expect(store.getState().contacts.contacts.length).toBe(1);
     expect(store.getState().contacts.contacts[0].id).toBe(1);
 
     fireEvent.click(getByTestId('add-row'));
+    fireEvent.click(getByTestId('final-add-row'));
     expect(store.getState().contacts.contacts.length).toBe(2);
     expect(store.getState().contacts.contacts[1].id).toBe(2);
 });
 
 it('should be able to edit a row', function () {
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: initialState,
+    const newState = Object.assign({}, initialState, {
+        contacts: {
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}]),
+            currentSelectedItems: initialState.contacts.currentSelectedItems
+        }
+    });
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
+        initialState: newState,
     });
 
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(1);
-    expect(store.getState().contacts.contacts[0].id).toBe(1);
-
-    const name_element = getByTestId('name-input-1');
-    fireEvent.change(name_element, {target: {value: 'test1'}});
-    fireEvent.blur(name_element);
-    expect(store.getState().contacts.contacts[0].name).toBe("test1");
+    fireEvent.click(getByTestId('edit-row'));
+    fireEvent.change(getByText('test1'), {target: {value: 'test2'}});
+    fireEvent.click(getByTestId('final-update-row'));
+    expect(store.getState().contacts.contacts[0].name).toBe("test2");
 });
 
 it('should not be able to edit a readonly column', function () {
@@ -149,6 +89,7 @@ it('should not be able to edit a readonly column', function () {
     });
 
     fireEvent.click(getByTestId('add-row'));
+    fireEvent.click(getByTestId('final-add-row'));
     expect(store.getState().contacts.contacts.length).toBe(1);
     expect(store.getState().contacts.contacts[0].id).toBe(1);
 
@@ -159,135 +100,86 @@ it('should not be able to edit a readonly column', function () {
 });
 
 it('should be able to select a row', function () {
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: initialState,
-    });
-
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(1);
-    fireEvent.click(getByTestId('select-row-single'));
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(1);
-});
-
-it('should be able to select all rows', function () {
     const newState = Object.assign({}, initialState, {
         contacts: {
-            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}]),
-            replayBuffer: initialState.contacts.replayBuffer,
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
             currentSelectedItems: initialState.contacts.currentSelectedItems
         }
     });
-    const {getByTestId, getAllByTestId, store} = renderWithRedux(<App/>, {
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
 
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(3);
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(4);
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(0);
-
-    // Check if checking select all adds all contacts as selected
-    fireEvent.click(getByTestId('select-all-rows'));
-
-    // Make sure that all of the check boxes are checked
-    const select_boxes = getAllByTestId('select-row-single');
-    for (let checkbox of select_boxes)
-        expect(checkbox).toBeChecked();
-
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(store.getState().contacts.contacts.length);
-
-    // Check if unchecking select all removes all selected rows
-    fireEvent.click(getByTestId('select-all-rows'));
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(0);
+    const firstRow = getByText('test1');
+    fireEvent.click(firstRow);
+    expect(store.getState().contacts.contacts[0].selected).toBe(true);
 });
 
 it('should be able to delete all rows', function () {
     const newState = Object.assign({}, initialState, {
         contacts: {
-            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}]),
-            replayBuffer: initialState.contacts.replayBuffer,
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
             currentSelectedItems: initialState.contacts.currentSelectedItems
         }
     });
-    const {getByTestId, store} = renderWithRedux(<App/>, {
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
 
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(3);
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(4);
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(0);
-
-    // Select all rows
-    fireEvent.click(getByTestId('select-all-rows'));
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(store.getState().contacts.contacts.length);
-
-    // Delete the rows
-    fireEvent.click(getByTestId('delete-row'));
+    fireEvent.click(getByText('test1'));
+    fireEvent.click(getByText('test2'));
+    fireEvent.click(getByTestId('delete-selected-row'));
     expect(store.getState().contacts.contacts.length).toBe(0);
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(0);
 });
 
 it('should be able to deselect a row', function () {
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: initialState,
-    });
-
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(1);
-    fireEvent.click(getByTestId('select-row-single'));
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(1);
-    fireEvent.click(getByTestId('select-row-single'));
-    expect(store.getState().contacts.currentSelectedItems.length).toBe(0);
-});
-
-it('should be able to delete a row', function () {
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: initialState,
-    });
-
-    fireEvent.click(getByTestId('add-row'));
-    expect(store.getState().contacts.contacts.length).toBe(1);
-    fireEvent.click(getByTestId('select-row-single'));
-    fireEvent.click(getByTestId('delete-row'));
-    expect(store.getState().contacts.contacts.length).toBe(0);
-});
-
-it('should be able to filter data using search', function () {
     const newState = Object.assign({}, initialState, {
         contacts: {
-            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test'}, {id: '2', name: 'test'}]),
-            replayBuffer: initialState.contacts.replayBuffer,
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
             currentSelectedItems: initialState.contacts.currentSelectedItems
         }
     });
-    const {getByText, getByTestId, store} = renderWithRedux(<App/>, {
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
 
-    let searchBox = getByTestId('search-filter');
-    expect(searchBox).toBeInTheDocument();
-    fireEvent.change(searchBox, {target: {value: '1'}});
-    expect(searchBox.value).toBe("1");
-    expect(store.getState().sorter.currentSearchFilter).toBe(searchBox.value);
-    expect(getByText("1-1 of 2")).toBeInTheDocument();
+    fireEvent.click(getByText('test1'));
+    expect(store.getState().contacts.contacts[0].selected).toBe(true);
+    fireEvent.click(getByText('test1'));
+    expect(store.getState().contacts.contacts[0].selected).toBe(false);
+});
+
+it('should be able to delete a row', function () {
+    const newState = Object.assign({}, initialState, {
+        contacts: {
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}]),
+            currentSelectedItems: initialState.contacts.currentSelectedItems
+        }
+    });
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
+        initialState: newState,
+    });
+
+    fireEvent.click(getByTestId('remove-row'));
+    expect(store.getState().contacts.contacts.length).toBe(0);
 });
 
 it('should be able to refresh the table data', function () {
     const newState = Object.assign({}, initialState, {
         contacts: {
-            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
-            replayBuffer: initialState.contacts.replayBuffer,
+            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}]),
             currentSelectedItems: initialState.contacts.currentSelectedItems
         }
     });
-    const {getByTestId, store} = renderWithRedux(<App/>, {
+    const {getByTestId, getByText, store} = renderWithRedux(<App/>, {
         initialState: newState,
     });
 
-    const name_element = getByTestId('name-input-1');
+    const editButton = getByTestId('edit-row');
+    expect(editButton).toBeInTheDocument();
+    fireEvent.click(editButton);
+
+    const name_element = getByText('test1');
     fireEvent.change(name_element, {target: {value: 'wrongText'}});
     expect(name_element.value).toBe("wrongText");
 
@@ -295,54 +187,47 @@ it('should be able to refresh the table data', function () {
     expect(refreshButton).toBeInTheDocument();
     fireEvent.click(refreshButton);
 
-    expect(store.getState().contacts.contacts.length).toBe(2);
-    // expect(name_element.value).toBe("test1");
+    expect(store.getState().contacts.contacts.length).toBe(1);
+    expect(name_element.value).toBe("test1");
 });
 
-it('should be able to save the table data replay buffer', async function () {
-    const newState = Object.assign({}, initialState, {
-        contacts: {
-            contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
-            replayBuffer: initialState.contacts.replayBuffer,
-            currentSelectedItems: initialState.contacts.currentSelectedItems
-        }
-    });
-
-    const fetchMock = require('fetch-mock/es5/client');
-    fetchMock
-        .getOnce(api, {
-            status: 200,
-            body: [{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]
-        }, {overwriteRoutes: false})
-        .getOnce(api, {status: 200, body: [{id: '1', name: 'wrongText'}]}, {overwriteRoutes: false})
-        .postOnce(api, 400)
-        .putOnce(api + '/1', {status: 200, body: {id: 1, name: 'wrongText'}})
-
-    const {getByTestId, store} = renderWithRedux(<App/>, {
-        initialState: newState,
-    });
-
-    const addButton = getByTestId('add-row');
-    expect(addButton).toBeInTheDocument();
-    fireEvent.click(addButton);
-    expect(store.getState().contacts.replayBuffer.length).toBe(1);
-
-    const name_element = getByTestId('name-input-1');
-    expect(name_element).toBeInTheDocument();
-    fireEvent.change(name_element, {target: {value: 'wrongText'}});
-    fireEvent.blur(name_element);
-    expect(name_element.value).toBe("wrongText");
-    expect(store.getState().contacts.replayBuffer.length).toBe(2);
-
-    const saveButton = getByTestId('save-table');
-    expect(saveButton).toBeInTheDocument();
-    fireEvent.click(saveButton);
-    expect(store.getState().contacts.replayBuffer.length).toBe(0);
-
-    const refreshButton = getByTestId('refresh-table');
-    expect(refreshButton).toBeInTheDocument();
-    await fireEvent.click(refreshButton);
-
-    expect(store.getState().contacts.contacts[0].name).toBe("wrongText");
-    fetchMock.reset();
-});
+// it('should be able to save the table data replay buffer', async function () {
+//     const newState = Object.assign({}, initialState, {
+//         contacts: {
+//             contacts: initialState.contacts.contacts.concat([{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]),
+//             currentSelectedItems: initialState.contacts.currentSelectedItems
+//         }
+//     });
+//     fetchMock
+//         .getOnce(api, {
+//             status: 200,
+//             body: [{id: '1', name: 'test1'}, {id: '2', name: 'test2'}]
+//         }, {overwriteRoutes: false})
+//         .getOnce(api, {status: 200, body: [{id: '1', name: 'test1'}, {id: '2', name: 'test2'}, {id: '3', name: 'test3'}]}, {overwriteRoutes: false})
+//         .postOnce(api, 400)
+//         .putOnce(api + '/1', {status: 200, body: {id: 1, name: 'wrongText'}})
+//         .done();
+//
+//     const {getByTestId, store} = renderWithRedux(<App/>, {
+//         initialState: newState,
+//     });
+//
+//     const addButton = getByTestId('add-row');
+//     expect(addButton).toBeInTheDocument();
+//     fireEvent.click(addButton);
+//     fireEvent.click(getByTestId('final-add-row'));
+//     expect(store.getState().contacts.contacts.length).toBe(3);
+//
+//     const name_element = getByTestId('name-input-1');
+//     expect(name_element).toBeInTheDocument();
+//     fireEvent.change(name_element, {target: {value: 'wrongText'}});
+//     fireEvent.blur(name_element);
+//     expect(name_element.value).toBe("wrongText");
+//
+//     const refreshButton = getByTestId('refresh-table');
+//     expect(refreshButton).toBeInTheDocument();
+//     await fireEvent.click(refreshButton);
+//
+//     expect(store.getState().contacts.contacts[0].name).toBe("wrongText");
+//     fetchMock.reset();
+// });
