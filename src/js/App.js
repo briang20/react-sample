@@ -19,6 +19,8 @@ import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, get
 import {CommandCell} from "./components/command-cell";
 import DataLoader from "./components/grid-data-loader";
 import {ColumnMenu} from "./components/gird-column-menu";
+import {DropDownCell} from "./components/drop-down-cell";
+import {MultiSelectCell} from "./components/multi-select-cell";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -58,9 +60,16 @@ const mapStateToProps = state => {
     };
 };
 
+const userGroups = [{text: 'admin', value: 1}, {text: 'user', value: 2}, {
+    text: 'security',
+    value: 3
+}, {text: 'privileged user', value: 4}];
+
 class ConnectedApp extends Component {
     editField = "inEdit";
-    CommandCell;
+    CommandCell = null;
+    YesNoCell = null;
+    GroupsCell = null;
     state = {
         dataState: {take: 10, skip: 0},
         contacts: {data: [...this.props.contacts], total: this.props.contacts.length}
@@ -87,6 +96,15 @@ class ConnectedApp extends Component {
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
         this.cancelCurrentChanges = this.cancelCurrentChanges.bind(this);
 
+        this.GroupsCell = MultiSelectCell({
+            options: userGroups
+        });
+        this.YesNoCell = DropDownCell({
+            options: [
+                {text: 'yes', value: true},
+                {text: 'no', value: false}
+            ]
+        });
         this.CommandCell = CommandCell({
             edit: this.enterEdit,
             remove: this.remove,
@@ -331,6 +349,8 @@ class ConnectedApp extends Component {
                                             columnMenu={ColumnMenu}/>
                                 <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}
                                             columnMenu={ColumnMenu}/>
+                                <GridColumn field={"enabled"} title={"Enabled"} cell={this.YesNoCell}/>
+                                <GridColumn field={"groups"} title={"Groups"} cell={this.GroupsCell}/>
                                 <GridColumn cell={this.CommandCell} width={"170px"}/>
                             </Grid>
                             <DataLoader
