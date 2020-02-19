@@ -5,7 +5,10 @@
       "name": "Leanne Graham",
       "username": "Bret",
       "email": "Sincere@april.biz",
-      "website": "hildegard.org"
+      "website": "hildegard.org",
+      "groups": [
+        1
+      ]
     },
     {
       "id": 2,
@@ -70,6 +73,24 @@
       "username": "Moriah.Stanton",
       "email": "Rey.Padberg@karina.biz",
       "website": "ambrose.net"
+    }
+  ],
+  "groups": [
+    {
+      "text": "admin",
+      "value": 1
+    },
+    {
+      "text": "user",
+      "value": 2
+    },
+    {
+      "text": "security",
+      "value": 3
+    },
+    {
+      "text": "privileged user",
+      "value": 4
     }
   ]
 }

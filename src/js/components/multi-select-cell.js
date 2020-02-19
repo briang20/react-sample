@@ -15,12 +15,12 @@ export function MultiSelectCell({options}) {
                 dataItem: this.props.dataItem,
                 field: this.props.field,
                 syntheticEvent: e.syntheticEvent,
-                value: e.target.value
+                value: e.target.value.map(item => item[e.target.props.dataItemKey])
             });
         }
 
         render() {
-            const {dataItem, field} = this.props;
+            const {dataItem, dataItemKey, field} = this.props;
             const dataValue = dataItem[field] == null ? '' : dataItem[field];
             const selectableOptions = this.options;
 
@@ -31,7 +31,13 @@ export function MultiSelectCell({options}) {
                         onChange={this.handleChange}
                         disabled={!dataItem.inEdit}
                         data={selectableOptions}
-                        value={dataValue}
+                        value={selectableOptions.filter(option => {
+                            for (let value of dataValue) {
+                                if (option.value === value)
+                                    return true;
+                            }
+                            return false;
+                        })}
                         textField="text"
                         dataItemKey="value"
                     />

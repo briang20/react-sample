@@ -13,9 +13,16 @@ import {
     deleteContacts,
     addSelectedItem,
     removeSelectedItem,
-    modifyContact
+    modifyContact,
+    getUserGroups
 } from "./actions/index";
-import {getContactsList, getCurrentSearchFilter, getCurrentSelectedItemList, getReplayList} from "./selectors/index";
+import {
+    getContactsList,
+    getCurrentSearchFilter,
+    getCurrentSelectedItemList,
+    getReplayList,
+    getUserGroupsList
+} from "./selectors/index";
 import {CommandCell} from "./components/command-cell";
 import DataLoader from "./components/grid-data-loader";
 import {ColumnMenu} from "./components/gird-column-menu";
@@ -48,6 +55,9 @@ function mapDispatchToProps(dispatch) {
         modifyContact: function (contact, newContact) {
             dispatch(modifyContact(contact, newContact))
         },
+        getUserGroups: function () {
+            return dispatch(getUserGroups())
+        }
     };
 }
 
@@ -56,7 +66,8 @@ const mapStateToProps = state => {
         contacts: getContactsList(state),
         currentSearchFilter: getCurrentSearchFilter(state),
         currentSelectedItems: getCurrentSelectedItemList(state),
-        replayBuffer: getReplayList(state)
+        replayBuffer: getReplayList(state),
+        groups: getUserGroupsList(state)
     };
 };
 
@@ -74,7 +85,8 @@ class ConnectedApp extends Component {
     GroupsCell = null;
     state = {
         dataState: {take: 10, skip: 0},
-        contacts: {data: [...this.props.contacts], total: this.props.contacts.length}
+        contacts: {data: [...this.props.contacts], total: this.props.contacts.length},
+        groups: [...this.props.groups]
     };
 
     constructor(props) {
@@ -98,9 +110,6 @@ class ConnectedApp extends Component {
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
         this.cancelCurrentChanges = this.cancelCurrentChanges.bind(this);
 
-        this.GroupsCell = MultiSelectCell({
-            options: userGroups
-        });
         this.YesNoCell = DropDownCell({
             options: [
                 {text: 'yes', value: true},
@@ -119,6 +128,10 @@ class ConnectedApp extends Component {
 
             editField: this.editField
         });
+    }
+
+    componentDidMount() {
+        this.handleRefreshTable();
     }
 
     enterEdit(dataItem) {
@@ -230,6 +243,11 @@ class ConnectedApp extends Component {
     }
 
     handleRefreshTable() {
+        this.props.getUserGroups()
+            .then(res => {
+                this.updateState();
+            });
+
         this.props.getContacts()
             .then(res => {
                 this.updateState();
@@ -242,7 +260,8 @@ class ConnectedApp extends Component {
         if (dataState.skip >= this.props.contacts.length)
             newDataState.skip = newDataState.skip - newDataState.take;
         this.setState({
-            contacts: process(this.props.contacts.slice(0), newDataState)
+            contacts: process(this.props.contacts.slice(0), newDataState),
+            groups: [...this.props.groups]
         });
     }
 
@@ -270,6 +289,10 @@ class ConnectedApp extends Component {
 
     render() {
         let {data} = this.state.contacts;
+
+        this.GroupsCell = MultiSelectCell({
+            options: this.state.groups
+        });
 
         const hasEditedItem = data.some(p => p.inEdit);
         const hasSelectedItems = data.some(p => p.selected);

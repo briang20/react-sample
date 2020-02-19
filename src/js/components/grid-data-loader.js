@@ -19,7 +19,7 @@ class ConnectedDataLoader extends Component {
     };
 
     requestDataIfNeeded() {
-        const {getContacts} = this.props;
+        const {getContacts, getUserGroups} = this.props;
 
         if (this.state.pending || toODataString(this.props.dataState) === this.state.lastSuccess) {
             return;
@@ -29,6 +29,7 @@ class ConnectedDataLoader extends Component {
             ...this.state,
             pending: toODataString(this.props.dataState)
         });
+
         getContacts()
             .then(res => {
                 if (res === 'SUCCESS') {
