@@ -60,10 +60,12 @@ const mapStateToProps = state => {
     };
 };
 
-const userGroups = [{text: 'admin', value: 1}, {text: 'user', value: 2}, {
-    text: 'security',
-    value: 3
-}, {text: 'privileged user', value: 4}];
+const userGroups = [
+    {text: 'admin', value: 1},
+    {text: 'user', value: 2},
+    {text: 'security', value: 3},
+    {text: 'privileged user', value: 4}
+];
 
 class ConnectedApp extends Component {
     editField = "inEdit";
