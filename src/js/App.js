@@ -85,6 +85,7 @@ class ConnectedApp extends Component {
         this.itemChange = this.itemChange.bind(this);
         this.addNew = this.addNew.bind(this);
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
+        this.cancelCurrentChanges = this.cancelCurrentChanges.bind(this);
 
         this.CommandCell = CommandCell({
             edit: this.enterEdit,
@@ -266,8 +267,6 @@ class ConnectedApp extends Component {
                         </div>
                     </div>
                 </header>
-
-
                 <div className="usa-section">
                     <main className="usa-layout-docs__main usa-prose usa-layout-docs"
                           id="main-content">
