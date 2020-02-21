@@ -12,12 +12,12 @@ export function DropDownCell({options}) {
             this.options = options.concat(this.options);
         }
 
-        handleChange = (e) => {
+        handleChange = (event) => {
             this.props.onChange({
                 dataItem: this.props.dataItem,
                 field: this.props.field,
-                syntheticEvent: e.syntheticEvent,
-                value: e.target.value.value
+                syntheticEvent: event.syntheticEvent,
+                value: event.target.value.value
             });
         }
 

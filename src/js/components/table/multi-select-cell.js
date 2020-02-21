@@ -17,10 +17,10 @@ export function MultiSelectCell({options}) {
                 syntheticEvent: e.syntheticEvent,
                 value: e.target.value.map(item => item[e.target.props.dataItemKey])
             });
-        }
+        };
 
         render() {
-            const {dataItem, dataItemKey, field} = this.props;
+            const {dataItem, field} = this.props;
             const dataValue = dataItem[field] == null ? '' : dataItem[field];
             const selectableOptions = this.options;
 

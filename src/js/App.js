@@ -24,10 +24,10 @@ import {
     getUserGroupsList
 } from "./selectors/index";
 import {CommandCell} from "./components/command-cell";
-import DataLoader from "./components/grid-data-loader";
-import {ColumnMenu} from "./components/gird-column-menu";
-import {DropDownCell} from "./components/drop-down-cell";
-import {MultiSelectCell} from "./components/multi-select-cell";
+import DataLoader from "./components/loading-portal";
+import {ColumnMenu} from "./components/table/gird-column-menu";
+import {DropDownCell} from "./components/table/drop-down-cell";
+import {MultiSelectCell} from "./components/table/multi-select-cell";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -70,13 +70,6 @@ const mapStateToProps = state => {
         groups: getUserGroupsList(state)
     };
 };
-
-const userGroups = [
-    {text: 'admin', value: 1},
-    {text: 'user', value: 2},
-    {text: 'security', value: 3},
-    {text: 'privileged user', value: 4}
-];
 
 class ConnectedApp extends Component {
     editField = "inEdit";
@@ -379,6 +372,8 @@ class ConnectedApp extends Component {
                                 <GridColumn cell={this.CommandCell} width={"170px"}/>
                             </Grid>
                             <DataLoader
+                                container={".k-grid-content"}
+                                fetchData={this.props.getContacts}
                                 dataState={this.state.dataState}
                                 onDataRecieved={this.updateState}
                             />

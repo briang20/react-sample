@@ -5,11 +5,6 @@
   }
 }
 
-//.usa-header {
-//  background-color: $color-blue-warm-5;
-//  border-bottom: 1px solid $color-blue-warm-5;
-//}
-
 .no-floating {
   // Make sure the footer is on it's own and not next to any floating members
   clear: both;
@@ -83,4 +78,8 @@
 #selectRow, #selectAll {
   min-width: 13px;
   min-height: 13px;
+}
+
+.k-notification-container {
+  margin: 6px;
 }

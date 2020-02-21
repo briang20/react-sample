@@ -95,7 +95,7 @@ export function getUserGroups() {
                     dispatch(clearUserGroups());
                     dispatch(updateUserGroups(data));
                 }
-                return res.type;
+                return res;
             })
     }
 }
@@ -109,7 +109,7 @@ export function getContacts() {
                     dispatch(clearContacts());
                     dispatch(updateContacts(data));
                 }
-                return res.type;
+                return res;
             })
     }
 }
@@ -122,7 +122,7 @@ export function postContacts(opts) {
                     const data = await res.payload.json();
                     dispatch(updateContacts(data));
                 }
-                return res.type;
+                return res;
             });
     }
 }
@@ -135,7 +135,7 @@ export function putContacts(opts) {
                     const data = await res.payload.json();
                     dispatch(modifyContact(data));
                 }
-                return res.type;
+                return res;
             });
     }
 }
@@ -147,7 +147,7 @@ export function deleteContacts(opts) {
                 if (res.type === 'SUCCESS') {
                     dispatch(removeContact(opts));
                 }
-                return res.type;
+                return res;
             });
     }
 }

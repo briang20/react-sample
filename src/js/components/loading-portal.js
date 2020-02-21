@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import {connect} from "react-redux";
 import {toODataString} from '@progress/kendo-data-query';
 import {getContacts} from '../actions/index';
+import {Notification, NotificationGroup} from '@progress/kendo-react-notification';
+import {Fade} from '@progress/kendo-react-animation'
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -15,11 +17,13 @@ function mapDispatchToProps(dispatch) {
 class ConnectedDataLoader extends Component {
     state = {
         lastSuccess: '',
-        pending: ''
+        pending: '',
+        error: false,
+        errorMessage: 'Oops! Something went wrong ...'
     };
 
     requestDataIfNeeded() {
-        const {getContacts, getUserGroups} = this.props;
+        const {fetchData} = this.props;
 
         if (this.state.pending || toODataString(this.props.dataState) === this.state.lastSuccess) {
             return;
@@ -30,9 +34,9 @@ class ConnectedDataLoader extends Component {
             pending: toODataString(this.props.dataState)
         });
 
-        getContacts()
+        fetchData.call(undefined)
             .then(res => {
-                if (res === 'SUCCESS') {
+                if (res.type === 'SUCCESS') {
                     this.setState({
                         lastSuccess: this.state.pending,
                         pending: ''
@@ -43,13 +47,39 @@ class ConnectedDataLoader extends Component {
                     } else {
                         this.requestDataIfNeeded();
                     }
+                } else if (res.type === 'FAILURE') {
+                    // Throw up a notification indicating an error occurred
+                    const data = res.payload.message;
+                    this.setState({error: true, errorMessage: data});
                 }
             });
     }
 
     render() {
         this.requestDataIfNeeded();
-        return this.state.pending && <LoadingPanel/>;
+        return (
+            <>
+                <NotificationGroup
+                    style={{
+                        right: 0,
+                        bottom: 0,
+                        alignItems: 'flex-start',
+                        flexWrap: 'wrap-reverse'
+                    }}
+                >
+                    <Fade enter={true} exit={true}>
+                        {this.state.error && <Notification
+                            type={{style: 'error', icon: true}}
+                            closable={true}
+                            onClose={() => this.setState({error: false})}
+                        >
+                            <span>{this.state.errorMessage}</span>
+                        </Notification>}
+                    </Fade>
+                </NotificationGroup>
+                {this.state.pending && <LoadingPanel container={this.props.container}/>}
+            </>
+        );
     }
 }
 
@@ -64,8 +94,8 @@ class LoadingPanel extends Component {
             </div>
         );
 
-        const gridContent = document && document.querySelector('.k-grid-content');
-        return gridContent ? ReactDOM.createPortal(loadingPanel, gridContent) : loadingPanel;
+        const container = document && document.querySelector(this.props.container);
+        return container ? ReactDOM.createPortal(loadingPanel, container) : loadingPanel;
     }
 }
 
