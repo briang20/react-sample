@@ -108,8 +108,9 @@ export function getContacts() {
                     const data = await res.payload.json();
                     dispatch(clearContacts());
                     dispatch(updateContacts(data));
+                    return {...res, data: data};
                 }
-                return res;
+                return {...res, data: null};
             })
     }
 }
@@ -121,8 +122,9 @@ export function postContacts(opts) {
                 if (res.type === 'SUCCESS') {
                     const data = await res.payload.json();
                     dispatch(updateContacts(data));
+                    return {...res, data: data};
                 }
-                return res;
+                return {...res, data: null};
             });
     }
 }
@@ -134,8 +136,9 @@ export function putContacts(opts) {
                 if (res.type === 'SUCCESS') {
                     const data = await res.payload.json();
                     dispatch(modifyContact(data));
+                    return {...res, data: data};
                 }
-                return res;
+                return {...res, data: null};
             });
     }
 }
@@ -147,7 +150,7 @@ export function deleteContacts(opts) {
                 if (res.type === 'SUCCESS') {
                     dispatch(removeContact(opts));
                 }
-                return res;
+                return {...res, data: null};
             });
     }
 }

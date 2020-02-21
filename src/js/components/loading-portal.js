@@ -43,7 +43,7 @@ class ConnectedDataLoader extends Component {
                     });
 
                     if (toODataString(this.props.dataState) === this.state.lastSuccess) {
-                        this.props.onDataRecieved.call(undefined);
+                        this.props.onDataReceived.call(undefined, res.data);
                     } else {
                         this.requestDataIfNeeded();
                     }

@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {process} from '@progress/kendo-data-query';
 import {Grid, GridColumn, GridToolbar} from '@progress/kendo-react-grid';
+import {GridWithState} from "./components/table/table";
 import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
 import '../css/App.css';
@@ -73,7 +74,6 @@ const mapStateToProps = state => {
 
 class ConnectedApp extends Component {
     editField = "inEdit";
-    CommandCell = null;
     YesNoCell = null;
     GroupsCell = null;
     state = {
@@ -86,22 +86,8 @@ class ConnectedApp extends Component {
         super(props);
 
         this.handleRefreshTable = this.handleRefreshTable.bind(this);
-        this.onRowClick = this.onRowClick.bind(this);
-        this.onItemChange = this.onItemChange.bind(this);
-        this.updateState = this.updateState.bind(this);
-        this.dataStateChange = this.dataStateChange.bind(this);
-        this.enterEdit = this.enterEdit.bind(this);
-        this.remove = this.remove.bind(this);
-        this.add = this.add.bind(this);
-        this.discard = this.discard.bind(this);
-        this.update = this.update.bind(this);
-        this.discard = this.discard.bind(this);
-        this.cancel = this.cancel.bind(this);
-        this.updateItem = this.updateItem.bind(this);
-        this.itemChange = this.itemChange.bind(this);
-        this.addNew = this.addNew.bind(this);
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
-        this.cancelCurrentChanges = this.cancelCurrentChanges.bind(this);
+        this.toolbarClick = this.toolbarClick.bind(this);
 
         this.YesNoCell = DropDownCell({
             options: [
@@ -109,186 +95,56 @@ class ConnectedApp extends Component {
                 {text: 'no', value: false}
             ]
         });
-        this.CommandCell = CommandCell({
-            edit: this.enterEdit,
-            remove: this.remove,
-
-            add: this.add,
-            discard: this.discard,
-
-            update: this.update,
-            cancel: this.cancel,
-
-            editField: this.editField
-        });
     }
 
     componentDidMount() {
-        this.handleRefreshTable();
-    }
-
-    enterEdit(dataItem) {
-        this.setState({
-            ...this.state,
-            contacts: {
-                ...this.state.contacts,
-                data: this.state.contacts.data.map(item =>
-                    item.id === dataItem.id ?
-                        {...item, inEdit: true} : item
-                )
-            }
-        });
-    };
-
-    remove(dataItem) {
-        this.props.deleteContacts(dataItem).then(this.updateState);
-    };
-
-    add(dataItem) {
-        dataItem.inEdit = undefined;
-        dataItem.id = this.generateId(this.props.contacts);
-        this.props.postContacts(dataItem).then(
-            res => {
-                this.setState({
-                    ...this.state,
-                    contacts: {data: [...this.state.contacts.data], total: this.props.contacts.length}
-                });
-            }
-        )
-    };
-
-    discard(dataItem) {
-        const data = [...this.state.contacts.data];
-
-        this.setState({
-            contacts: {
-                ...this.state.contacts,
-                data: data.filter(item => {
-                    if (item === dataItem)
-                        return false;
-                    return true;
-                }), total: this.props.contacts.length
-            }
-        });
-    };
-
-    update(dataItem) {
-        const data = [...this.state.contacts.data];
-        const updatedItem = {...dataItem, inEdit: undefined};
-
-        this.updateItem(data, updatedItem);
-        this.props.putContacts(updatedItem)
-            .then(res => {
-                this.updateState()
-            });
-    };
-
-    cancel(dataItem) {
-        const originalItem = this.props.contacts.find(p => p.id === dataItem.id);
-        const data = this.state.contacts.data.map(item => item.id === originalItem.id ? originalItem : item);
-
-        this.setState({contacts: {...this.state.contacts, data}});
-    };
-
-    updateItem(data, item) {
-        let index = data.findIndex(p => p === item || (item.id && p.id === item.id));
-        if (index >= 0) {
-            data[index] = {...item};
-        }
-    };
-
-    itemChange(event) {
-        const data = this.state.contacts.data.map(item =>
-            item.id === event.dataItem.id ?
-                {...item, [event.field]: event.value} : item
-        );
-
-        this.setState({contacts: {...this.state.contacts, data}});
-    };
-
-    addNew() {
-        const newDataItem = {inEdit: true};
-
-        this.setState({
-            contacts: {data: [newDataItem, ...this.state.contacts.data], total: this.props.contacts.length + 1}
-        });
-    };
-
-    deleteSelectedItems() {
-        const selectedItems = this.state.contacts.data.filter(item => item.selected);
-        for (let item of selectedItems)
-            this.remove(item);
-    };
-
-    cancelCurrentChanges() {
-        this.setState({contacts: {data: [...this.props.contacts], total: this.props.contacts.length}});
-    };
-
-    generateId() {
-        let id = 1;
-        if (this.props.contacts.length > 0) {
-            const lastContact = this.props.contacts.reduce(function (a, b) {
-                return a.id < b.id ? b : a;
-            });
-            if (lastContact) id = lastContact.id + 1;
-        }
-        return id;
-    }
-
-    handleRefreshTable() {
         this.props.getUserGroups()
             .then(res => {
                 this.updateState();
             });
+    }
 
-        this.props.getContacts()
-            .then(res => {
-                this.updateState();
-            });
+    deleteSelectedItems() {
+        const selectedItems = this.props.contacts.filter(item => item.selected);
+        for (let item of selectedItems)
+            this.remove(item);
+    };
+
+    handleRefreshTable() {
+        this.props.getContacts();
     }
 
     updateState() {
-        const {dataState} = this.state;
-        let newDataState = dataState;
-        if (dataState.skip >= this.props.contacts.length)
-            newDataState.skip = newDataState.skip - newDataState.take;
         this.setState({
-            contacts: process(this.props.contacts.slice(0), newDataState),
             groups: [...this.props.groups]
         });
     }
 
-    onItemChange(event) {
-        console.log(event);
-        const editedItem = event.dataItem;
-        let payload = {id: editedItem.id, field: event.field, value: event.value};
-        this.props.modifyContact(editedItem, payload);
-    }
-
-    onRowClick(event) {
-        if (event.dataItem.selected === true) {
-            this.props.removeSelectedItem(event.dataItem);
-        } else {
-            this.props.addSelectedItem(event.dataItem);
+    toolbarClick(event) {
+        switch (event.value) {
+            case 'refresh':
+                this.props.getContacts()
+                    .then(res => {
+                        if (event.callback)
+                            event.callback.call(undefined, res.data);
+                    });
+                break;
+            case 'delete-selected':
+                this.deleteSelectedItems();
+                if (event.callback)
+                    event.callback.call(undefined, this.props.contacts);
+                break;
         }
     }
 
-    dataStateChange(event) {
-        this.setState({
-            contacts: process(this.props.contacts.slice(0), event.data),
-            dataState: event.data
-        });
-    }
-
     render() {
-        let {data} = this.state.contacts;
+        const data = this.props.contacts;
 
         this.GroupsCell = MultiSelectCell({
             options: this.state.groups
         });
 
-        const hasEditedItem = data.some(p => p.inEdit);
-        const hasSelectedItems = data.some(p => p.selected);
+        //TODO:: Figure out why our grid doesn't update with new data when the data var above changes
         return (
             <>
                 <a className="usa-skipnav" href="#main-content">Skip to main content</a>
@@ -307,56 +163,16 @@ class ConnectedApp extends Component {
                     <main className="usa-layout-docs__main usa-prose usa-layout-docs"
                           id="main-content">
                         <div className={"usa-content"}>
-                            <Grid className={"usa-table"}
-                                  editable={true}
-                                  sortable={true}
-                                  pageable={true}
-
-                                  {...this.state.dataState}
-                                  {...this.state.contacts}
-
-                                  data={data}
-                                  editField={this.editField}
-                                  selectedField={"selected"}
-                                  onDataStateChange={this.dataStateChange}
-                                  onItemChange={this.itemChange}
-                                  onRowClick={this.onRowClick}
+                            <GridWithState className={"usa-table"}
+                                           editable={true}
+                                           sortable={true}
+                                           pageable={true}
+                                           pageSize={10}
+                                           data={data}
+                                           onClick={this.toolbarClick}
+                                           fetchData={this.props.getContacts}
+                                           editField={this.editField}
                             >
-                                <GridToolbar>
-                                    <button
-                                        title="Refresh"
-                                        className="k-button k-primary"
-                                        onClick={this.handleRefreshTable}
-                                        data-testid={"refresh-table"}
-                                    >
-                                        Refresh
-                                    </button>
-                                    <button
-                                        title="Add new"
-                                        className="k-button k-primary"
-                                        onClick={this.addNew}
-                                        data-testid={"add-row"}
-                                    >
-                                        Add new
-                                    </button>
-                                    {hasSelectedItems && (<button
-                                        title="Delete Selected Items"
-                                        className="k-button"
-                                        onClick={this.deleteSelectedItems}
-                                        data-testid={"delete-selected-row"}
-                                    >
-                                        Delete Selected Items
-                                    </button>)}
-                                    {hasEditedItem && (
-                                        <button
-                                            title="Cancel current changes"
-                                            className="k-button"
-                                            onClick={this.cancelCurrentChanges}
-                                            data-testid={"cancel-current-changes"}
-                                        >
-                                            Cancel current changes
-                                        </button>)}
-                                </GridToolbar>
                                 <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}
                                             columnMenu={ColumnMenu}/>
                                 <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}
@@ -367,16 +183,8 @@ class ConnectedApp extends Component {
                                             columnMenu={ColumnMenu}/>
                                 <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}
                                             columnMenu={ColumnMenu}/>
-                                <GridColumn field={"enabled"} title={"Enabled"} cell={this.YesNoCell}/>
                                 <GridColumn field={"groups"} title={"Groups"} cell={this.GroupsCell}/>
-                                <GridColumn cell={this.CommandCell} width={"170px"}/>
-                            </Grid>
-                            <DataLoader
-                                container={".k-grid-content"}
-                                fetchData={this.props.getContacts}
-                                dataState={this.state.dataState}
-                                onDataRecieved={this.updateState}
-                            />
+                            </GridWithState>
                         </div>
                     </main>
                 </div>

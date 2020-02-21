@@ -12,8 +12,10 @@ export class CommandCell extends GridCell {
             return null;
         }
 
+        console.log(dataItem);
+
         const inEdit = dataItem[field];
-        const isNewItem = dataItem.id === undefined;
+        const isNewItem = (dataItem.id === undefined);
 
         return inEdit ? (
             <td className="k-command-cell">
