@@ -172,6 +172,8 @@ export class GridWithState extends Component {
             case 'refresh':
                 this.props.onClick.call(undefined, {event, value: command, callback: this.dataReceived});
                 break;
+            default:
+                break;
         }
     }
 
@@ -255,6 +257,8 @@ export class GridWithState extends Component {
                     });
                     return;
                 }
+                default:
+                    return;
             }
         } else {
             newData = this.state.result.data.map(item => {

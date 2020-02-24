@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {GridColumn} from '@progress/kendo-react-grid';
 import {GridWithState} from "./components/table/table";
 import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
@@ -77,17 +76,19 @@ class ConnectedApp extends Component {
         ]
     });
     GroupsCell = null;
-    state = {
-        dataState: {take: 10, skip: 0},
-        groups: [...this.props.groups]
-    };
     columns = [
         {title: '#', field: 'id', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
         {title: 'Name', field: 'name', editor: 'text', columnMenu: ColumnMenu},
         {title: 'Username', field: 'username', columnMenu: ColumnMenu},
         {title: 'Email', field: 'email', columnMenu: ColumnMenu},
-        {title: 'URL', field: 'website', columnMenu: ColumnMenu}
+        {title: 'URL', field: 'website', columnMenu: ColumnMenu},
+        {title: 'Groups', field: 'groups', cell: this.GroupsCell}
     ];
+    GridColumns = GridColumns(this.columns, this.editField);
+    state = {
+        dataState: {take: 10, skip: 0},
+        groups: [...this.props.groups]
+    };
 
     constructor(props) {
         super(props);
@@ -101,7 +102,7 @@ class ConnectedApp extends Component {
     componentDidMount() {
         this.props.getUserGroups()
             .then(res => {
-                this.updateState();
+                this.updateGroups();
             });
     }
 
@@ -115,7 +116,16 @@ class ConnectedApp extends Component {
         this.props.getContacts();
     }
 
-    updateState() {
+    updateGroups() {
+        this.GroupsCell = MultiSelectCell({options: this.props.groups});
+
+        let columns = this.columns.map(item => {
+            if (item.field === 'groups') {
+                return {title: 'Groups', field: 'groups', cell: this.GroupsCell}
+            }
+            return item
+        });
+        this.GridColumns = GridColumns(columns, this.editField);
         this.setState({
             groups: [...this.props.groups]
         });
@@ -135,6 +145,8 @@ class ConnectedApp extends Component {
                 if (event.callback)
                     event.callback.call(undefined, this.props.contacts);
                 break;
+            default:
+                break;
         }
     }
 
@@ -149,16 +161,13 @@ class ConnectedApp extends Component {
             case 'remove':
                 this.props.deleteContacts(event.dataItem);
                 break;
+            default:
+                break;
         }
     }
 
     render() {
         const data = this.props.contacts;
-
-        this.GroupsCell = MultiSelectCell({
-            options: this.state.groups
-        });
-        const columns = this.columns.concat({title: 'Groups', field: 'groups', cell: this.GroupsCell});
         return (
             <>
                 <a className="usa-skipnav" href="#main-content">Skip to main content</a>
@@ -189,7 +198,7 @@ class ConnectedApp extends Component {
                                            editField={this.editField}
                                            selectedField={this.selectedField}
                             >
-                                {GridColumns(columns, this.editField)}
+                                {this.GridColumns}
                             </GridWithState>
                         </div>
                     </main>
