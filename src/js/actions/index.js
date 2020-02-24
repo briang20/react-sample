@@ -145,7 +145,7 @@ export function putContacts(opts) {
 
 export function deleteContacts(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/users', 'delete', JSON.stringify(opts), opts.id))
+        return dispatch(fetchContacts('/users', 'delete', null, opts.id))
             .then(async res => {
                 if (res.type === 'SUCCESS') {
                     dispatch(removeContact(opts));

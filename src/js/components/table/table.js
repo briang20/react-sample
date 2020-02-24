@@ -54,8 +54,8 @@ export class GridWithState extends Component {
     };
 
     cleanRecord = (item) => {
-        delete item.dataItem[this.props.editField];
-        delete item.dataItem[this.props.selectedField];
+        delete item[this.props.editField];
+        delete item[this.props.selectedField];
         return item;
     };
 
@@ -152,7 +152,7 @@ export class GridWithState extends Component {
 
     toolbarButtonClick(event, command) {
         switch (command) {
-            case 'add':
+            case 'add': {
                 let data = this.makeDeepCopy(this.state.allData);
                 let newItem = {[this.props.editField]: true, id: undefined};
 
@@ -161,17 +161,22 @@ export class GridWithState extends Component {
                     result: process([...data], this.state.dataState)
                 });
                 break;
-            case 'cancel':
+            }
+            case 'cancel': {
                 this.setState({
                     result: process(this.makeDeepCopy(this.state.allData), this.state.dataState)
                 });
                 break;
-            case 'delete-selected':
-                this.props.onClick.call(undefined, {event, value: command});
+            }
+            case 'delete-selected': {
+                let dataToDelete = this.state.result.data.filter(item => item.selected);
+                this.props.onClick.call(undefined, {event, dataItem: dataToDelete, value: command});
                 break;
-            case 'refresh':
+            }
+            case 'refresh': {
                 this.props.onClick.call(undefined, {event, value: command, callback: this.dataReceived});
                 break;
+            }
             default:
                 break;
         }

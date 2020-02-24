@@ -93,10 +93,7 @@ class ConnectedApp extends Component {
     constructor(props) {
         super(props);
 
-        this.handleRefreshTable = this.handleRefreshTable.bind(this);
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
-        this.toolbarClick = this.toolbarClick.bind(this);
-        this.onDataChange = this.onDataChange.bind(this);
     }
 
     componentDidMount() {
@@ -109,12 +106,8 @@ class ConnectedApp extends Component {
     deleteSelectedItems() {
         const selectedItems = this.props.contacts.filter(item => item.selected);
         for (let item of selectedItems)
-            this.remove(item);
+            this.props.deleteContacts(item);
     };
-
-    handleRefreshTable() {
-        this.props.getContacts();
-    }
 
     updateGroups() {
         this.GroupsCell = MultiSelectCell({options: this.props.groups});
@@ -131,7 +124,7 @@ class ConnectedApp extends Component {
         });
     }
 
-    toolbarClick(event) {
+    onToolbarClick = (event) => {
         switch (event.value) {
             case 'refresh':
                 this.props.getContacts()
@@ -141,7 +134,7 @@ class ConnectedApp extends Component {
                     });
                 break;
             case 'delete-selected':
-                this.deleteSelectedItems();
+                this.props.deleteContacts(event.dataItem);
                 if (event.callback)
                     event.callback.call(undefined, this.props.contacts);
                 break;
@@ -150,7 +143,7 @@ class ConnectedApp extends Component {
         }
     }
 
-    onDataChange(event) {
+    onDataChange = (event) => {
         switch (event.value) {
             case 'add':
                 this.props.postContacts(event.dataItem);
@@ -192,7 +185,7 @@ class ConnectedApp extends Component {
                                            pageable={true}
                                            pageSize={10}
                                            data={data}
-                                           onClick={this.toolbarClick}
+                                           onClick={this.onToolbarClick}
                                            onChange={this.onDataChange}
                                            fetchData={this.props.getContacts}
                                            editField={this.editField}
