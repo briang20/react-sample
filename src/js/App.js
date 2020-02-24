@@ -26,6 +26,7 @@ import {
 import {ColumnMenu} from "./components/table/gird-column-menu";
 import {DropDownCell} from "./components/table/drop-down-cell";
 import {MultiSelectCell} from "./components/table/multi-select-cell";
+import {GridColumns} from "./components/table/grid-columns";
 
 function mapDispatchToProps(dispatch) {
     return {
@@ -69,12 +70,24 @@ const mapStateToProps = state => {
 class ConnectedApp extends Component {
     editField = "inEdit";
     selectedField = "selected";
-    YesNoCell = null;
+    YesNoCell = DropDownCell({
+        options: [
+            {text: 'yes', value: true},
+            {text: 'no', value: false}
+        ]
+    });
     GroupsCell = null;
     state = {
         dataState: {take: 10, skip: 0},
         groups: [...this.props.groups]
     };
+    columns = [
+        {title: '#', field: 'id', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
+        {title: 'Name', field: 'name', editor: 'text', columnMenu: ColumnMenu},
+        {title: 'Username', field: 'username', columnMenu: ColumnMenu},
+        {title: 'Email', field: 'email', columnMenu: ColumnMenu},
+        {title: 'URL', field: 'website', columnMenu: ColumnMenu}
+    ];
 
     constructor(props) {
         super(props);
@@ -83,13 +96,6 @@ class ConnectedApp extends Component {
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
         this.toolbarClick = this.toolbarClick.bind(this);
         this.onDataChange = this.onDataChange.bind(this);
-
-        this.YesNoCell = DropDownCell({
-            options: [
-                {text: 'yes', value: true},
-                {text: 'no', value: false}
-            ]
-        });
     }
 
     componentDidMount() {
@@ -152,7 +158,7 @@ class ConnectedApp extends Component {
         this.GroupsCell = MultiSelectCell({
             options: this.state.groups
         });
-
+        const columns = this.columns.concat({title: 'Groups', field: 'groups', cell: this.GroupsCell});
         return (
             <>
                 <a className="usa-skipnav" href="#main-content">Skip to main content</a>
@@ -183,17 +189,7 @@ class ConnectedApp extends Component {
                                            editField={this.editField}
                                            selectedField={this.selectedField}
                             >
-                                <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}
-                                            columnMenu={ColumnMenu}/>
-                                <GridColumn field={"name"} title={"Name"} filter={'text'} editor={"text"}
-                                            columnMenu={ColumnMenu}/>
-                                <GridColumn field={"username"} title={"Username"} filter={'text'} editor={"text"}
-                                            columnMenu={ColumnMenu}/>
-                                <GridColumn field={"email"} title={"Email"} filter={'text'} editor={"text"}
-                                            columnMenu={ColumnMenu}/>
-                                <GridColumn field={"website"} title={"URL"} filter={'text'} editor={"text"}
-                                            columnMenu={ColumnMenu}/>
-                                <GridColumn field={"groups"} title={"Groups"} cell={this.GroupsCell}/>
+                                {GridColumns(columns, this.editField)}
                             </GridWithState>
                         </div>
                     </main>
