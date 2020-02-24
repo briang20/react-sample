@@ -8,15 +8,16 @@ export class GridWithState extends Component {
     constructor(props) {
         super(props);
         const dataState = props.pageable ? {
-            take: this.props.pageSize,
             filter: undefined,
+            group: undefined,
             skip: 0,
-            sort: undefined
+            sort: undefined,
+            take: this.props.pageSize
         } : {skip: 0};
 
         this.state = {
             dataState: dataState,
-            result: process(this.props.data, dataState),
+            result: process(JSON.parse(JSON.stringify(this.props.data)), dataState),
             allData: this.props.data
         };
 
@@ -26,11 +27,29 @@ export class GridWithState extends Component {
         this.onDataStateChange = this.onDataStateChange.bind(this);
     }
 
-    render() {
-        let {allData} = this.state;
+    updateDataState = (data) => {
+        const {dataState} = this.state;
+        let skip = dataState.skip;
+        if (dataState.skip >= data.length)
+            skip = dataState.skip - dataState.take;
 
-        const hasEditedItem = allData.some(p => p.inEdit);
-        const hasSelectedItems = allData.some(p => p.selected);
+        const state = this.props.pageable ? {
+            filter: this.state.dataState.filter,
+            group: this.state.dataState.group,
+            skip: skip,
+            sort: this.state.dataState.sort,
+            take: this.state.dataState.take
+        } : dataState;
+        this.setState({
+            dataState: state
+        });
+    }
+
+    render() {
+        let {data} = this.state.result;
+
+        const hasEditedItem = data.some(p => p.inEdit);
+        const hasSelectedItems = data.some(p => p.selected);
         return (
             <>
                 <Grid
@@ -83,7 +102,6 @@ export class GridWithState extends Component {
                     {this.props.children}
 
                     <GridColumn
-                        groupable={false}
                         sortable={false}
                         filterable={false}
                         resizable={false}
@@ -117,26 +135,18 @@ export class GridWithState extends Component {
     toolbarButtonClick(event, command) {
         switch (command) {
             case 'add':
-                let data = this.state.result.data;
-                data.unshift({[this.props.editField]: true, id: undefined});
+                let data = JSON.parse(JSON.stringify(this.state.allData));
+                let newItem = {[this.props.editField]: true, id: undefined};
+
+                data.splice([this.state.dataState.skip], 0, newItem);
                 this.setState({
-                    result: process(data, this.props.pageable ? {
-                        take: this.state.dataState.take,
-                        filter: this.state.dataState.filter,
-                        skip: 0,
-                        sort: this.state.dataState.sort
-                    } : this.state.dataState),
-                    dataState: this.props.pageable ? {
-                        take: this.state.dataState.take,
-                        filter: this.state.dataState.filter,
-                        skip: 0,
-                        sort: this.state.dataState.sort
-                    } : this.state.dataState
+                    result: process([...data], this.state.dataState)
                 });
                 break;
             case 'cancel':
-                //TODO:
-                console.log('cancel all changes button pressed');
+                this.setState({
+                    result: process(JSON.parse(JSON.stringify(this.state.allData)), this.state.dataState)
+                });
                 break;
             case 'delete-selected':
                 this.props.onClick.call(undefined, {event, value: command});
@@ -148,78 +158,107 @@ export class GridWithState extends Component {
     }
 
     itemChange(event) {
+        console.log('itemChange');
         const {allData} = this.state;
+        let newData = this.state.result.data;
 
         if (event.field === this.props.editField) {
             switch (event.value) {
-                case 'add':
-                    //TODO: add row
-                    console.log('final add button pressed');
-                    break;
-                case 'edit':
-                    //TODO: set the edit field
-                    console.log('got edit event', event);
-                    event.dataItem[event.field] = true;
-                    break;
-                case 'discard':
-                    this.setState({
-                        result: process(allData, this.props.pageable ? {
-                            take: this.state.dataState.take,
-                            filter: this.state.dataState.filter,
-                            skip: 0,
-                            sort: this.state.dataState.sort
-                        } : this.state.dataState),
+                case 'edit': {
+                    newData = this.state.result.data.map(item => {
+                        let rtn = item;
+                        if (rtn.id === event.dataItem.id)
+                            rtn[event.field] = true;
+                        return rtn;
                     });
                     break;
-                case 'cancel':
-                    //TODO: undo the changes to the row
+                }
+                case 'discard': {
+                    this.setState({
+                        result: process(JSON.parse(JSON.stringify(this.state.allData)), this.state.dataState)
+                    });
+                    return;
+                }
+                case 'cancel': {
                     const originalItem = this.state.allData.find(p => p.id === event.dataItem.id);
                     const data = this.state.result.data.map(item => item.id === originalItem.id ? originalItem : item);
 
-                    delete event.dataItem[this.props.editField];
                     this.setState({
-                        result: process(data, this.props.pageable ? {
-                            take: this.state.dataState.take,
-                            filter: this.state.dataState.filter,
-                            skip: 0,
-                            sort: this.state.dataState.sort
-                        } : this.state.dataState),
+                        result: {
+                            ...this.state.result,
+                            data: JSON.parse(JSON.stringify(data))
+                        },
+                    });
+                    return;
+                }
+
+                case 'add': {
+                    delete event.dataItem[this.props.editField];
+                    event.dataItem.id = this.generateId();
+                    this.props.onChange(event);
+                    const stringData = JSON.stringify([...this.state.allData, event.dataItem]);
+                    this.updateDataState(JSON.parse(stringData));
+                    this.setState({
+                        result: process(JSON.parse(stringData), this.state.dataState),
+                        allData: [...this.state.allData, event.dataItem]
+                    });
+                    return;
+                }
+                case 'update': {
+                    delete event.dataItem[this.props.editField];
+                    this.props.onChange(event);
+                    newData = this.state.result.data.map(item => item.id === event.dataItem.id ? event.dataItem : item);
+                    const updatedAllData = allData.map(item => item.id === event.dataItem.id ? event.dataItem : item);
+                    this.setState({
+                        allData: updatedAllData
                     });
                     break;
-
-                case 'update':
-                    //TODO: CRUD calls
-                    //this.props.endPoint;
+                }
+                case 'remove': {
                     delete event.dataItem[this.props.editField];
                     this.props.onChange(event);
-                    break;
-                case 'remove':
-                    //TODO: CRUD calls
-                    //this.props.endPoint;
-                    delete event.dataItem[this.props.editField];
-                    this.props.onChange(event);
-                    break;
+                    const data = allData.filter(item => item.id !== event.dataItem.id);
+                    const stringData = JSON.stringify(data);
+                    console.log(this.state.dataState);
+                    this.updateDataState(data);
+                    this.setState({
+                        result: process(JSON.parse(stringData), this.state.dataState),
+                        allData: JSON.parse(stringData)
+                    });
+                    return;
+                }
             }
         } else {
-            event.dataItem[event.field] = event.value;
+            newData = this.state.result.data.map(item => {
+                let rtn = item;
+                if (rtn.id === event.dataItem.id)
+                    rtn[event.field] = event.value;
+                return rtn;
+            });
         }
 
+        //TODO: This line causes an issue where when you press the edit button, the table updates to only having 10 items total
         this.setState({
-            result: process(allData, this.state.dataState)
+            result: {
+                ...this.state.result,
+                data: [...newData]
+            },
         });
     }
 
     dataReceived(e) {
+        console.log('dataReceived');
         this.setState({
-            result: process(e, this.state.dataState),
+            result: process(JSON.parse(JSON.stringify(e)), this.state.dataState),
             allData: e
         });
     }
 
     onDataStateChange(e) {
+        console.log('onDataStateChange');
         this.setState({
             dataState: e.data,
-            result: process(this.state.data, e.data)
+            result: process(JSON.parse(JSON.stringify(this.state.allData)), e.data)
         });
     }
 }

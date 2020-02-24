@@ -133,6 +133,9 @@ class ConnectedApp extends Component {
 
     onDataChange(event) {
         switch (event.value) {
+            case 'add':
+                this.props.postContacts(event.dataItem);
+                break;
             case 'update':
                 this.props.putContacts(event.dataItem);
                 break;
