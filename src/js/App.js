@@ -68,6 +68,7 @@ const mapStateToProps = state => {
 
 class ConnectedApp extends Component {
     editField = "inEdit";
+    selectedField = "selected";
     YesNoCell = null;
     GroupsCell = null;
     state = {
@@ -180,6 +181,7 @@ class ConnectedApp extends Component {
                                            onChange={this.onDataChange}
                                            fetchData={this.props.getContacts}
                                            editField={this.editField}
+                                           selectedField={this.selectedField}
                             >
                                 <GridColumn field={"id"} title={"#"} width={"75px"} filter={'numeric'} editable={false}
                                             columnMenu={ColumnMenu}/>

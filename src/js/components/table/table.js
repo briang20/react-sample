@@ -53,6 +53,17 @@ export class GridWithState extends Component {
         return this.isString(data) ? JSON.parse(data) : JSON.parse(JSON.stringify(data));
     };
 
+    cleanRecord = (item) => {
+        delete item.dataItem[this.props.editField];
+        delete item.dataItem[this.props.selectedField];
+        return item;
+    };
+
+    validateRequired = (data) => {
+        //TODO: do validation here
+        return true;
+    };
+
     render() {
         let {data} = this.state.result;
 
@@ -62,8 +73,7 @@ export class GridWithState extends Component {
             <>
                 <Grid
                     editField={this.props.editField}
-                    expandField="_expanded"
-                    selectedField={"selected"}
+                    selectedField={this.props.selectedField}
                     {...this.props}
                     {...this.state.dataState}
                     {...this.state.result}
@@ -201,7 +211,13 @@ export class GridWithState extends Component {
                 }
 
                 case 'add': {
-                    delete event.dataItem[this.props.editField];
+                    //TODO: check if all required fields are set
+                    if (false === this.validateRequired(event.dataItem)) {
+                        //TODO: throw error notification
+                        return;
+                    }
+                    this.cleanRecord(event.dataItem);
+
                     event.dataItem.id = this.generateId();
                     this.props.onChange(event);
                     const stringData = JSON.stringify([...this.state.allData, event.dataItem]);
@@ -213,7 +229,11 @@ export class GridWithState extends Component {
                     return;
                 }
                 case 'update': {
-                    delete event.dataItem[this.props.editField];
+                    if (false === this.validateRequired(event.dataItem)) {
+                        //TODO: throw error notification
+                        return;
+                    }
+                    this.cleanRecord(event.dataItem);
                     this.props.onChange(event);
                     newData = this.state.result.data.map(item => item.id === event.dataItem.id ? event.dataItem : item);
                     const updatedAllData = allData.map(item => item.id === event.dataItem.id ? event.dataItem : item);
@@ -223,7 +243,7 @@ export class GridWithState extends Component {
                     break;
                 }
                 case 'remove': {
-                    delete event.dataItem[this.props.editField];
+                    this.cleanRecord(event.dataItem);
                     this.props.onChange(event);
                     const data = allData.filter(item => item.id !== event.dataItem.id);
                     const stringData = JSON.stringify(data);
