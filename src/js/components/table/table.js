@@ -17,7 +17,7 @@ export class GridWithState extends Component {
 
         this.state = {
             dataState: dataState,
-            result: process(JSON.parse(JSON.stringify(this.props.data)), dataState),
+            result: process(this.makeDeepCopy(this.props.data), dataState),
             allData: this.props.data
         };
 
@@ -43,7 +43,15 @@ export class GridWithState extends Component {
         this.setState({
             dataState: state
         });
+    };
+
+    isString(value) {
+        return typeof value === 'string' || value instanceof String;
     }
+
+    makeDeepCopy = (data) => {
+        return this.isString(data) ? JSON.parse(data) : JSON.parse(JSON.stringify(data));
+    };
 
     render() {
         let {data} = this.state.result;
@@ -135,7 +143,7 @@ export class GridWithState extends Component {
     toolbarButtonClick(event, command) {
         switch (command) {
             case 'add':
-                let data = JSON.parse(JSON.stringify(this.state.allData));
+                let data = this.makeDeepCopy(this.state.allData);
                 let newItem = {[this.props.editField]: true, id: undefined};
 
                 data.splice([this.state.dataState.skip], 0, newItem);
@@ -145,7 +153,7 @@ export class GridWithState extends Component {
                 break;
             case 'cancel':
                 this.setState({
-                    result: process(JSON.parse(JSON.stringify(this.state.allData)), this.state.dataState)
+                    result: process(this.makeDeepCopy(this.state.allData), this.state.dataState)
                 });
                 break;
             case 'delete-selected':
@@ -175,7 +183,7 @@ export class GridWithState extends Component {
                 }
                 case 'discard': {
                     this.setState({
-                        result: process(JSON.parse(JSON.stringify(this.state.allData)), this.state.dataState)
+                        result: process(this.makeDeepCopy(this.state.allData), this.state.dataState)
                     });
                     return;
                 }
@@ -186,7 +194,7 @@ export class GridWithState extends Component {
                     this.setState({
                         result: {
                             ...this.state.result,
-                            data: JSON.parse(JSON.stringify(data))
+                            data: this.makeDeepCopy(data)
                         },
                     });
                     return;
@@ -197,9 +205,9 @@ export class GridWithState extends Component {
                     event.dataItem.id = this.generateId();
                     this.props.onChange(event);
                     const stringData = JSON.stringify([...this.state.allData, event.dataItem]);
-                    this.updateDataState(JSON.parse(stringData));
+                    this.updateDataState(this.makeDeepCopy(stringData));
                     this.setState({
-                        result: process(JSON.parse(stringData), this.state.dataState),
+                        result: process(this.makeDeepCopy(stringData), this.state.dataState),
                         allData: [...this.state.allData, event.dataItem]
                     });
                     return;
@@ -219,11 +227,11 @@ export class GridWithState extends Component {
                     this.props.onChange(event);
                     const data = allData.filter(item => item.id !== event.dataItem.id);
                     const stringData = JSON.stringify(data);
-                    console.log(this.state.dataState);
+
                     this.updateDataState(data);
                     this.setState({
-                        result: process(JSON.parse(stringData), this.state.dataState),
-                        allData: JSON.parse(stringData)
+                        result: process(this.makeDeepCopy(stringData), this.state.dataState),
+                        allData: this.makeDeepCopy(stringData)
                     });
                     return;
                 }
@@ -249,7 +257,7 @@ export class GridWithState extends Component {
     dataReceived(e) {
         console.log('dataReceived');
         this.setState({
-            result: process(JSON.parse(JSON.stringify(e)), this.state.dataState),
+            result: process(this.makeDeepCopy(e), this.state.dataState),
             allData: e
         });
     }
@@ -258,7 +266,7 @@ export class GridWithState extends Component {
         console.log('onDataStateChange');
         this.setState({
             dataState: e.data,
-            result: process(JSON.parse(JSON.stringify(this.state.allData)), e.data)
+            result: process(this.makeDeepCopy(this.state.allData), e.data)
         });
     }
 }
