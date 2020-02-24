@@ -20,12 +20,32 @@ export class GridWithState extends Component {
             result: process(this.makeDeepCopy(this.props.data), dataState),
             allData: this.props.data
         };
-
-        this.generateId = this.generateId.bind(this);
-        this.itemChange = this.itemChange.bind(this);
-        this.dataReceived = this.dataReceived.bind(this);
-        this.onDataStateChange = this.onDataStateChange.bind(this);
     }
+
+    isString(value) {
+        return typeof value === 'string' || value instanceof String;
+    }
+
+    makeDeepCopy = (data) => {
+        return this.isString(data) ? JSON.parse(data) : JSON.parse(JSON.stringify(data));
+    };
+
+    cleanRecord = (item) => {
+        delete item[this.props.editField];
+        delete item[this.props.selectedField];
+        return item;
+    };
+
+    generateId = () => {
+        let id = 1;
+        if (this.state.allData.length > 0) {
+            const lastId = this.state.allData.reduce(function (a, b) {
+                return a.id < b.id ? b : a;
+            });
+            if (lastId) id = lastId.id + 1;
+        }
+        return id;
+    };
 
     updateDataState = (data) => {
         const {dataState} = this.state;
@@ -43,20 +63,6 @@ export class GridWithState extends Component {
         this.setState({
             dataState: state
         });
-    };
-
-    isString(value) {
-        return typeof value === 'string' || value instanceof String;
-    }
-
-    makeDeepCopy = (data) => {
-        return this.isString(data) ? JSON.parse(data) : JSON.parse(JSON.stringify(data));
-    };
-
-    cleanRecord = (item) => {
-        delete item[this.props.editField];
-        delete item[this.props.selectedField];
-        return item;
     };
 
     validateRequired = (data) => {
@@ -78,14 +84,15 @@ export class GridWithState extends Component {
                     {...this.state.dataState}
                     {...this.state.result}
 
-                    onItemChange={this.itemChange}
+                    onRowClick={this.onRowClick}
+                    onItemChange={this.onItemChange}
                     onDataStateChange={this.onDataStateChange}
                 >
                     <GridToolbar>
                         <button
                             title="Refresh"
                             className="k-button k-primary"
-                            onClick={event => this.toolbarButtonClick(event, 'refresh')}
+                            onClick={event => this.onToolbarButtonClick(event, 'refresh')}
                             data-testid={"refresh-table"}
                         >
                             Refresh
@@ -93,7 +100,7 @@ export class GridWithState extends Component {
                         <button
                             title="Add new"
                             className="k-button k-primary"
-                            onClick={event => this.toolbarButtonClick(event, 'add')}
+                            onClick={event => this.onToolbarButtonClick(event, 'add')}
                             data-testid={"add-row"}
                         >
                             Add new
@@ -101,7 +108,7 @@ export class GridWithState extends Component {
                         {hasSelectedItems && (<button
                             title="Delete Selected Items"
                             className="k-button"
-                            onClick={event => this.toolbarButtonClick(event, 'delete-selected')}
+                            onClick={event => this.onToolbarButtonClick(event, 'delete-selected')}
                             data-testid={"delete-selected-row"}
                         >
                             Delete Selected Items
@@ -110,7 +117,7 @@ export class GridWithState extends Component {
                             <button
                                 title="Cancel current changes"
                                 className="k-button"
-                                onClick={event => this.toolbarButtonClick(event, 'cancel')}
+                                onClick={event => this.onToolbarButtonClick(event, 'cancel')}
                                 data-testid={"cancel-current-changes"}
                             >
                                 Cancel current changes
@@ -133,24 +140,13 @@ export class GridWithState extends Component {
                     container={".k-grid-content"}
                     fetchData={this.props.fetchData}
                     dataState={this.state.dataState}
-                    onDataReceived={this.dataReceived}
+                    onDataReceived={this.onDataReceived}
                 />
             </>
         );
     }
 
-    generateId() {
-        let id = 1;
-        if (this.state.allData.length > 0) {
-            const lastId = this.state.allData.reduce(function (a, b) {
-                return a.id < b.id ? b : a;
-            });
-            if (lastId) id = lastId.id + 1;
-        }
-        return id;
-    }
-
-    toolbarButtonClick(event, command) {
+    onToolbarButtonClick = (event, command) => {
         switch (command) {
             case 'add': {
                 let data = this.makeDeepCopy(this.state.allData);
@@ -169,20 +165,69 @@ export class GridWithState extends Component {
                 break;
             }
             case 'delete-selected': {
+                let data = this.state.allData;
                 let dataToDelete = this.state.result.data.filter(item => item.selected);
-                this.props.onClick.call(undefined, {event, dataItem: dataToDelete, value: command});
+                for (let item of dataToDelete) {
+                    //TODO: confirm delete
+
+                    this.props.onClick.call(undefined, {
+                        event,
+                        dataItem: item,
+                        value: command,
+                        callback: this.onDataReceived
+                    });
+                    data = data.filter(element => element.id !== item.id);
+                }
+                const stringData = JSON.stringify(data);
+                this.updateDataState(data);
+                this.setState({
+                    result: process(this.makeDeepCopy(stringData), this.state.dataState),
+                    allData: this.makeDeepCopy(stringData)
+                });
                 break;
             }
             case 'refresh': {
-                this.props.onClick.call(undefined, {event, value: command, callback: this.dataReceived});
+                this.props.onClick.call(undefined, {event, value: command, callback: this.onDataReceived});
                 break;
             }
             default:
                 break;
         }
-    }
+    };
 
-    itemChange(event) {
+    onDataReceived = (e) => {
+        console.log('dataReceived');
+        this.setState({
+            result: process(this.makeDeepCopy(e), this.state.dataState),
+            allData: e
+        });
+    };
+
+    onDataStateChange = (e) => {
+        console.log('onDataStateChange');
+        this.setState({
+            dataState: e.data,
+            result: process(this.makeDeepCopy(this.state.allData), e.data)
+        });
+    };
+
+    onRowClick = (event) => {
+        let newData = this.state.result.data.map(item => {
+            let rtn = item;
+            if (rtn.id === event.dataItem.id)
+                rtn[this.props.selectedField] = !rtn[this.props.selectedField];
+            return rtn;
+        });
+
+        this.setState({
+            result: {
+                ...this.state.result,
+                data: [...newData]
+            },
+        });
+    };
+
+    onItemChange = (event) => {
         console.log('itemChange');
         const {allData} = this.state;
         let newData = this.state.result.data;
@@ -274,28 +319,11 @@ export class GridWithState extends Component {
             });
         }
 
-        //TODO: This line causes an issue where when you press the edit button, the table updates to only having 10 items total
         this.setState({
             result: {
                 ...this.state.result,
                 data: [...newData]
             },
         });
-    }
-
-    dataReceived(e) {
-        console.log('dataReceived');
-        this.setState({
-            result: process(this.makeDeepCopy(e), this.state.dataState),
-            allData: e
-        });
-    }
-
-    onDataStateChange(e) {
-        console.log('onDataStateChange');
-        this.setState({
-            dataState: e.data,
-            result: process(this.makeDeepCopy(this.state.allData), e.data)
-        });
-    }
+    };
 }

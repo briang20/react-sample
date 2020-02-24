@@ -94,8 +94,9 @@ export function getUserGroups() {
                     const data = await res.payload.json();
                     dispatch(clearUserGroups());
                     dispatch(updateUserGroups(data));
+                    return {...res, data: data};
                 }
-                return res;
+                return {...res, data: null};
             })
     }
 }
@@ -148,7 +149,7 @@ export function deleteContacts(opts) {
         return dispatch(fetchContacts('/users', 'delete', null, opts.id))
             .then(async res => {
                 if (res.type === 'SUCCESS') {
-                    dispatch(removeContact(opts));
+                    await dispatch(removeContact(opts));
                 }
                 return {...res, data: null};
             });

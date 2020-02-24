@@ -92,8 +92,6 @@ class ConnectedApp extends Component {
 
     constructor(props) {
         super(props);
-
-        this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
     }
 
     componentDidMount() {
@@ -102,12 +100,6 @@ class ConnectedApp extends Component {
                 this.updateGroups();
             });
     }
-
-    deleteSelectedItems() {
-        const selectedItems = this.props.contacts.filter(item => item.selected);
-        for (let item of selectedItems)
-            this.props.deleteContacts(item);
-    };
 
     updateGroups() {
         this.GroupsCell = MultiSelectCell({options: this.props.groups});
@@ -126,18 +118,18 @@ class ConnectedApp extends Component {
 
     onToolbarClick = (event) => {
         switch (event.value) {
-            case 'refresh':
+            case 'refresh': {
                 this.props.getContacts()
                     .then(res => {
                         if (event.callback)
                             event.callback.call(undefined, res.data);
                     });
                 break;
-            case 'delete-selected':
+            }
+            case 'delete-selected': {
                 this.props.deleteContacts(event.dataItem);
-                if (event.callback)
-                    event.callback.call(undefined, this.props.contacts);
                 break;
+            }
             default:
                 break;
         }
@@ -145,15 +137,19 @@ class ConnectedApp extends Component {
 
     onDataChange = (event) => {
         switch (event.value) {
-            case 'add':
+            case 'add': {
                 this.props.postContacts(event.dataItem);
                 break;
-            case 'update':
+            }
+            case 'update': {
                 this.props.putContacts(event.dataItem);
                 break;
-            case 'remove':
+            }
+            case 'remove': {
+                //TODO: confirm delete
                 this.props.deleteContacts(event.dataItem);
                 break;
+            }
             default:
                 break;
         }
