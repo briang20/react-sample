@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import {connect} from "react-redux";
-import {process} from '@progress/kendo-data-query';
-import {Grid, GridColumn, GridToolbar} from '@progress/kendo-react-grid';
+import {GridColumn} from '@progress/kendo-react-grid';
 import {GridWithState} from "./components/table/table";
 import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
@@ -24,8 +23,6 @@ import {
     getReplayList,
     getUserGroupsList
 } from "./selectors/index";
-import {CommandCell} from "./components/command-cell";
-import DataLoader from "./components/loading-portal";
 import {ColumnMenu} from "./components/table/gird-column-menu";
 import {DropDownCell} from "./components/table/drop-down-cell";
 import {MultiSelectCell} from "./components/table/multi-select-cell";
@@ -65,9 +62,6 @@ function mapDispatchToProps(dispatch) {
 const mapStateToProps = state => {
     return {
         contacts: getContactsList(state),
-        currentSearchFilter: getCurrentSearchFilter(state),
-        currentSelectedItems: getCurrentSelectedItemList(state),
-        replayBuffer: getReplayList(state),
         groups: getUserGroupsList(state)
     };
 };
@@ -78,7 +72,6 @@ class ConnectedApp extends Component {
     GroupsCell = null;
     state = {
         dataState: {take: 10, skip: 0},
-        contacts: {data: [...this.props.contacts], total: this.props.contacts.length},
         groups: [...this.props.groups]
     };
 
@@ -88,6 +81,7 @@ class ConnectedApp extends Component {
         this.handleRefreshTable = this.handleRefreshTable.bind(this);
         this.deleteSelectedItems = this.deleteSelectedItems.bind(this);
         this.toolbarClick = this.toolbarClick.bind(this);
+        this.onDataChange = this.onDataChange.bind(this);
 
         this.YesNoCell = DropDownCell({
             options: [
@@ -137,6 +131,17 @@ class ConnectedApp extends Component {
         }
     }
 
+    onDataChange(event) {
+        switch (event.value) {
+            case 'update':
+                this.props.putContacts(event.dataItem);
+                break;
+            case 'remove':
+                this.props.deleteContacts(event.dataItem);
+                break;
+        }
+    }
+
     render() {
         const data = this.props.contacts;
 
@@ -144,7 +149,6 @@ class ConnectedApp extends Component {
             options: this.state.groups
         });
 
-        //TODO:: Figure out why our grid doesn't update with new data when the data var above changes
         return (
             <>
                 <a className="usa-skipnav" href="#main-content">Skip to main content</a>
@@ -170,6 +174,7 @@ class ConnectedApp extends Component {
                                            pageSize={10}
                                            data={data}
                                            onClick={this.toolbarClick}
+                                           onChange={this.onDataChange}
                                            fetchData={this.props.getContacts}
                                            editField={this.editField}
                             >

@@ -7,7 +7,12 @@ import DataLoader from "../loading-portal";
 export class GridWithState extends Component {
     constructor(props) {
         super(props);
-        const dataState = props.pageable ? {skip: 0, take: this.props.pageSize} : {skip: 0};
+        const dataState = props.pageable ? {
+            take: this.props.pageSize,
+            filter: undefined,
+            skip: 0,
+            sort: undefined
+        } : {skip: 0};
 
         this.state = {
             dataState: dataState,
@@ -110,12 +115,9 @@ export class GridWithState extends Component {
     }
 
     toolbarButtonClick(event, command) {
-        const {allData} = this.state;
-
         switch (command) {
             case 'add':
-                //TODO:
-                let data = this.state.allData;
+                let data = this.state.result.data;
                 data.unshift({[this.props.editField]: true, id: undefined});
                 this.setState({
                     result: process(data, this.props.pageable ? {
@@ -124,7 +126,6 @@ export class GridWithState extends Component {
                         skip: 0,
                         sort: this.state.dataState.sort
                     } : this.state.dataState),
-                    allData: data,
                     dataState: this.props.pageable ? {
                         take: this.state.dataState.take,
                         filter: this.state.dataState.filter,
@@ -153,25 +154,49 @@ export class GridWithState extends Component {
             switch (event.value) {
                 case 'add':
                     //TODO: add row
+                    console.log('final add button pressed');
                     break;
                 case 'edit':
                     //TODO: set the edit field
+                    console.log('got edit event', event);
+                    event.dataItem[event.field] = true;
                     break;
                 case 'discard':
-                    //TODO: undo the new row
+                    this.setState({
+                        result: process(allData, this.props.pageable ? {
+                            take: this.state.dataState.take,
+                            filter: this.state.dataState.filter,
+                            skip: 0,
+                            sort: this.state.dataState.sort
+                        } : this.state.dataState),
+                    });
                     break;
                 case 'cancel':
                     //TODO: undo the changes to the row
+                    const originalItem = this.state.allData.find(p => p.id === event.dataItem.id);
+                    const data = this.state.result.data.map(item => item.id === originalItem.id ? originalItem : item);
+
+                    delete event.dataItem[this.props.editField];
+                    this.setState({
+                        result: process(data, this.props.pageable ? {
+                            take: this.state.dataState.take,
+                            filter: this.state.dataState.filter,
+                            skip: 0,
+                            sort: this.state.dataState.sort
+                        } : this.state.dataState),
+                    });
                     break;
 
                 case 'update':
                     //TODO: CRUD calls
                     //this.props.endPoint;
+                    delete event.dataItem[this.props.editField];
                     this.props.onChange(event);
                     break;
                 case 'remove':
                     //TODO: CRUD calls
                     //this.props.endPoint;
+                    delete event.dataItem[this.props.editField];
                     this.props.onChange(event);
                     break;
             }

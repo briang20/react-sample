@@ -12,8 +12,6 @@ export class CommandCell extends GridCell {
             return null;
         }
 
-        console.log(dataItem);
-
         const inEdit = dataItem[field];
         const isNewItem = (dataItem.id === undefined);
 
