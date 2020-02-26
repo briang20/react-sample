@@ -133,7 +133,7 @@ class ConnectedApp extends Component {
             default:
                 break;
         }
-    }
+    };
 
     onDataChange = (event) => {
         switch (event.value) {
@@ -153,7 +153,7 @@ class ConnectedApp extends Component {
             default:
                 break;
         }
-    }
+    };
 
     render() {
         const data = this.props.contacts;
@@ -171,11 +171,11 @@ class ConnectedApp extends Component {
                         </div>
                     </div>
                 </header>
-                <div className="usa-section">
-                    <main className="usa-layout-docs__main usa-prose usa-layout-docs"
-                          id="main-content">
+                <div className={"usa-section"}>
+                    <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
+                          id={"main-content"}>
                         <div className={"usa-content"}>
-                            <GridWithState className={"usa-table"}
+                            <GridWithState className={"usa-table overflow-x-auto overflow-y-auto"}
                                            editable={true}
                                            sortable={true}
                                            pageable={true}

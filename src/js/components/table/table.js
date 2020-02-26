@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import {GridColumn, Grid, GridToolbar} from '@progress/kendo-react-grid';
+import {Dialog, DialogActionsBar} from '@progress/kendo-react-dialogs';
 import {process} from '@progress/kendo-data-query';
 import {CommandCell} from "./command-cell";
 import DataLoader from "../loading-portal";
@@ -18,7 +19,8 @@ export class GridWithState extends Component {
         this.state = {
             dataState: dataState,
             result: process(this.makeDeepCopy(this.props.data), dataState),
-            allData: this.props.data
+            allData: this.props.data,
+            pendingDeleteAction: []
         };
     }
 
@@ -65,10 +67,46 @@ export class GridWithState extends Component {
         });
     };
 
+    toggleDeleteDialog = (event, action) => {
+        switch (action) {
+            case 'yes': {
+                if (event.callback)
+                    event.callback.call(undefined, event);
+
+                //this.props.onChange({dataItem: event, value: 'delete'});
+                const data = this.state.allData.filter(item => item.id !== event.dataItem.id);
+                const stringData = JSON.stringify(data);
+
+                this.updateDataState(data);
+                this.setState({
+                    result: process(this.makeDeepCopy(stringData), this.state.dataState),
+                    allData: this.makeDeepCopy(stringData)
+                });
+                break;
+            }
+            case 'no':
+            case 'close':
+            default:
+                break;
+        }
+        this.setState({
+            pendingDeleteAction: this.state.pendingDeleteAction.filter((action) => action !== event)
+        });
+    };
+
     validateRequired = (data) => {
         //TODO: do validation here
         return true;
     };
+
+    createEvent = (command, data, callback) => {
+        return {dataItem: data, value: command, callback: callback || null}
+    };
+
+    // rowRender(trElement, props) {
+    //     const trProps = { className: 'overflow-x-auto overflow-y-auto' };
+    //     return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
+    // }
 
     render() {
         let {data} = this.state.result;
@@ -77,6 +115,23 @@ export class GridWithState extends Component {
         const hasSelectedItems = data.some(p => p.selected);
         return (
             <>
+                {this.state.pendingDeleteAction.length > 0 && <Dialog title={"Please confirm"}
+                                                                      onClose={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'close')}>
+                    <p style={{margin: "25px", textAlign: "center"}}>Are you sure you want to delete the following
+                        record?</p>
+                    <p style={{
+                        margin: "25px",
+                        textAlign: "center"
+                    }}>{this.state.pendingDeleteAction[0].dataItem.name}</p>
+                    <DialogActionsBar>
+                        <button className="k-button"
+                                onClick={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'yes')}>Yes
+                        </button>
+                        <button className="k-button"
+                                onClick={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'no')}>No
+                        </button>
+                    </DialogActionsBar>
+                </Dialog>}
                 <Grid
                     editField={this.props.editField}
                     selectedField={this.props.selectedField}
@@ -84,6 +139,7 @@ export class GridWithState extends Component {
                     {...this.state.dataState}
                     {...this.state.result}
 
+                    // rowRender={this.rowRender}
                     onRowClick={this.onRowClick}
                     onItemChange={this.onItemChange}
                     onDataStateChange={this.onDataStateChange}
@@ -167,23 +223,28 @@ export class GridWithState extends Component {
             case 'delete-selected': {
                 let data = this.state.allData;
                 let dataToDelete = this.state.result.data.filter(item => item.selected);
-                for (let item of dataToDelete) {
-                    //TODO: confirm delete
+                let deleteEvents = dataToDelete.map(item => this.createEvent(command, item, this.props.onClick));
 
-                    this.props.onClick.call(undefined, {
-                        event,
-                        dataItem: item,
-                        value: command,
-                        callback: this.onDataReceived
-                    });
-                    data = data.filter(element => element.id !== item.id);
-                }
-                const stringData = JSON.stringify(data);
-                this.updateDataState(data);
                 this.setState({
-                    result: process(this.makeDeepCopy(stringData), this.state.dataState),
-                    allData: this.makeDeepCopy(stringData)
+                    pendingDeleteAction: this.state.pendingDeleteAction.concat(deleteEvents)
                 });
+                // for (let item of dataToDelete) {
+                //     //TODO: confirm delete
+                //
+                //     this.props.onClick.call(undefined, {
+                //         event,
+                //         dataItem: item,
+                //         value: command,
+                //         callback: this.onDataReceived
+                //     });
+                //     data = data.filter(element => element.id !== item.id);
+                // }
+                // const stringData = JSON.stringify(data);
+                // this.updateDataState(data);
+                // this.setState({
+                //     result: process(this.makeDeepCopy(stringData), this.state.dataState),
+                //     allData: this.makeDeepCopy(stringData)
+                // });
                 break;
             }
             case 'refresh': {
@@ -295,16 +356,19 @@ export class GridWithState extends Component {
                     break;
                 }
                 case 'remove': {
-                    this.cleanRecord(event.dataItem);
-                    this.props.onChange(event);
-                    const data = allData.filter(item => item.id !== event.dataItem.id);
-                    const stringData = JSON.stringify(data);
-
-                    this.updateDataState(data);
+                    this.cleanRecord(event);
                     this.setState({
-                        result: process(this.makeDeepCopy(stringData), this.state.dataState),
-                        allData: this.makeDeepCopy(stringData)
+                        pendingDeleteAction: this.state.pendingDeleteAction.concat(this.createEvent(event.value, event.dataItem, this.props.onChange))
                     });
+                    // this.props.onChange(event);
+                    // const data = allData.filter(item => item.id !== event.dataItem.id);
+                    // const stringData = JSON.stringify(data);
+                    //
+                    // this.updateDataState(data);
+                    // this.setState({
+                    //     result: process(this.makeDeepCopy(stringData), this.state.dataState),
+                    //     allData: this.makeDeepCopy(stringData)
+                    // });
                     return;
                 }
                 default:
