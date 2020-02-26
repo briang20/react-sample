@@ -174,8 +174,8 @@ class ConnectedApp extends Component {
                 <div className={"usa-section"}>
                     <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
                           id={"main-content"}>
-                        <div className={"usa-content"}>
-                            <GridWithState className={"usa-table overflow-x-auto overflow-y-auto"}
+                        <div className={"usa-content overflow-x-auto overflow-x-auto"}>
+                            <GridWithState className={"usa-table"}
                                            editable={true}
                                            sortable={true}
                                            pageable={true}
