@@ -78,11 +78,11 @@ class ConnectedApp extends Component {
     GroupsCell = null;
     columns = [
         {title: '#', field: 'id', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
-        {title: 'Name', field: 'name', editor: 'text', columnMenu: ColumnMenu},
-        {title: 'Username', field: 'username', columnMenu: ColumnMenu},
-        {title: 'Email', field: 'email', columnMenu: ColumnMenu},
+        {title: 'Name', field: 'name', editor: 'text', required: true, columnMenu: ColumnMenu},
+        {title: 'Username', field: 'username', required: true, columnMenu: ColumnMenu},
+        {title: 'Email', field: 'email', required: true, columnMenu: ColumnMenu},
         {title: 'URL', field: 'website', columnMenu: ColumnMenu},
-        {title: 'Groups', field: 'groups', cell: this.GroupsCell}
+        {title: 'Groups', field: 'groups', required: true, cell: this.GroupsCell}
     ];
     GridColumns = GridColumns(this.columns, this.editField);
     state = {
@@ -160,7 +160,6 @@ class ConnectedApp extends Component {
         return (
             <>
                 <a className="usa-skipnav" href="#main-content">Skip to main content</a>
-
                 <header className="usa-header usa-header--basic">
                     <div className="usa-nav-container">
                         <div className="usa-navbar">
@@ -174,7 +173,7 @@ class ConnectedApp extends Component {
                 <div className={"usa-section"}>
                     <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
                           id={"main-content"}>
-                        <div className={"usa-content overflow-x-auto overflow-x-auto"}>
+                        <div className={"usa-content overflow-x-auto overflow-y-auto"}>
                             <GridWithState className={"usa-table"}
                                            editable={true}
                                            sortable={true}
@@ -186,6 +185,7 @@ class ConnectedApp extends Component {
                                            fetchData={this.props.getContacts}
                                            editField={this.editField}
                                            selectedField={this.selectedField}
+                                           columns={this.columns}
                             >
                                 {this.GridColumns}
                             </GridWithState>

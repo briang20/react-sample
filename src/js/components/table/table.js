@@ -96,23 +96,30 @@ export class GridWithState extends Component {
 
     validateRequired = (data) => {
         //TODO: do validation here
-        return true;
+        if (this.props.validateData)
+            return this.props.validateData.call(undefined, data);
+
+        let valid = true;
+        if (!this.props.columns) return valid;
+        for (let column of this.props.columns) {
+            if (column.required === true && !data[column.field]) {
+                valid = false;
+            }
+        }
+        return valid;
     };
 
     createEvent = (command, data, callback) => {
         return {dataItem: data, value: command, callback: callback || null}
     };
 
-    // rowRender(trElement, props) {
-    //     const trProps = { className: 'overflow-x-auto overflow-y-auto' };
-    //     return React.cloneElement(trElement, { ...trProps }, trElement.props.children);
-    // }
-
     render() {
         let {data} = this.state.result;
 
         const hasEditedItem = data.some(p => p.inEdit);
         const hasSelectedItems = data.some(p => p.selected);
+
+        //TODO: Move the dialog into a HOC
         return (
             <>
                 {this.state.pendingDeleteAction.length > 0 && <Dialog title={"Please confirm"}
@@ -139,7 +146,6 @@ export class GridWithState extends Component {
                     {...this.state.dataState}
                     {...this.state.result}
 
-                    // rowRender={this.rowRender}
                     onRowClick={this.onRowClick}
                     onItemChange={this.onItemChange}
                     onDataStateChange={this.onDataStateChange}
@@ -221,30 +227,12 @@ export class GridWithState extends Component {
                 break;
             }
             case 'delete-selected': {
-                let data = this.state.allData;
                 let dataToDelete = this.state.result.data.filter(item => item.selected);
                 let deleteEvents = dataToDelete.map(item => this.createEvent(command, item, this.props.onClick));
 
                 this.setState({
                     pendingDeleteAction: this.state.pendingDeleteAction.concat(deleteEvents)
                 });
-                // for (let item of dataToDelete) {
-                //     //TODO: confirm delete
-                //
-                //     this.props.onClick.call(undefined, {
-                //         event,
-                //         dataItem: item,
-                //         value: command,
-                //         callback: this.onDataReceived
-                //     });
-                //     data = data.filter(element => element.id !== item.id);
-                // }
-                // const stringData = JSON.stringify(data);
-                // this.updateDataState(data);
-                // this.setState({
-                //     result: process(this.makeDeepCopy(stringData), this.state.dataState),
-                //     allData: this.makeDeepCopy(stringData)
-                // });
                 break;
             }
             case 'refresh': {
@@ -322,11 +310,10 @@ export class GridWithState extends Component {
                     });
                     return;
                 }
-
                 case 'add': {
-                    //TODO: check if all required fields are set
                     if (false === this.validateRequired(event.dataItem)) {
                         //TODO: throw error notification
+                        console.log('data validation failed');
                         return;
                     }
                     this.cleanRecord(event.dataItem);
@@ -344,6 +331,7 @@ export class GridWithState extends Component {
                 case 'update': {
                     if (false === this.validateRequired(event.dataItem)) {
                         //TODO: throw error notification
+                        console.log('data validation failed');
                         return;
                     }
                     this.cleanRecord(event.dataItem);
@@ -360,15 +348,6 @@ export class GridWithState extends Component {
                     this.setState({
                         pendingDeleteAction: this.state.pendingDeleteAction.concat(this.createEvent(event.value, event.dataItem, this.props.onChange))
                     });
-                    // this.props.onChange(event);
-                    // const data = allData.filter(item => item.id !== event.dataItem.id);
-                    // const stringData = JSON.stringify(data);
-                    //
-                    // this.updateDataState(data);
-                    // this.setState({
-                    //     result: process(this.makeDeepCopy(stringData), this.state.dataState),
-                    //     allData: this.makeDeepCopy(stringData)
-                    // });
                     return;
                 }
                 default:
