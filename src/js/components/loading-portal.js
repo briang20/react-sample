@@ -34,25 +34,28 @@ class ConnectedDataLoader extends Component {
             pending: toODataString(this.props.dataState)
         });
 
-        fetchData.call(undefined)
-            .then(res => {
-                if (res.type === 'SUCCESS') {
-                    this.setState({
-                        lastSuccess: this.state.pending,
-                        pending: ''
-                    });
+        if (fetchData && typeof fetchData === 'function') {
+            fetchData.call(undefined)
+                .then(res => {
+                    if (res.type.indexOf('SUCCESS') !== -1) {
+                        this.setState({
+                            lastSuccess: this.state.pending,
+                            pending: ''
+                        });
 
-                    if (toODataString(this.props.dataState) === this.state.lastSuccess) {
-                        this.props.onDataReceived.call(undefined, res.data);
-                    } else {
-                        this.requestDataIfNeeded();
+                        if (toODataString(this.props.dataState) === this.state.lastSuccess) {
+                            if (this.props.onDataReceived && typeof this.props.onDataReceived === 'function')
+                                this.props.onDataReceived.call(undefined, res.data);
+                        } else {
+                            this.requestDataIfNeeded();
+                        }
+                    } else if (res.type.indexOf('FAILURE') !== -1) {
+                        // Throw up a notification indicating an error occurred
+                        const data = res.payload.message;
+                        this.setState({error: true, errorMessage: data});
                     }
-                } else if (res.type === 'FAILURE') {
-                    // Throw up a notification indicating an error occurred
-                    const data = res.payload.message;
-                    this.setState({error: true, errorMessage: data});
-                }
-            });
+                });
+        }
     }
 
     render() {

@@ -6,20 +6,13 @@ import '../css/uswds-theme.scss';
 import '../css/App.css';
 import {
     getContacts,
-    clearSelectedItems,
     postContacts,
     putContacts,
     deleteContacts,
-    addSelectedItem,
-    removeSelectedItem,
-    modifyContact,
     getUserGroups
 } from "./actions/index";
 import {
     getContactsList,
-    getCurrentSearchFilter,
-    getCurrentSelectedItemList,
-    getReplayList,
     getUserGroupsList
 } from "./selectors/index";
 import {ColumnMenu} from "./components/table/gird-column-menu";
@@ -29,9 +22,6 @@ import {GridColumns} from "./components/table/grid-columns";
 
 function mapDispatchToProps(dispatch) {
     return {
-        clearSelectedItems: function () {
-            dispatch(clearSelectedItems())
-        },
         getContacts: function () {
             return dispatch(getContacts())
         },
@@ -43,15 +33,6 @@ function mapDispatchToProps(dispatch) {
         },
         deleteContacts: function (opts) {
             return dispatch(deleteContacts(opts))
-        },
-        addSelectedItem: function (item) {
-            dispatch(addSelectedItem(item))
-        },
-        removeSelectedItem: function (item) {
-            dispatch(removeSelectedItem(item))
-        },
-        modifyContact: function (contact, newContact) {
-            dispatch(modifyContact(contact, newContact))
         },
         getUserGroups: function () {
             return dispatch(getUserGroups())
@@ -90,10 +71,6 @@ class ConnectedApp extends Component {
         groups: [...this.props.groups]
     };
 
-    constructor(props) {
-        super(props);
-    }
-
     componentDidMount() {
         this.props.getUserGroups()
             .then(res => {
@@ -121,7 +98,7 @@ class ConnectedApp extends Component {
             case 'refresh': {
                 this.props.getContacts()
                     .then(res => {
-                        if (event.callback)
+                        if (event.callback && typeof event.callback === 'function')
                             event.callback.call(undefined, res.data);
                     });
                 break;
@@ -138,17 +115,13 @@ class ConnectedApp extends Component {
     onDataChange = (event) => {
         switch (event.value) {
             case 'add': {
-                this.props.postContacts(event.dataItem);
-                break;
+                return this.props.postContacts(event.dataItem);
             }
             case 'update': {
-                this.props.putContacts(event.dataItem);
-                break;
+                return this.props.putContacts(event.dataItem);
             }
             case 'remove': {
-                //TODO: confirm delete
-                this.props.deleteContacts(event.dataItem);
-                break;
+                return this.props.deleteContacts(event.dataItem);
             }
             default:
                 break;

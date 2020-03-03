@@ -4,6 +4,7 @@ import {Dialog, DialogActionsBar} from '@progress/kendo-react-dialogs';
 import {process} from '@progress/kendo-data-query';
 import {CommandCell} from "./command-cell";
 import DataLoader from "../loading-portal";
+import {ModalDialog} from "../dialog-box";
 
 export class GridWithState extends Component {
     constructor(props) {
@@ -70,10 +71,9 @@ export class GridWithState extends Component {
     toggleDeleteDialog = (event, action) => {
         switch (action) {
             case 'yes': {
-                if (event.callback)
+                if (event.callback && typeof event.callback === 'function')
                     event.callback.call(undefined, event);
 
-                //this.props.onChange({dataItem: event, value: 'delete'});
                 const data = this.state.allData.filter(item => item.id !== event.dataItem.id);
                 const stringData = JSON.stringify(data);
 
@@ -96,7 +96,7 @@ export class GridWithState extends Component {
 
     validateRequired = (data) => {
         //TODO: do validation here
-        if (this.props.validateData)
+        if (this.props.validateData && typeof this.props.validateData === 'function')
             return this.props.validateData.call(undefined, data);
 
         let valid = true;
@@ -109,8 +109,14 @@ export class GridWithState extends Component {
         return valid;
     };
 
-    createEvent = (command, data, callback) => {
-        return {dataItem: data, value: command, callback: callback || null}
+    createDeleteEvent = (command, data, callback) => {
+        return {
+            title: 'Please confirm',
+            question: 'Are you sure you want to delete the following record? ' + data.name,
+            dataItem: data,
+            value: command,
+            callback: callback || null
+        }
     };
 
     render() {
@@ -118,27 +124,11 @@ export class GridWithState extends Component {
 
         const hasEditedItem = data.some(p => p.inEdit);
         const hasSelectedItems = data.some(p => p.selected);
+        const confirmDelete = ModalDialog(this.state.pendingDeleteAction, this.toggleDeleteDialog);
 
-        //TODO: Move the dialog into a HOC
         return (
             <>
-                {this.state.pendingDeleteAction.length > 0 && <Dialog title={"Please confirm"}
-                                                                      onClose={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'close')}>
-                    <p style={{margin: "25px", textAlign: "center"}}>Are you sure you want to delete the following
-                        record?</p>
-                    <p style={{
-                        margin: "25px",
-                        textAlign: "center"
-                    }}>{this.state.pendingDeleteAction[0].dataItem.name}</p>
-                    <DialogActionsBar>
-                        <button className="k-button"
-                                onClick={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'yes')}>Yes
-                        </button>
-                        <button className="k-button"
-                                onClick={() => this.toggleDeleteDialog(this.state.pendingDeleteAction[0], 'no')}>No
-                        </button>
-                    </DialogActionsBar>
-                </Dialog>}
+                {confirmDelete}
                 <Grid
                     editField={this.props.editField}
                     selectedField={this.props.selectedField}
@@ -228,7 +218,7 @@ export class GridWithState extends Component {
             }
             case 'delete-selected': {
                 let dataToDelete = this.state.result.data.filter(item => item.selected);
-                let deleteEvents = dataToDelete.map(item => this.createEvent(command, item, this.props.onClick));
+                let deleteEvents = dataToDelete.map(item => this.createDeleteEvent(command, item, this.props.onClick));
 
                 this.setState({
                     pendingDeleteAction: this.state.pendingDeleteAction.concat(deleteEvents)
@@ -236,7 +226,8 @@ export class GridWithState extends Component {
                 break;
             }
             case 'refresh': {
-                this.props.onClick.call(undefined, {event, value: command, callback: this.onDataReceived});
+                if (this.props.onClick && typeof this.props.onClick === 'function')
+                    this.props.onClick.call(undefined, {event, value: command, callback: this.onDataReceived});
                 break;
             }
             default:
@@ -319,7 +310,8 @@ export class GridWithState extends Component {
                     this.cleanRecord(event.dataItem);
 
                     event.dataItem.id = this.generateId();
-                    this.props.onChange(event);
+                    if (this.props.onChange && typeof this.props.onChange === 'function')
+                        this.props.onChange(event);
                     const stringData = JSON.stringify([...this.state.allData, event.dataItem]);
                     this.updateDataState(this.makeDeepCopy(stringData));
                     this.setState({
@@ -335,7 +327,8 @@ export class GridWithState extends Component {
                         return;
                     }
                     this.cleanRecord(event.dataItem);
-                    this.props.onChange(event);
+                    if (this.props.onChange && typeof this.props.onChange === 'function')
+                        this.props.onChange(event);
                     newData = this.state.result.data.map(item => item.id === event.dataItem.id ? event.dataItem : item);
                     const updatedAllData = allData.map(item => item.id === event.dataItem.id ? event.dataItem : item);
                     this.setState({
@@ -346,7 +339,7 @@ export class GridWithState extends Component {
                 case 'remove': {
                     this.cleanRecord(event);
                     this.setState({
-                        pendingDeleteAction: this.state.pendingDeleteAction.concat(this.createEvent(event.value, event.dataItem, this.props.onChange))
+                        pendingDeleteAction: this.state.pendingDeleteAction.concat(this.createDeleteEvent(event.value, event.dataItem, this.props.onChange))
                     });
                     return;
                 }

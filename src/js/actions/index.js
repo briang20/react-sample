@@ -6,12 +6,15 @@ import {
     REMOVE_CONTACT,
     MODIFY_CONTACT,
     UPDATE_CONTACTS,
-    CHANGE_SORTING,
-    CHANGE_SEARCH_FILTER,
-    ADD_SELECTED_ITEM,
-    REMOVE_SELECTED_ITEM,
-    CLEAR_SELECTED_ITEMS,
-    CLEAR_CONTACTS, CLEAR_REPLAY, CLEAR_USER_GROUPS, UPDATE_USER_GROUPS
+    CLEAR_CONTACTS,
+    CLEAR_USER_GROUPS,
+    UPDATE_USER_GROUPS,
+    USER_API_REQUEST,
+    USER_API_SUCCESS,
+    USER_API_FAILURE,
+    GROUPS_API_REQUEST,
+    GROUPS_API_SUCCESS,
+    GROUPS_API_FAILURE
 } from "../constants/action-types";
 
 export function updateContacts(payload) {
@@ -29,27 +32,6 @@ export function removeContact(payload) {
 export function modifyContact(payload) {
     return {type: MODIFY_CONTACT, payload}
 }
-
-export function changeSorting(payload) {
-    return {type: CHANGE_SORTING, payload}
-}
-
-export function changeSearchFilter(payload) {
-    return {type: CHANGE_SEARCH_FILTER, payload}
-}
-
-export function addSelectedItem(payload) {
-    return {type: ADD_SELECTED_ITEM, payload}
-}
-
-export function removeSelectedItem(payload) {
-    return {type: REMOVE_SELECTED_ITEM, payload}
-}
-
-export function clearSelectedItems() {
-    return {type: CLEAR_SELECTED_ITEMS}
-}
-
 export function clearContacts() {
     return {type: CLEAR_CONTACTS}
 }
@@ -62,19 +44,14 @@ export function clearUserGroups() {
     return {type: CLEAR_USER_GROUPS}
 }
 
-export function clearReplayBuffer() {
-    return {type: CLEAR_REPLAY}
-}
-
-export function fetchContacts(dataset, type, opts = null, key = '') {
+export function fetchUsers(type, opts = null, key = '') {
     return (dispatch, getState, api) => {
-        let baseUrl = api ? api : 'https://my-json-server.typicode.com/RavenX8/react-sample';
-        let url = baseUrl + dataset;
+        let url = api ? api + '/users' : 'https://my-json-server.typicode.com/RavenX8/react-sample/users';
         if (type !== 'get' && type !== 'post') url = url + "/" + key;
 
         return dispatch({
             [CALL_API]: {
-                types: ['REQUEST', 'SUCCESS', 'FAILURE'],
+                types: [USER_API_REQUEST, USER_API_SUCCESS, USER_API_FAILURE],
                 endpoint: url,
                 options: {
                     method: type,
@@ -88,9 +65,19 @@ export function fetchContacts(dataset, type, opts = null, key = '') {
 
 export function getUserGroups() {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/groups', 'get'))
+        let url = api ? api + '/groups' : 'https://my-json-server.typicode.com/RavenX8/react-sample/groups';
+        return dispatch({
+            [CALL_API]: {
+                types: [GROUPS_API_REQUEST, GROUPS_API_SUCCESS, GROUPS_API_FAILURE],
+                endpoint: url,
+                options: {
+                    method: 'get',
+                    headers: {'Content-Type': 'application/json'},
+                }
+            }
+        })
             .then(async res => {
-                if (res.type === 'SUCCESS') {
+                if (res.type === GROUPS_API_SUCCESS) {
                     const data = await res.payload.json();
                     dispatch(clearUserGroups());
                     dispatch(updateUserGroups(data));
@@ -103,9 +90,9 @@ export function getUserGroups() {
 
 export function getContacts() {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/users', 'get'))
+        return dispatch(fetchUsers('get'))
             .then(async res => {
-                if (res.type === 'SUCCESS') {
+                if (res.type === USER_API_SUCCESS) {
                     const data = await res.payload.json();
                     dispatch(clearContacts());
                     dispatch(updateContacts(data));
@@ -118,9 +105,9 @@ export function getContacts() {
 
 export function postContacts(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/users', 'post', JSON.stringify(opts), opts.id))
+        return dispatch(fetchUsers('post', JSON.stringify(opts), opts.id))
             .then(async res => {
-                if (res.type === 'SUCCESS') {
+                if (res.type === USER_API_SUCCESS) {
                     const data = await res.payload.json();
                     dispatch(updateContacts(data));
                     return {...res, data: data};
@@ -132,9 +119,9 @@ export function postContacts(opts) {
 
 export function putContacts(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/users', 'put', JSON.stringify(opts), opts.id))
+        return dispatch(fetchUsers('put', JSON.stringify(opts), opts.id))
             .then(async res => {
-                if (res.type === 'SUCCESS') {
+                if (res.type === USER_API_SUCCESS) {
                     const data = await res.payload.json();
                     dispatch(modifyContact(data));
                     return {...res, data: data};
@@ -146,9 +133,9 @@ export function putContacts(opts) {
 
 export function deleteContacts(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchContacts('/users', 'delete', null, opts.id))
+        return dispatch(fetchUsers('delete', null, opts.id))
             .then(async res => {
-                if (res.type === 'SUCCESS') {
+                if (res.type === USER_API_SUCCESS) {
                     await dispatch(removeContact(opts));
                 }
                 return {...res, data: null};
