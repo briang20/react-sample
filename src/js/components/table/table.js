@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import {GridColumn, Grid, GridToolbar} from '@progress/kendo-react-grid';
-import {Dialog, DialogActionsBar} from '@progress/kendo-react-dialogs';
 import {process} from '@progress/kendo-data-query';
 import {CommandCell} from "./command-cell";
 import DataLoader from "../loading-portal";
