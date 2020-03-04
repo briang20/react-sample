@@ -123,7 +123,7 @@ export class GridWithState extends Component {
         let {data} = this.state.result;
 
         const hasEditedItem = data.some(p => p.inEdit);
-        const hasSelectedItems = data.some(p => p.selected);
+        const hasSelectedItems = data.some(p => p.selected && p.id);
         const confirmDelete = ModalDialog(this.state.pendingDeleteAction, this.toggleDeleteDialog);
 
         return (
