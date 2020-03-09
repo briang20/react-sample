@@ -2,10 +2,9 @@ import React, {Component} from 'react';
 import {connect} from "react-redux";
 import {GridWithState as Grid} from "../components/table/table";
 import {ColumnMenu} from "../components/table/gird-column-menu";
-import {MultiSelectCell} from "../components/table/multi-select-cell";
 import {GridColumns} from "../components/table/grid-columns";
 import {deleteContacts, getContacts, getUserGroups, postContacts, putContacts} from "../actions";
-import {getContactsList, getUserGroupsList} from "../selectors";
+import {getUserGroupsList} from "../selectors";
 import {BuildHeader} from "../components/header-box";
 
 const mapDispatchToProps = dispatch => {
@@ -30,50 +29,22 @@ const mapDispatchToProps = dispatch => {
 
 const mapStateToProps = state => {
     return {
-        contacts: getContactsList(state),
         groups: getUserGroupsList(state)
     };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(class UserTable extends Component {
+export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable extends Component {
     editField = "inEdit";
     selectedField = "selected";
-    GroupsCell = null;
     columns = [
-        {title: '#', field: 'id', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
-        {title: 'Name', field: 'name', editor: 'text', required: true, columnMenu: ColumnMenu},
-        {title: 'Username', field: 'username', required: true, columnMenu: ColumnMenu},
-        {title: 'Email', field: 'email', required: true, columnMenu: ColumnMenu},
-        {title: 'URL', field: 'website', columnMenu: ColumnMenu},
-        {title: 'Groups', field: 'groups', required: true, cell: this.GroupsCell}
+        {title: '#', field: 'value', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
+        {title: 'Name', field: 'text', editor: 'text', required: true, columnMenu: ColumnMenu}
     ];
     GridColumns = GridColumns(this.columns, this.editField);
     state = {
         dataState: {take: 10, skip: 0},
         groups: [...this.props.groups]
     };
-
-    componentDidMount() {
-        this.props.getUserGroups()
-            .then(res => {
-                this.updateGroups();
-            });
-    }
-
-    updateGroups() {
-        this.GroupsCell = MultiSelectCell({options: this.props.groups});
-
-        let columns = this.columns.map(item => {
-            if (item.field === 'groups') {
-                return {title: 'Groups', field: 'groups', cell: this.GroupsCell}
-            }
-            return item
-        });
-        this.GridColumns = GridColumns(columns, this.editField);
-        this.setState({
-            groups: [...this.props.groups]
-        });
-    }
 
     onToolbarClick = (event) => {
         switch (event.value) {
@@ -111,10 +82,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
     };
 
     render() {
-        const data = this.props.contacts;
+        const data = this.props.groups;
         return (
             <>
-                {BuildHeader('Users Table')}
+                {BuildHeader('Groups Table')}
                 <div className={"usa-section"}>
                     <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
                           id={"main-content"}>
@@ -127,10 +98,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
                                   data={data}
                                   onClick={this.onToolbarClick}
                                   onChange={this.onDataChange}
-                                  fetchData={this.props.getContacts}
+                                  fetchData={this.props.getUserGroups}
                                   editField={this.editField}
                                   selectedField={this.selectedField}
-                                  idField={'id'}
+                                  idField={'value'}
                                   columns={this.columns}
                             >
                                 {this.GridColumns}

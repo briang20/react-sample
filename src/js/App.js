@@ -3,7 +3,6 @@ import '@progress/kendo-theme-default/dist/all.css';
 import '../css/uswds-theme.scss';
 import '../css/App.css';
 import {defaultRoutes} from "./routes";
-import {Link} from "react-router-dom";
 
 class App extends Component {
     render() {
