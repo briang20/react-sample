@@ -6,7 +6,7 @@ import {MultiSelectCell} from "../components/table/multi-select-cell";
 import {GridColumns} from "../components/table/grid-columns";
 import {deleteContacts, getContacts, getUserGroups, postContacts, putContacts} from "../actions";
 import {getContactsList, getUserGroupsList} from "../selectors";
-import {Link} from "react-router-dom";
+import {BuildHeader} from "../components/header-box";
 
 const mapDispatchToProps = dispatch => {
     return {
@@ -114,19 +114,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
         const data = this.props.contacts;
         return (
             <>
-                <header className="usa-header usa-header--basic">
-                    <div className="usa-nav-container">
-                        <div className="usa-navbar">
-                            <div className="usa-logo" id="basic-logo">
-                                <Link to={'/'}>
-                                    <em className="usa-logo__text"><a href="/" title="Home" aria-label="Home">Users
-                                        Lookup</a>
-                                    </em>
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </header>
+                {BuildHeader('Users Table')}
                 <div className={"usa-section"}>
                     <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
                           id={"main-content"}>
