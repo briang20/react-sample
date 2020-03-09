@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from "react-redux";
 import {BrowserRouter as Router} from "react-router-dom";
-//import "./js/index";
 import './css/index.css';
 import App from './js/App';
 import * as serviceWorker from './serviceWorker';

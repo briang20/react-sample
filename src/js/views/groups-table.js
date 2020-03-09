@@ -3,26 +3,23 @@ import {connect} from "react-redux";
 import {GridWithState as Grid} from "../components/table/table";
 import {ColumnMenu} from "../components/table/gird-column-menu";
 import {GridColumns} from "../components/table/grid-columns";
-import {deleteContacts, getContacts, getUserGroups, postContacts, putContacts} from "../actions";
 import {getUserGroupsList} from "../selectors";
 import {BuildHeader} from "../components/header-box";
+import {deleteGroups, getGroups, postGroups, putGroups} from "../actions/group-actions";
 
 const mapDispatchToProps = dispatch => {
     return {
-        getContacts: function () {
-            return dispatch(getContacts())
+        getGroups: function () {
+            return dispatch(getGroups())
         },
-        postContacts: function (opts) {
-            return dispatch(postContacts(opts))
+        postGroups: function (opts) {
+            return dispatch(postGroups(opts))
         },
-        putContacts: function (opts) {
-            return dispatch(putContacts(opts))
+        putGroups: function (opts) {
+            return dispatch(putGroups(opts))
         },
-        deleteContacts: function (opts) {
-            return dispatch(deleteContacts(opts))
-        },
-        getUserGroups: function () {
-            return dispatch(getUserGroups())
+        deleteGroups: function (opts) {
+            return dispatch(deleteGroups(opts))
         }
     };
 };
@@ -38,7 +35,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
     selectedField = "selected";
     columns = [
         {title: '#', field: 'value', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
-        {title: 'Name', field: 'text', editor: 'text', required: true, columnMenu: ColumnMenu}
+        {title: 'Name', field: 'name', editor: 'text', required: true, columnMenu: ColumnMenu}
     ];
     GridColumns = GridColumns(this.columns, this.editField);
     state = {
@@ -49,7 +46,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
     onToolbarClick = (event) => {
         switch (event.value) {
             case 'refresh': {
-                this.props.getContacts()
+                this.props.getGroups()
                     .then(res => {
                         if (event.callback && typeof event.callback === 'function')
                             event.callback.call(undefined, res.data);
@@ -57,7 +54,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
                 break;
             }
             case 'delete-selected': {
-                this.props.deleteContacts(event.dataItem);
+                this.props.deleteGroups(event.dataItem);
                 break;
             }
             default:
@@ -68,13 +65,13 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
     onDataChange = (event) => {
         switch (event.value) {
             case 'add': {
-                return this.props.postContacts(event.dataItem);
+                return this.props.postGroups(event.dataItem);
             }
             case 'update': {
-                return this.props.putContacts(event.dataItem);
+                return this.props.putGroups(event.dataItem);
             }
             case 'remove': {
-                return this.props.deleteContacts(event.dataItem);
+                return this.props.deleteGroups(event.dataItem);
             }
             default:
                 break;
@@ -98,7 +95,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
                                   data={data}
                                   onClick={this.onToolbarClick}
                                   onChange={this.onDataChange}
-                                  fetchData={this.props.getUserGroups}
+                                  fetchData={this.props.getGroups}
                                   editField={this.editField}
                                   selectedField={this.selectedField}
                                   idField={'value'}

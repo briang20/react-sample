@@ -4,26 +4,27 @@ import {GridWithState as Grid} from "../components/table/table";
 import {ColumnMenu} from "../components/table/gird-column-menu";
 import {MultiSelectCell} from "../components/table/multi-select-cell";
 import {GridColumns} from "../components/table/grid-columns";
-import {deleteContacts, getContacts, getUserGroups, postContacts, putContacts} from "../actions";
+import {deleteUsers, getUsers, postUsers, putUsers} from "../actions";
 import {getContactsList, getUserGroupsList} from "../selectors";
 import {BuildHeader} from "../components/header-box";
+import {getGroups} from "../actions/group-actions";
 
 const mapDispatchToProps = dispatch => {
     return {
         getContacts: function () {
-            return dispatch(getContacts())
+            return dispatch(getUsers())
         },
         postContacts: function (opts) {
-            return dispatch(postContacts(opts))
+            return dispatch(postUsers(opts))
         },
         putContacts: function (opts) {
-            return dispatch(putContacts(opts))
+            return dispatch(putUsers(opts))
         },
         deleteContacts: function (opts) {
-            return dispatch(deleteContacts(opts))
+            return dispatch(deleteUsers(opts))
         },
         getUserGroups: function () {
-            return dispatch(getUserGroups())
+            return dispatch(getGroups())
         }
     };
 };
@@ -61,7 +62,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
     }
 
     updateGroups() {
-        this.GroupsCell = MultiSelectCell({options: this.props.groups});
+        this.GroupsCell = MultiSelectCell({options: this.props.groups, textField: 'name', dataField: 'id'});
 
         let columns = this.columns.map(item => {
             if (item.field === 'groups') {

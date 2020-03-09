@@ -42,9 +42,9 @@ export class GridWithState extends Component {
         let id = 1;
         if (this.state.allData.length > 0) {
             const lastId = this.state.allData.reduce(function (a, b) {
-                return a[this.props.idField] < b[this.props.idField] ? b : a;
+                return a.id < b.id ? b : a;
             });
-            if (lastId) id = lastId[this.props.idField] + 1;
+            if (lastId) id = lastId.id + 1;
         }
         return id;
     };
@@ -73,7 +73,7 @@ export class GridWithState extends Component {
                 if (event.callback && typeof event.callback === 'function')
                     event.callback.call(undefined, event);
 
-                const data = this.state.allData.filter(item => item[this.props.idField] !== event.dataItem[this.props.idField]);
+                const data = this.state.allData.filter(item => item.id !== event.dataItem.id);
                 const stringData = JSON.stringify(data);
 
                 this.updateDataState(data);
@@ -122,7 +122,7 @@ export class GridWithState extends Component {
         let {data} = this.state.result;
 
         const hasEditedItem = data.some(p => p.inEdit);
-        const hasSelectedItems = data.some(p => p.selected && p[this.props.idField]);
+        const hasSelectedItems = data.some(p => p.selected && p.id);
         const confirmDelete = ModalDialog(this.state.pendingDeleteAction, this.toggleDeleteDialog);
 
         return (
@@ -253,7 +253,7 @@ export class GridWithState extends Component {
     onRowClick = (event) => {
         let newData = this.state.result.data.map(item => {
             let rtn = item;
-            if (rtn[this.props.idField] === event.dataItem[this.props.idField])
+            if (rtn.id === event.dataItem.id)
                 rtn[this.props.selectedField] = !rtn[this.props.selectedField];
             return rtn;
         });
@@ -276,7 +276,7 @@ export class GridWithState extends Component {
                 case 'edit': {
                     newData = this.state.result.data.map(item => {
                         let rtn = item;
-                        if (rtn[this.props.idField] === event.dataItem[this.props.idField])
+                        if (rtn.id === event.dataItem.id)
                             rtn[event.field] = true;
                         return rtn;
                     });
@@ -289,8 +289,8 @@ export class GridWithState extends Component {
                     return;
                 }
                 case 'cancel': {
-                    const originalItem = this.state.allData.find(p => p[this.props.idField] === event.dataItem[this.props.idField]);
-                    const data = this.state.result.data.map(item => item[this.props.idField] === originalItem[this.props.idField] ? originalItem : item);
+                    const originalItem = this.state.allData.find(p => p.id === event.dataItem.id);
+                    const data = this.state.result.data.map(item => item.id === originalItem.id ? originalItem : item);
 
                     this.setState({
                         result: {
@@ -308,7 +308,7 @@ export class GridWithState extends Component {
                     }
                     this.cleanRecord(event.dataItem);
 
-                    event.dataItem[this.props.idField] = this.generateId();
+                    event.dataItem.id = this.generateId();
                     if (this.props.onChange && typeof this.props.onChange === 'function')
                         this.props.onChange(event);
                     const stringData = JSON.stringify([...this.state.allData, event.dataItem]);
@@ -328,8 +328,8 @@ export class GridWithState extends Component {
                     this.cleanRecord(event.dataItem);
                     if (this.props.onChange && typeof this.props.onChange === 'function')
                         this.props.onChange(event);
-                    newData = this.state.result.data.map(item => item[this.props.idField] === event.dataItem[this.props.idField] ? event.dataItem : item);
-                    const updatedAllData = allData.map(item => item[this.props.idField] === event.dataItem[this.props.idField] ? event.dataItem : item);
+                    newData = this.state.result.data.map(item => item.id === event.dataItem.id ? event.dataItem : item);
+                    const updatedAllData = allData.map(item => item.id === event.dataItem.id ? event.dataItem : item);
                     this.setState({
                         allData: updatedAllData
                     });
@@ -348,7 +348,7 @@ export class GridWithState extends Component {
         } else {
             newData = this.state.result.data.map(item => {
                 let rtn = item;
-                if (rtn[this.props.idField] === event.dataItem[this.props.idField])
+                if (rtn.id === event.dataItem.id)
                     rtn[event.field] = event.value;
                 return rtn;
             });

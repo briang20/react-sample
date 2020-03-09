@@ -1,15 +1,15 @@
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk'
 import {
-    addContact,
-    removeContact,
-    modifyContact,
+    addUser,
+    removeUser,
+    modifyUser,
     changeSorting,
     changeSearchFilter,
     addSelectedItem,
     removeSelectedItem,
     clearSelectedItems,
-    clearContacts, clearReplayBuffer
+    clearUsers, clearReplayBuffer
 } from "../actions/index";
 import {
     ADD_CONTACT,
@@ -31,7 +31,7 @@ it('should dispatch an add contact action', function () {
     const initialState = {};
     const store = mockStore(initialState);
     const opts = {'name': 'test'};
-    store.dispatch(addContact(opts));
+    store.dispatch(addUser(opts));
 
     const actions = store.getActions();
     const expectedPayload = {type: ADD_CONTACT, payload: opts};
@@ -43,7 +43,7 @@ it('should dispatch an remove contact action', function () {
     const initialState = {};
     const store = mockStore(initialState);
     const opts = {'name': 'test'};
-    store.dispatch(removeContact(opts));
+    store.dispatch(removeUser(opts));
 
     const actions = store.getActions();
     const expectedPayload = {type: REMOVE_CONTACT, payload: opts};
@@ -55,7 +55,7 @@ it('should dispatch an modify contact action', function () {
     const initialState = {};
     const store = mockStore(initialState);
     const opts = {'name': 'test'};
-    store.dispatch(modifyContact(opts));
+    store.dispatch(modifyUser(opts));
 
     const actions = store.getActions();
     const expectedPayload = {type: MODIFY_CONTACT, payload: opts};
@@ -125,7 +125,7 @@ it('should dispatch an clearContacts action', function () {
     // Initialize mockstore with empty state
     const initialState = {};
     const store = mockStore(initialState);
-    store.dispatch(clearContacts());
+    store.dispatch(clearUsers());
 
     const actions = store.getActions();
     const expectedPayload = {type: CLEAR_CONTACTS};
