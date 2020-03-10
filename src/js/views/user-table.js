@@ -4,26 +4,26 @@ import {GridWithState as Grid} from "../components/table/table";
 import {ColumnMenu} from "../components/table/gird-column-menu";
 import {MultiSelectCell} from "../components/table/multi-select-cell";
 import {GridColumns} from "../components/table/grid-columns";
-import {deleteUsers, getUsers, postUsers, putUsers} from "../actions";
-import {getContactsList, getUserGroupsList} from "../selectors";
 import {BuildHeader} from "../components/header-box";
+import {getContactsList, getUserGroupsList} from "../selectors";
+import {deleteUsers, getUsers, postUsers, putUsers} from "../actions";
 import {getGroups} from "../actions/group-actions";
 
 const mapDispatchToProps = dispatch => {
     return {
-        getContacts: function () {
+        getUsers: function () {
             return dispatch(getUsers())
         },
-        postContacts: function (opts) {
+        postUsers: function (opts) {
             return dispatch(postUsers(opts))
         },
-        putContacts: function (opts) {
+        putUsers: function (opts) {
             return dispatch(putUsers(opts))
         },
-        deleteContacts: function (opts) {
+        deleteUsers: function (opts) {
             return dispatch(deleteUsers(opts))
         },
-        getUserGroups: function () {
+        getGroups: function () {
             return dispatch(getGroups())
         }
     };
@@ -55,14 +55,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
     };
 
     componentDidMount() {
-        this.props.getUserGroups()
+        this.props.getGroups()
             .then(res => {
                 this.updateGroups();
             });
     }
 
     updateGroups() {
-        this.GroupsCell = MultiSelectCell({options: this.props.groups, textField: 'name', dataField: 'id'});
+        this.GroupsCell = MultiSelectCell({options: this.props.groups});
 
         let columns = this.columns.map(item => {
             if (item.field === 'groups') {
@@ -79,7 +79,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
     onToolbarClick = (event) => {
         switch (event.value) {
             case 'refresh': {
-                this.props.getContacts()
+                this.props.getUsers()
                     .then(res => {
                         if (event.callback && typeof event.callback === 'function')
                             event.callback.call(undefined, res.data);
@@ -87,7 +87,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
                 break;
             }
             case 'delete-selected': {
-                this.props.deleteContacts(event.dataItem);
+                this.props.deleteUsers(event.dataItem);
                 break;
             }
             default:
@@ -98,13 +98,13 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
     onDataChange = (event) => {
         switch (event.value) {
             case 'add': {
-                return this.props.postContacts(event.dataItem);
+                return this.props.postUsers(event.dataItem);
             }
             case 'update': {
-                return this.props.putContacts(event.dataItem);
+                return this.props.putUsers(event.dataItem);
             }
             case 'remove': {
-                return this.props.deleteContacts(event.dataItem);
+                return this.props.deleteUsers(event.dataItem);
             }
             default:
                 break;
@@ -128,7 +128,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class UserTable exte
                                   data={data}
                                   onClick={this.onToolbarClick}
                                   onChange={this.onDataChange}
-                                  fetchData={this.props.getContacts}
+                                  fetchData={this.props.getUsers}
                                   editField={this.editField}
                                   selectedField={this.selectedField}
                                   idField={'id'}

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {MultiSelect} from '@progress/kendo-react-dropdowns';
 
-export function MultiSelectCell({options, textField, dataField}) {
+export function MultiSelectCell({options, textField = 'name', dataField = 'id'}) {
     return class extends Component {
         options = [];
         textField = 'name';
