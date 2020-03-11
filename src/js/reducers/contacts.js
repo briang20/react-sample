@@ -12,10 +12,6 @@ export default function contacts(state = {contacts: []}, action) {
             return Object.assign({}, state, {
                 contacts: state.contacts.concat(action.payload)
             });
-        case ADD_CONTACT:
-            return Object.assign({}, state, {
-                contacts: state.contacts.concat(action.payload)
-            });
         case REMOVE_CONTACT:
             return Object.assign({}, state, {
                 contacts: state.contacts.filter(contact => contact !== action.payload)

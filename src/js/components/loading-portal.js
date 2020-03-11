@@ -2,19 +2,10 @@ import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from "react-redux";
 import {toODataString} from '@progress/kendo-data-query';
-import {getUsers} from '../actions/index';
 import {Notification, NotificationGroup} from '@progress/kendo-react-notification';
 import {Fade} from '@progress/kendo-react-animation'
 
-function mapDispatchToProps(dispatch) {
-    return {
-        getContacts: function () {
-            return dispatch(getUsers())
-        }
-    };
-}
-
-class ConnectedDataLoader extends Component {
+class DataLoader extends Component {
     state = {
         lastSuccess: '',
         pending: '',
@@ -102,5 +93,5 @@ class LoadingPanel extends Component {
     }
 }
 
-export default connect(null, mapDispatchToProps)(ConnectedDataLoader);
+export default DataLoader;
 

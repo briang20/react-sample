@@ -9,10 +9,5 @@ export const defaultRoutes = (
         <Route exact path={"/"} component={UserTable}/>
         <Route path={'/users'} component={UserTable}/>
         <Route path={"/groups"} component={GroupsTable}/>
-        <Route path={'/test'} render={() => (
-            <>
-                <img src={logo} className={"App-logo"} alt={"logo"}/>
-                <h1 className={"App-title"}>Welcome</h1>
-            </>)}/>
     </Switch>
 );

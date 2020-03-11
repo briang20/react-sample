@@ -16,10 +16,6 @@ export function updateUsers(payload) {
     return {type: UPDATE_CONTACTS, payload}
 }
 
-export function addUser(payload) {
-    return {type: ADD_CONTACT, payload}
-}
-
 export function removeUser(payload) {
     return {type: REMOVE_CONTACT, payload}
 }
