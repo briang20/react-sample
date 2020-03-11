@@ -1,9 +1,7 @@
 import React from "react";
 import configureStore from 'redux-mock-store';
-import {applyMiddleware, createStore} from 'redux'
 import {Provider} from 'react-redux'
 import {render, fireEvent} from '@testing-library/react'
-import reducer from '../reducers/index'
 import App from '../App';
 import thunk from "redux-thunk";
 import {createMiddleware} from "redux-callapi-middleware";

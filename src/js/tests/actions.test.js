@@ -1,16 +1,20 @@
 import configureStore from 'redux-mock-store';
 import thunk from 'redux-thunk'
 import {
-    addUser,
     removeUser,
     modifyUser,
-    clearUsers, updateUsers
+    clearUsers,
+    updateUsers
 } from "../actions/index";
 import {
-    ADD_CONTACT,
     REMOVE_CONTACT,
     MODIFY_CONTACT,
-    CLEAR_CONTACTS, MODIFY_USER_GROUPS, REMOVE_USER_GROUPS, CLEAR_USER_GROUPS, UPDATE_USER_GROUPS, UPDATE_CONTACTS
+    CLEAR_CONTACTS,
+    MODIFY_USER_GROUPS,
+    REMOVE_USER_GROUPS,
+    CLEAR_USER_GROUPS,
+    UPDATE_USER_GROUPS,
+    UPDATE_CONTACTS
 } from "../constants/action-types";
 import {createMiddleware} from "redux-callapi-middleware";
 import {clearUserGroups, modifyUserGroups, removeUserGroups, updateUserGroups} from "../actions/group-actions";

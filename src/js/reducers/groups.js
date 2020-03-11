@@ -18,7 +18,7 @@ export default function groups(state = {groups: []}, action) {
         case MODIFY_USER_GROUPS:
             return Object.assign({}, state, {
                 groups: state.groups.map(group => {
-                    if (group.value === action.payload.value)
+                    if (group.id === action.payload.id)
                         return action.payload;
                     return group;
                 })

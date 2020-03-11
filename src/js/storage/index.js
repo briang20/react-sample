@@ -20,7 +20,7 @@ const middleware = [thunk.withExtraArgument(api), apiMiddleware];
 
 export default function configureStore(initialState) {
     return createStore(reducer,
-        {},
+        initialState,
         applyMiddleware(...middleware)
     );
 }
