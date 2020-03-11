@@ -5,21 +5,10 @@ import {
     clearUsers,
     updateUsers
 } from "../actions/index";
-import {
-    REMOVE_CONTACT,
-    MODIFY_CONTACT,
-    CLEAR_CONTACTS,
-    MODIFY_USER_GROUPS,
-    REMOVE_USER_GROUPS,
-    CLEAR_USER_GROUPS,
-    UPDATE_USER_GROUPS,
-    UPDATE_CONTACTS
-} from "../constants/action-types";
 import {createMiddleware} from "redux-callapi-middleware";
 import {clearUserGroups, modifyUserGroups, removeUserGroups, updateUserGroups} from "../actions/group-actions";
 import {applyMiddleware, createStore} from "redux";
 import reducer from "../reducers";
-
 
 const onSuccess = (response) => {
     if (!response.ok) throw new Error('Error');
@@ -39,7 +28,6 @@ function configureStore(initialState) {
 }
 
 it('should add a user', function () {
-    // Initialize mockstore with empty state
     const initialState = {};
     const store = configureStore(initialState);
     const opts = {'name': 'test'};
@@ -51,7 +39,6 @@ it('should add a user', function () {
 });
 
 it('should remove a user', function () {
-    // Initialize mockstore with empty state
     const opts = {'id': 1, 'name': 'test'};
     const initialState = {contacts: {contacts: [opts]}};
     const store = configureStore(initialState);
@@ -63,7 +50,6 @@ it('should remove a user', function () {
 });
 
 it('should modify a user', function () {
-    // Initialize mockstore with empty state
     const initialState = {contacts: {contacts: [{'id': 1, 'name': 'test'}]}};
     const store = configureStore(initialState);
     const opts = {'id': 1, 'name': 'test1'};
@@ -75,7 +61,6 @@ it('should modify a user', function () {
 });
 
 it('should clear the user store', function () {
-    // Initialize mockstore with empty state
     const initialState = {contacts: {contacts: [{'id': 1, 'name': 'test'}]}};
     const store = configureStore(initialState);
     store.dispatch(clearUsers());
@@ -87,7 +72,6 @@ it('should clear the user store', function () {
 
 
 it('should add a group', function () {
-    // Initialize mockstore with empty state
     const initialState = {};
     const store = configureStore(initialState);
     const opts = {'id': 1, 'name': 'test'};
@@ -99,7 +83,6 @@ it('should add a group', function () {
 });
 
 it('should modify a group', function () {
-    // Initialize mockstore with empty state
     const initialState = {groups: {groups: [{'id': 1, 'name': 'test'}]}};
     const store = configureStore(initialState);
     const opts = {'id': 1, 'name': 'test1'};
@@ -122,7 +105,6 @@ it('should remove a group', function () {
 });
 
 it('should clear the groups store', function () {
-    // Initialize mockstore with empty state
     const initialState = {groups: {groups: [{'id': 1, 'name': 'test'}]}};
     const store = configureStore(initialState);
     store.dispatch(clearUserGroups());
