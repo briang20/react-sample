@@ -82,7 +82,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
         const data = this.props.groups;
         return (
             <>
-                {BuildHeader('Groups Table')}
+                {BuildHeader('Groups Table', '/groups')}
                 <div className={"usa-section"}>
                     <main className={"usa-layout-docs__main usa-prose usa-layout-docs"}
                           id={"main-content"}>
