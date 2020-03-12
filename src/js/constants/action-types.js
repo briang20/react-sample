@@ -1,11 +1,12 @@
 // src/js/constants/action-types.js
 
-export const ADD_CONTACT = "ADD_CONTACT";
 export const REMOVE_CONTACT = "REMOVE_CONTACT";
 export const MODIFY_CONTACT = "MODIFY_CONTACT";
 export const UPDATE_CONTACTS = "UPDATE_CONTACTS";
 export const CLEAR_CONTACTS = "CLEAR_CONTACTS";
 
+export const REMOVE_USER_GROUPS = "REMOVE_USER_GROUPS";
+export const MODIFY_USER_GROUPS = "MODIFY_USER_GROUPS";
 export const UPDATE_USER_GROUPS = "UPDATE_USER_GROUPS";
 export const CLEAR_USER_GROUPS = "CLEAR_USER_GROUPS";
 

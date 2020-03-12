@@ -1,5 +1,4 @@
 import {
-    ADD_CONTACT,
     CLEAR_CONTACTS,
     MODIFY_CONTACT,
     REMOVE_CONTACT,
@@ -9,10 +8,6 @@ import {
 export default function contacts(state = {contacts: []}, action) {
     switch (action.type) {
         case UPDATE_CONTACTS:
-            return Object.assign({}, state, {
-                contacts: state.contacts.concat(action.payload)
-            });
-        case ADD_CONTACT:
             return Object.assign({}, state, {
                 contacts: state.contacts.concat(action.payload)
             });

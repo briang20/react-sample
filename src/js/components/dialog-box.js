@@ -16,14 +16,16 @@ export function ModalDialog(dialogs, callback) {
                                       onClose={() => {
                                           if (callback && typeof callback === 'function') callback.call(undefined, action, 'close')
                                       }}>
-            <p style={{margin: "25px", textAlign: "center"}}>{question}</p>
+            <p style={{margin: "25px", textAlign: "center"}} data-testid={"dialog-text"}>{question}</p>
             <DialogActionsBar>
                 <button className="k-button"
+                        data-testid={"dialog-yes"}
                         onClick={() => {
                             if (callback && typeof callback === 'function') callback.call(undefined, action, 'yes')
                         }}>Yes
                 </button>
                 <button className="k-button"
+                        data-testid={"dialog-no"}
                         onClick={() => {
                             if (callback && typeof callback === 'function') callback.call(undefined, action, 'no')
                         }}>No

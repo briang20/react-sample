@@ -1,13 +1,17 @@
 import React, {Component} from 'react';
 import {MultiSelect} from '@progress/kendo-react-dropdowns';
 
-export function MultiSelectCell({options}) {
+export function MultiSelectCell({options, textField = 'name', dataField = 'id'}) {
     return class extends Component {
         options = [];
+        textField = 'name';
+        dataField = 'id';
 
         constructor(props) {
             super(props);
             this.options = options.concat(this.options);
+            this.textField = textField;
+            this.dataField = dataField;
         }
 
         handleChange = (e) => {
@@ -33,13 +37,13 @@ export function MultiSelectCell({options}) {
                         data={selectableOptions}
                         value={selectableOptions.filter(option => {
                             for (let value of dataValue) {
-                                if (option.value === value)
+                                if (option[this.dataField] === value)
                                     return true;
                             }
                             return false;
                         })}
-                        textField="text"
-                        dataItemKey="value"
+                        textField={this.textField}
+                        dataItemKey={this.dataField}
                     />
                 </td>
             );

@@ -77,20 +77,24 @@
   ],
   "groups": [
     {
-      "text": "admin",
-      "value": 1
+      "id": 1,
+      "name": "admin"
     },
     {
-      "text": "user",
-      "value": 2
+      "id": 2,
+      "name": "user"
     },
     {
-      "text": "security",
-      "value": 3
+      "id": 3,
+      "name": "security"
     },
     {
-      "text": "privileged user",
-      "value": 4
+      "id": 4,
+      "name": "privileged user"
+    },
+    {
+      "name": "test group",
+      "id": 5
     }
   ]
 }
