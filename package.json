@@ -29,7 +29,7 @@
     "uswds": "^2.4.0"
   },
   "scripts": {
-    "start-api": "json-server --watch db.json --host 0.0.0.0 --port 3004",
+    "start-api": "json-server --watch db.json --host localhost --port 3004",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
