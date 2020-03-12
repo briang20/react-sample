@@ -6,7 +6,6 @@ import App from '../App';
 import thunk from "redux-thunk";
 import {createMiddleware} from "redux-callapi-middleware";
 import {BrowserRouter as Router} from "react-router-dom";
-import GroupsTable from "../views/groups-table";
 
 const onSuccess = (response) => {
     if (!response.ok) {
@@ -300,46 +299,5 @@ describe('testing user ui', () => {
         fireEvent.click(refreshButton);
 
         expect(store.getState().contacts.contacts.length).toBe(1);
-    });
-});
-
-describe('testing group ui', () => {
-    beforeEach(() => {
-        fetch.resetMocks();
-    });
-
-    it('should render columns correctly', function () {
-        fetch.mockResponse(JSON.stringify([]));
-        const {getByText} = renderWithRedux(<App/>);
-
-        expect(getByText('#')).toBeInTheDocument();
-        expect(getByText('Name')).toBeInTheDocument();
-    });
-
-    it('should be able to add a row', function () {
-        fetch.mockResponses(
-            // Initial qpi call
-            [
-                JSON.stringify([]),
-                {status: 200}
-            ],
-            [
-                JSON.stringify([]),
-                {status: 200}
-            ],
-            // API call after first add
-            [
-                JSON.stringify([{id: 1}]),
-                {status: 200}
-            ]
-        );
-
-        const {getByTestId, store} = renderWithRedux(<GroupsTable/>, {
-            initialState: initialState,
-        });
-
-        fireEvent.click(getByTestId('add-row'));
-        // TODO: set the name here
-        fireEvent.click(getByTestId('final-add-row'));
     });
 });
