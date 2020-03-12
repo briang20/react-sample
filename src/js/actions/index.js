@@ -2,7 +2,6 @@
 
 import {CALL_API} from "redux-callapi-middleware";
 import {
-    ADD_CONTACT,
     REMOVE_CONTACT,
     MODIFY_CONTACT,
     UPDATE_CONTACTS,

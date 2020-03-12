@@ -1,5 +1,4 @@
 import {
-    ADD_CONTACT,
     CLEAR_CONTACTS,
     MODIFY_CONTACT,
     REMOVE_CONTACT,

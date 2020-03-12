@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {connect} from "react-redux";
 import {toODataString} from '@progress/kendo-data-query';
 import {Notification, NotificationGroup} from '@progress/kendo-react-notification';
 import {Fade} from '@progress/kendo-react-animation'

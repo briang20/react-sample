@@ -62,7 +62,7 @@ export function getGroups() {
 
 export function postGroups(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchGroups('post', JSON.stringify(opts), opts.value))
+        return dispatch(fetchGroups('post', JSON.stringify(opts), opts.id))
             .then(async res => {
                 if (res.type === GROUPS_API_SUCCESS) {
                     const data = await res.payload.json();
@@ -76,7 +76,7 @@ export function postGroups(opts) {
 
 export function putGroups(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchGroups('put', JSON.stringify(opts), opts.value))
+        return dispatch(fetchGroups('put', JSON.stringify(opts), opts.id))
             .then(async res => {
                 if (res.type === GROUPS_API_SUCCESS) {
                     const data = await res.payload.json();
@@ -90,11 +90,10 @@ export function putGroups(opts) {
 
 export function deleteGroups(opts) {
     return (dispatch, getState, api) => {
-        return dispatch(fetchGroups('delete', null, opts.value))
+        return dispatch(fetchGroups('delete', null, opts.id))
             .then(async res => {
                 if (res.type === GROUPS_API_SUCCESS) {
-                    const data = await res.payload.json();
-                    dispatch(removeUserGroups(data));
+                    dispatch(removeUserGroups(opts));
                 }
                 return {...res, data: null};
             });

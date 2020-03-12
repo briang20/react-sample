@@ -19,7 +19,7 @@ export function DropDownCell({options}) {
                 syntheticEvent: event.syntheticEvent,
                 value: event.target.value.value
             });
-        }
+        };
 
         render() {
             const {dataItem, field} = this.props;
