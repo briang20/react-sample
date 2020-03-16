@@ -34,7 +34,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
     editField = "inEdit";
     selectedField = "selected";
     columns = [
-        {title: '#', field: 'value', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
+        {title: '#', field: 'id', width: '75px', filter: 'numeric', editable: false, columnMenu: ColumnMenu},
         {title: 'Name', field: 'name', editor: 'text', required: true, columnMenu: ColumnMenu}
     ];
     GridColumns = GridColumns(this.columns, this.editField);
@@ -98,7 +98,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(class GroupsTable ex
                                   fetchData={this.props.getGroups}
                                   editField={this.editField}
                                   selectedField={this.selectedField}
-                                  idField={'value'}
+                                  idField={'id'}
                                   columns={this.columns}
                             >
                                 {this.GridColumns}
